@@ -157,6 +157,55 @@
 
 
 
+
+
+//// Unit go to Move Position
+//public class UnitMoveSystem : JobComponentSystem
+//{
+
+//    private struct Job : IJobForEachWithEntity<MoveTo, Translation, Skeleton_PlayAnim>
+//    {
+
+//        public float deltaTime;
+
+//        public void Execute(Entity entity, int index, ref MoveTo moveTo, ref Translation translation, ref Skeleton_PlayAnim skeletonPlayAnim)
+//        {
+//            if (moveTo.move)
+//            {
+//                float reachedPositionDistance = 1f;
+//                if (math.distance(translation.Value, moveTo.position) > reachedPositionDistance)
+//                {
+//                    // Far from target position, Move to position
+//                    float3 moveDir = math.normalize(moveTo.position - translation.Value);
+//                    moveTo.lastMoveDir = moveDir;
+//                    translation.Value += moveDir * moveTo.moveSpeed * deltaTime;
+//                    skeletonPlayAnim.PlayAnim(ECS_UnitAnimType.TypeEnum.dMarine_Walk, moveDir, default);
+//                }
+//                else
+//                {
+//                    // Already there
+//                    skeletonPlayAnim.PlayAnim(ECS_UnitAnimType.TypeEnum.dMarine_Idle, moveTo.lastMoveDir, default);
+//                    moveTo.move = false;
+//                }
+//            }
+//        }
+//    }
+
+//    protected override JobHandle OnUpdate(JobHandle inputDeps)
+//    {
+//        Job job = new Job
+//        {
+//            deltaTime = Time.DeltaTime,
+//        };
+//        return job.Schedule(this, inputDeps);
+//    }
+
+//}
+
+
+
+
+
 /* 
     ------------------- Code Monkey -------------------
 
