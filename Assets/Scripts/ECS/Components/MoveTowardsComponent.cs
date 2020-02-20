@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 [GenerateAuthoringComponent]
-public struct PlayerInputComponent : IComponentData
+
+public struct MoveTowardsComponent : IComponentData
 {
-    public bool LeftClick;
-    public bool RightClick;
+    public float3 TargetPosition;
 }
