@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class SpawnSystem : ComponentSystem
@@ -9,8 +10,7 @@ public class SpawnSystem : ComponentSystem
     {
         if (Input.GetKeyDown(KeyCode.B))
         {
-            EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            entityManager.Instantiate(PrefabsManager.Instance.EntityPrefabs[0]);
+
         }
     }
 }
