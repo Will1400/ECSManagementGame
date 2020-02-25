@@ -18,7 +18,7 @@ public class ECSRaycast : MonoBehaviour
         RaycastInput raycastInput = new RaycastInput
         {
             Start = fromPosition,
-            End = toPosition,
+            End = toPosition, 
             Filter = new CollisionFilter
             {
                 BelongsTo = ~0u,

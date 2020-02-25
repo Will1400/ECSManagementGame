@@ -49,4 +49,13 @@ public class PrefabManager : MonoBehaviour
     {
         return unitPrefabs.Select(x => x.name).ToList().IndexOf(unitName);
     }
+
+    public GameObject GetPrefabByName(string name)
+    {
+        if (name.Contains("(Clone)"))
+        {
+            name = name.Replace("(Clone)", string.Empty);
+        }
+        return buildingPrefabs.Concat(unitPrefabs).FirstOrDefault(x => x.name == name);
+    }
 }

@@ -4,6 +4,9 @@ using UnityEngine.EventSystems;
 using Unity.Entities;
 using Unity.Mathematics;
 using System;
+using Unity.Rendering;
+using Unity.Collections;
+using Unity.Transforms;
 
 public class PlacementManager : MonoBehaviour
 {
@@ -13,6 +16,7 @@ public class PlacementManager : MonoBehaviour
     private uint collisionLayerMask;
     [SerializeField]
     private GameObject currentObject;
+
 
     private void Awake()
     {
@@ -71,16 +75,21 @@ public class PlacementManager : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        var hit = ECSRaycast.Raycast(ray.origin, ray.direction * 100, collisionLayerMask);
+        var hit = ECSRaycast.Raycast(ray.origin, ray.direction * 999, collisionLayerMask);
         currentObject.transform.position = hit.Position;
     }
 
     void PlaceCurrentObject()
     {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        var constructionEntity = entityManager.CreateEntity(typeof(UnderConstruction),
+                                                            typeof(NeedsWorkersTag),
+                                                            typeof(Translation));
 
-        currentObject.AddComponent<ConvertToEntity>();
+        entityManager.AddComponentData(constructionEntity, new Translation { Value = currentObject.transform.position });
+        entityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, maxWorkers = 3, finishedPrefabName = currentObject.name });
 
+        CancelBuild();
         GameManager.Instance.CursorState = CursorState.None;
     }
 
