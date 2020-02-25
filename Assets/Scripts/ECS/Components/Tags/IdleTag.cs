@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Entities;
 
 [GenerateAuthoringComponent]
-public struct NeedsWorkersTag : IComponentData
+public struct IdleTag : IComponentData
 {
 }
+

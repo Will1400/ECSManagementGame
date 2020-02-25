@@ -17,11 +17,11 @@ public class MoveTowardsSystem : JobComponentSystem
         return moveJob.Schedule(this, inputDeps);
     }
 
-    private struct MoveJob : IJobForEachWithEntity<MoveTowardsComponent, Translation, MoveSpeed>
+    private struct MoveJob : IJobForEachWithEntity<MoveTowards, Translation, MoveSpeed>
     {
         public float deltatime;
 
-        public void Execute(Entity entity, int index, ref MoveTowardsComponent moveTowardsComponent, ref Translation translation, ref MoveSpeed moveSpeedComponent)
+        public void Execute(Entity entity, int index, ref MoveTowards moveTowardsComponent, ref Translation translation, ref MoveSpeed moveSpeedComponent)
         {
             if (math.distance(translation.Value, moveTowardsComponent.TargetPosition) > .05f)
             {

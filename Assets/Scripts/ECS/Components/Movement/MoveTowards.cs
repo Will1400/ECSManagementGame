@@ -6,7 +6,7 @@ using UnityEngine;
 
 [GenerateAuthoringComponent]
 
-public struct MoveTowardsComponent : IComponentData
+public struct MoveTowards : IComponentData
 {
     public float3 TargetPosition;
 }

@@ -38,7 +38,7 @@ public class PlacementManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            SpawnUnit("Swordmen");
+            SpawnUnit("Citizen");
         }
 
         if (GameManager.Instance.CursorState == CursorState.Building)
@@ -64,7 +64,8 @@ public class PlacementManager : MonoBehaviour
     public void SpawnUnit(string unitName)
     {
         CancelBuild();
-        GameManager.Instance.CursorState = CursorState.Building;
+
+        Instantiate(Resources.Load<GameObject>("Prefabs/Citizen"));
     }
 
     public void SpawnBuilding(string buildingName)
@@ -87,7 +88,7 @@ public class PlacementManager : MonoBehaviour
     {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         var constructionEntity = entityManager.CreateEntity(typeof(UnderConstruction),
-                                                            typeof(NeedsWorkersTag),
+                                                            typeof(NeedsWorkers),
                                                             typeof(Translation));
 
         entityManager.AddComponentData(constructionEntity, new Translation { Value = currentObject.transform.position });

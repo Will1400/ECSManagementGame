@@ -22,9 +22,9 @@ public class ConstructionSystem : ComponentSystem
             {
                 construction.remainingConstructionTime -= Time.DeltaTime * (construction.currentWorkers / .5f);
             }
-            else if (construction.currentWorkers != -1 &&  !EntityManager.HasComponent(entity, typeof(NeedsWorkersTag)))
+            else if (construction.currentWorkers != -1 &&  !EntityManager.HasComponent(entity, typeof(NeedsWorkers)))
             {
-                EntityManager.AddComponent(entity, typeof(NeedsWorkersTag));
+                EntityManager.AddComponent(entity, typeof(NeedsWorkers));
             }
 
             if (construction.remainingConstructionTime <= 0)

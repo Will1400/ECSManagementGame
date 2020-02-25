@@ -16,7 +16,7 @@ public class UnitControlSystem : ComponentSystem
 
             int row = -1;
             int i = 0;
-            Entities.ForEach((ref MoveTowardsComponent moveTowards) =>
+            Entities.ForEach((ref MoveTowards moveTowards) =>
             {
                 if (i % 10 == 0)
                     row++;
