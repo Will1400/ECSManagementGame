@@ -16,7 +16,7 @@ public class PlacementManager : MonoBehaviour
     private uint collisionLayerMask;
     [SerializeField]
     private GameObject currentObject;
-
+    private float3 currentObjectOffset;
 
     private void Awake()
     {
@@ -31,7 +31,10 @@ public class PlacementManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SpawnBuilding("TallHouse");
+            if (currentObject != null)
+                SpawnBuilding(PrefabManager.Instance.GetBuilding(1).name);
+            else
+                SpawnBuilding("TallHouse");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -68,6 +71,7 @@ public class PlacementManager : MonoBehaviour
     {
         CancelBuild();
         currentObject = Instantiate(PrefabManager.Instance.GetBuilding(buildingName));
+        currentObjectOffset = currentObject.transform.position;
         GameManager.Instance.CursorState = CursorState.Building;
     }
 
@@ -76,7 +80,7 @@ public class PlacementManager : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         var hit = ECSRaycast.Raycast(ray.origin, ray.direction * 999, collisionLayerMask);
-        currentObject.transform.position = hit.Position;
+        currentObject.transform.position = hit.Position + currentObjectOffset;
     }
 
     void PlaceCurrentObject()
@@ -87,7 +91,7 @@ public class PlacementManager : MonoBehaviour
                                                             typeof(Translation));
 
         entityManager.AddComponentData(constructionEntity, new Translation { Value = currentObject.transform.position });
-        entityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, maxWorkers = 3, finishedPrefabName = currentObject.name });
+        entityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, maxWorkers = 3, currentWorkers = 1, finishedPrefabName = currentObject.name });
 
         CancelBuild();
         GameManager.Instance.CursorState = CursorState.None;

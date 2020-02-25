@@ -454,6 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingPrefabs:
   - {fileID: 6937537905966124670, guid: 6cd26999bd449694083638dd95378eb9, type: 3}
+  - {fileID: 4851850016261904117, guid: d469cc562f6280d4b836527444ed15df, type: 3}
   unitPrefabs:
   - {fileID: 3935147142508643628, guid: 9e9108a4c5a49644d9d868b1ed264992, type: 3}
 --- !u!4 &435013944
@@ -963,7 +964,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1977384660}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 17.1}
+  m_LocalPosition: {x: 0, y: 0, z: 17}
   m_LocalScale: {x: 8, y: 1, z: 8}
   m_Children: []
   m_Father: {fileID: 999815830}

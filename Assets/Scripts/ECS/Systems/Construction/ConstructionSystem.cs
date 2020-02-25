@@ -7,13 +7,9 @@ using UnityEngine;
 public class ConstructionSystem : ComponentSystem
 {
     EntityQuery allSitesQuery;
-    EntityQuery sitesNeedingWorkersQuery;
 
     protected override void OnCreate()
     {
-        sitesNeedingWorkersQuery = Entities.WithAll<UnderConstruction, NeedsWorkersTag, Translation>()
-                        .ToEntityQuery();
-
         allSitesQuery = Entities.WithAll<UnderConstruction, Translation>()
                         .ToEntityQuery();
     }
@@ -24,12 +20,17 @@ public class ConstructionSystem : ComponentSystem
         {
             if (construction.currentWorkers >= 0)
             {
-                construction.remainingConstructionTime -= Time.DeltaTime;
+                construction.remainingConstructionTime -= Time.DeltaTime * (construction.currentWorkers / .5f);
             }
+            else if (construction.currentWorkers != -1 &&  !EntityManager.HasComponent(entity, typeof(NeedsWorkersTag)))
+            {
+                EntityManager.AddComponent(entity, typeof(NeedsWorkersTag));
+            }
+
             if (construction.remainingConstructionTime <= 0)
             {
                 var prefab = PrefabManager.Instance.GetPrefabByName(construction.finishedPrefabName.ToString());
-                GameObject.Instantiate(prefab, translation.Value, prefab.transform.rotation).AddComponent(typeof(ConvertToEntity));
+                Object.Instantiate(prefab, translation.Value, prefab.transform.rotation).AddComponent(typeof(ConvertToEntity));
                 construction.currentWorkers = -1;
                 EntityManager.DestroyEntity(entity);
             }
