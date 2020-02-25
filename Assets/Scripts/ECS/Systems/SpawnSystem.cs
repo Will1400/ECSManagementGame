@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 public class SpawnSystem : ComponentSystem
@@ -10,7 +11,6 @@ public class SpawnSystem : ComponentSystem
     {
         if (Input.GetKeyDown(KeyCode.B))
         {
-
         }
     }
 }
