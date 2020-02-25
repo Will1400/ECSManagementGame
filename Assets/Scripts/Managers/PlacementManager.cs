@@ -20,14 +20,14 @@ public class PlacementManager : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
-        collisionLayerMask = Convert.ToUInt32(LayerMask.GetMask("Terrain"));
+        collisionLayerMask = 1u << 9;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SpawnBuilding("House1v1");
+            SpawnBuilding("TallHouse");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -71,8 +71,8 @@ public class PlacementManager : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        var raycastHit = ECSRaycast.Raycast(ray.origin, ray.direction * 100, collisionLayerMask);
-        currentObject.transform.position = raycastHit.Position + new float3(0, currentObject.transform.localScale.y / 2, 0);
+        var hit = ECSRaycast.Raycast(ray.origin, ray.direction * 100, collisionLayerMask);
+        currentObject.transform.position = hit.Position;
     }
 
     void PlaceCurrentObject()
