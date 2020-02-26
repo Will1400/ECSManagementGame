@@ -92,7 +92,8 @@ public class PlacementManager : MonoBehaviour
                                                             typeof(Translation));
 
         entityManager.AddComponentData(constructionEntity, new Translation { Value = currentObject.transform.position });
-        entityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, maxWorkers = 3, currentWorkers = 1, finishedPrefabName = currentObject.name });
+        entityManager.AddComponentData(constructionEntity, new NeedsWorkers { WorkersNeeded = 3, WorkPosition = currentObject.transform.position });
+        entityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, maxWorkers = 3, currentWorkers = 0, finishedPrefabName = currentObject.name });
 
         CancelBuild();
         GameManager.Instance.CursorState = CursorState.None;

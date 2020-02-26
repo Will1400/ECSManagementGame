@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Transforms;
 using Unity.Mathematics;
+using Unity.Collections;
 
 public class CitizenWorkMovement : JobComponentSystem
 {
@@ -19,8 +20,8 @@ public class CitizenWorkMovement : JobComponentSystem
 
     private struct MoveJob : IJobForEachWithEntity<GoingToWorkTag, CitizenWork, MoveSpeed, Translation, Rotation>
     {
+        [ReadOnly]
         public float deltatime;
-        public EntityCommandBuffer commandBuffer;
 
         public void Execute(Entity entity, int index, ref GoingToWorkTag goingToWork, ref CitizenWork work, ref MoveSpeed moveSpeed, ref Translation translation, ref Rotation rotation)
         {
