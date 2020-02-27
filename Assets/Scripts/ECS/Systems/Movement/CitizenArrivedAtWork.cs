@@ -4,7 +4,6 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 
-[UpdateBefore(typeof(CitizenWorkAssignmentSystem))]
 [UpdateAfter(typeof(CitizenWorkMovement))]
 public class CitizenArrivedAtWork : ComponentSystem
 {
