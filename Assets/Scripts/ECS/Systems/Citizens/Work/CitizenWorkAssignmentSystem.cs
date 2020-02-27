@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Collections;
+using Unity.Jobs;
 
 public class CitizenWorkAssignmentSystem : ComponentSystem
 {
@@ -20,23 +21,27 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-
-        Entities.With(idleCitizensQuery).ForEach((Entity entity, ref Citizen citizen) =>
+        Entities.With(needsWorkersQuery).ForEach((Entity workPlace, ref BuildingWorkerData workerData) =>
         {
-            Entities.With(needsWorkersQuery).ForEach((Entity workPlaceEntity, ref BuildingWorkerData workerData) =>
+            if (workerData.CurrentWorkers < workerData.MaxWorkers)
             {
-                if (workerData.CurrentWorkers < workerData.MaxWorkers)
+                int currentWorkers = workerData.CurrentWorkers;
+                BuildingWorkerData tempWorkerData = workerData;
+                Entities.With(idleCitizensQuery).ForEach((Entity citizen) =>
                 {
-                    EntityManager.AddComponent<GoingToWorkTag>(entity);
-                    if (!EntityManager.HasComponent<CitizenWork>(entity))
-                        EntityManager.AddComponent<CitizenWork>(entity);
+                    if (currentWorkers < tempWorkerData.MaxWorkers)
+                    {
+                        EntityManager.AddComponent<GoingToWorkTag>(citizen);
+                        EntityManager.AddComponent<CitizenWork>(citizen);
 
-                    EntityManager.AddComponentData(entity, new CitizenWork { WorkPlaceEntity = workPlaceEntity, WorkPosition = workerData.WorkPosition });
+                        EntityManager.AddComponentData(citizen, new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = tempWorkerData.WorkPosition });
 
-                    workerData.CurrentWorkers++;
-                    EntityManager.RemoveComponent<IdleTag>(entity);
-                }
-            });
+                        currentWorkers++;
+                        EntityManager.RemoveComponent<IdleTag>(citizen);
+                    }
+                });
+                workerData.CurrentWorkers = currentWorkers;
+            }
         });
     }
 }
