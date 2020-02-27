@@ -2,7 +2,6 @@
 using System.Collections;
 using Unity.Entities;
 
-[GenerateAuthoringComponent]
-public struct HasWorkTag : IComponentData
+public struct RemoveWorkPlaceTag : IComponentData
 {
 }

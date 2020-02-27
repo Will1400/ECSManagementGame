@@ -13,34 +13,30 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
     {
         idleCitizensQuery = Entities.WithAll<Citizen, IdleTag>()
                                     .ToEntityQuery();
-        needsWorkersQuery = Entities.WithAll<NeedsWorkers>()
-                                   .ToEntityQuery();
+        needsWorkersQuery = Entities.WithAll<BuildingWorkerData>()
+                                    .WithNone<RemoveWorkPlaceTag>()
+                                    .ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
-        NativeArray<Entity> availableWorkPlaces = needsWorkersQuery.ToEntityArray(Allocator.TempJob);
-        NativeArray<NeedsWorkers> availableWork = needsWorkersQuery.ToComponentDataArray<NeedsWorkers>(Allocator.TempJob);
 
-        int workIndex = 0;
         Entities.With(idleCitizensQuery).ForEach((Entity entity, ref Citizen citizen) =>
         {
-            if (availableWork.Length > 0)
+            Entities.With(needsWorkersQuery).ForEach((Entity workPlaceEntity, ref BuildingWorkerData workerData) =>
             {
-                if (availableWork[workIndex].WorkersNeeded > 0)
+                if (workerData.CurrentWorkers < workerData.MaxWorkers)
                 {
                     EntityManager.AddComponent<GoingToWorkTag>(entity);
                     if (!EntityManager.HasComponent<CitizenWork>(entity))
                         EntityManager.AddComponent<CitizenWork>(entity);
 
+                    EntityManager.AddComponentData(entity, new CitizenWork { WorkPlaceEntity = workPlaceEntity, WorkPosition = workerData.WorkPosition });
+
+                    workerData.CurrentWorkers++;
                     EntityManager.RemoveComponent<IdleTag>(entity);
-
-                    EntityManager.AddComponentData(entity, new CitizenWork { WorkPlaceEntity = availableWorkPlaces[workIndex], WorkPosition = availableWork[workIndex].WorkPosition });
                 }
-            }
+            });
         });
-
-        availableWorkPlaces.Dispose();
-        availableWork.Dispose();
     }
 }

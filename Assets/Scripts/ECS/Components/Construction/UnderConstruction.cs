@@ -8,7 +8,5 @@ public struct UnderConstruction : IComponentData
 {
     public float totalConstructionTime;
     public float remainingConstructionTime;
-    public float maxWorkers;
-    public float currentWorkers;
     public NativeString128 finishedPrefabName;
 }

@@ -18,21 +18,18 @@ public class CitizenWorkMovement : JobComponentSystem
         return moveJob.Schedule(this, inputDeps);
     }
 
-    private struct MoveJob : IJobForEachWithEntity<GoingToWorkTag, CitizenWork, MoveSpeed, Translation, Rotation>
+    [RequireComponentTag(typeof(GoingToWorkTag))]
+    private struct MoveJob : IJobForEachWithEntity<CitizenWork, MoveSpeed, Translation, Rotation>
     {
-        [ReadOnly]
         public float deltatime;
 
-        public void Execute(Entity entity, int index, ref GoingToWorkTag goingToWork, ref CitizenWork work, ref MoveSpeed moveSpeed, ref Translation translation, ref Rotation rotation)
+        public void Execute(Entity entity, int index, ref CitizenWork work, ref MoveSpeed moveSpeed, ref Translation translation, ref Rotation rotation)
         {
             if (math.distance(translation.Value, work.WorkPosition) >= .2f)
             {
-                float3 direction = math.normalize(work.WorkPosition- translation.Value);
+                float3 direction = math.normalize(work.WorkPosition - translation.Value);
                 direction.y = 0;
                 translation.Value += direction * moveSpeed.Speed * deltatime;
-            }
-            else
-            {
             }
         }
     }

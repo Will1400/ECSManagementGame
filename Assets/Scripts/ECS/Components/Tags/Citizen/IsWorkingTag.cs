@@ -2,6 +2,7 @@
 using System.Collections;
 using Unity.Entities;
 
-public struct HasReachedWorkTag : IComponentData
+[GenerateAuthoringComponent]
+public struct IsWorkingTag : IComponentData
 {
 }
