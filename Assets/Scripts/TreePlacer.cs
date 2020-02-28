@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -14,6 +15,12 @@ public class TreePlacer : MonoBehaviour
 
     [SerializeField]
     float2 mapSize;
+    [SerializeField]
+    Texture2D texture;
+    [SerializeField]
+    float threshold = .4f;
+    [SerializeField]
+    int randomMax = 1;
 
     Queue<GameObject> SpawnedTrees;
     private void Start()
@@ -23,11 +30,11 @@ public class TreePlacer : MonoBehaviour
             Mesh planeMesh = ground.GetComponent<MeshFilter>().mesh;
             Bounds bounds = planeMesh.bounds;
             float boundsX = ground.transform.localScale.x * bounds.size.x;
-            float boundsY = ground.transform.localScale.y * bounds.size.y;
             float boundsZ = ground.transform.localScale.z * bounds.size.z;
             mapSize = new float2(boundsX, boundsZ);
         }
         SpawnedTrees = new Queue<GameObject>();
+        texture = new Texture2D((int)mapSize.x, (int)mapSize.y);
         PlaceTrees();
     }
 
@@ -40,11 +47,13 @@ public class TreePlacer : MonoBehaviour
             {
                 var point = Mathf.PerlinNoise(x / mapSize.x, y / mapSize.y);
                 point = point + 0.01f;
-                if (point >= .5f && Random.Range(0, 2) == 0)
+
+                texture.SetPixel(x,y, new Color(point, point, point));
+                if (point >= threshold && Random.Range(0, randomMax) == 0)
                 {
                     var tree = TreePrefabs[Random.Range(0, TreePrefabs.Count - 1)];
                     var spawnedTree = Instantiate(tree, new Vector3(x, 0, y), tree.transform.rotation);
-                    spawnedTree.transform.Rotate(new Vector3(0, Random.Range(0, 360)));
+                    spawnedTree.transform.eulerAngles += (new Vector3(0, Random.Range(0, 360)));
 
                     if (IsTreePlacementValid(spawnedTree.GetComponent<Collider>()))
                     {
