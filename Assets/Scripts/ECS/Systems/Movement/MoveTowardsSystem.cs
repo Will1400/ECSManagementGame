@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Jobs;
+using Unity.Collections;
 
 public class MoveTowardsSystem : JobComponentSystem
 {
@@ -21,7 +22,7 @@ public class MoveTowardsSystem : JobComponentSystem
     {
         public float deltatime;
 
-        public void Execute(Entity entity, int index, ref MoveTowards moveTowardsComponent, ref Translation translation, ref MoveSpeed moveSpeedComponent)
+        public void Execute(Entity entity, int index, [ReadOnly] ref MoveTowards moveTowardsComponent, ref Translation translation, [ReadOnly] ref MoveSpeed moveSpeedComponent)
         {
             if (math.distance(translation.Value, moveTowardsComponent.TargetPosition) > .05f)
             {

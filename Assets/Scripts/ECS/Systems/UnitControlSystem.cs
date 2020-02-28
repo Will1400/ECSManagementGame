@@ -4,28 +4,34 @@ using Unity.Entities;
 using Unity.Mathematics;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Jobs;
 
-public class UnitControlSystem : ComponentSystem
+public class UnitControlSystem : JobComponentSystem
 {
-    protected override void OnUpdate()
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
+        JobHandle job = new JobHandle();
         if (Input.GetMouseButtonDown(1))
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float3 targetPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 100).Position;
 
-            int row = -1;
-            int i = 0;
-            Entities.ForEach((ref MoveTowards moveTowards) =>
+            job = new SetPositionJob
             {
-                if (i % 10 == 0)
-                    row++;
+                targetPosition = targetPosition
+            }.Schedule(this, inputDeps);
+        }
 
-                float3 offset = new float3(1.5f, 0, 0) * (i % 10) + new float3(0, 0, row * 2);
+        return job;
+    }
 
-                moveTowards.TargetPosition = targetPosition + offset;
-                i++;
-            });
+    struct SetPositionJob : IJobForEachWithEntity<MoveTowards>
+    {
+        public float3 targetPosition;
+
+        public void Execute(Entity entity, int index, ref MoveTowards moveTowards)
+        {
+            moveTowards.TargetPosition = targetPosition;
         }
     }
 }
