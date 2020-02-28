@@ -29,7 +29,6 @@ public class ECSRaycast : MonoBehaviour
 
         if (collisionWorld.CastRay(raycastInput, out RaycastHit hit))
         {
-            var entity = buildPhysicsWorld.PhysicsWorld.Bodies[hit.RigidBodyIndex].Entity;
             return hit;
         }
 

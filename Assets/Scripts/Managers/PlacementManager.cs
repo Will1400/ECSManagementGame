@@ -78,6 +78,9 @@ public class PlacementManager : MonoBehaviour
 
     void MoveBuildingToMouse()
     {
+        if (currentObject == null)
+            return;
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         var hit = ECSRaycast.Raycast(ray.origin, ray.direction * 999, collisionLayerMask);

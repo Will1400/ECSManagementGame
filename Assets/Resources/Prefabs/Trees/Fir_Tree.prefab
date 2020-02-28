@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8598035139635722267}
   - component: {fileID: 723212400393650733}
   - component: {fileID: 6428277912202706644}
+  - component: {fileID: 1655440989114817803}
   m_Layer: 0
   m_Name: Fir_Tree
   m_TagString: Untagged
@@ -80,3 +81,16 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!65 &1655440989114817803
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4686279908090366472}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.037715558, y: 0.037702985, z: 0.05713142}
+  m_Center: {x: -0.00000039488077, y: 0.0000022575264, z: 0.028566537}
