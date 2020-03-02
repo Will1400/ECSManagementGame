@@ -5,19 +5,20 @@ using Unity.Jobs;
 using Unity.Transforms;
 using Unity.Mathematics;
 
-public class MoveToMousePositionSystem : JobComponentSystem
+public class PlacementPositionSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         var hit = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9);
         float3 mouseWorldPosition = hit.Position;
+        mouseWorldPosition = math.round(mouseWorldPosition);
 
         Job job = new Job { position = mouseWorldPosition };
         return job.Schedule(this, inputDeps);
     }
 
-    [RequireComponentTag(typeof(FollowsMousePositionTag))]
+    [RequireComponentTag(typeof(BeingPlacedTag))]
     public struct Job : IJobForEachWithEntity<Translation>
     {
         public float3 position;
