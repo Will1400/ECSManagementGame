@@ -23,7 +23,7 @@ public class CitizenWorkMovement : JobComponentSystem
     {
         public float deltatime;
 
-        public void Execute(Entity entity, int index, ref CitizenWork work, ref MoveSpeed moveSpeed, ref Translation translation, ref Rotation rotation)
+        public void Execute(Entity entity, int index, [ReadOnly] ref CitizenWork work, [ReadOnly] ref MoveSpeed moveSpeed, ref Translation translation, ref Rotation rotation)
         {
             if (math.distance(translation.Value, work.WorkPosition) >= .2f)
             {

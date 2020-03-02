@@ -667,7 +667,6 @@ GameObject:
   m_Component:
   - component: {fileID: 683806040}
   - component: {fileID: 683806039}
-  - component: {fileID: 683806041}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -704,27 +703,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &683806041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 683806038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fcba15bdd7eb634d9f7ba3ca5575dce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TreePrefabs:
-  - {fileID: 4686279908090366472, guid: 465c868c5ccca704b9f0e9b0c80e687b, type: 3}
-  - {fileID: 4933233804446065320, guid: d71587d2605bb2b489ff026ccea31edd, type: 3}
-  - {fileID: 6928695709443086216, guid: 38e7ca8291985784abbca829b8c28e21, type: 3}
-  - {fileID: 3672485806607329181, guid: 2f4085f8720454345a457c4f7a31adac, type: 3}
-  ground: {fileID: 1701700218}
-  mapSize:
-    x: 200
-    y: 200
 --- !u!1 &999815829
 GameObject:
   m_ObjectHideFlags: 0
