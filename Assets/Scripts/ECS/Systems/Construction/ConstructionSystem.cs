@@ -35,10 +35,10 @@ public class ConstructionSystem : ComponentSystem
                 Entity finishedEntity = ArcheTypeManager.Instance.GetSetupBuildingEntity(prefab.GetComponent<MeshFilter>().sharedMesh, prefab.GetComponent<Renderer>().sharedMaterial, prefab);
 
 
-                var occupation = GridHelper.CalculateGridOccupationFromBounds(EntityManager.GetComponentData<WorldRenderBounds>(finishedEntity).Value);
-
                 EntityManager.AddComponentData(finishedEntity, new Translation { Value = translation.Value});
-                EntityManager.AddComponentData(finishedEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
+
+                var occupation = EntityManager.GetComponentData<GridOccupation>(entity);
+                EntityManager.AddComponentData(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End});
 
                 workerData.CurrentWorkers = -1;
                 workerData.ActiveWorkers = -1;

@@ -44,6 +44,7 @@ public class ArcheTypeManager : MonoBehaviour
             typeof(Scale),
             typeof(RenderMesh),
             typeof(RenderBounds),
+            typeof(WorldRenderBounds),
             typeof(LocalToWorld),
             typeof(GridOccupation)));
 
@@ -54,6 +55,7 @@ public class ArcheTypeManager : MonoBehaviour
             typeof(Rotation),
             typeof(Scale),
             typeof(RenderMesh),
+            typeof(WorldRenderBounds),
             typeof(RenderBounds),
             typeof(LocalToWorld)));
     }
@@ -67,10 +69,10 @@ public class ArcheTypeManager : MonoBehaviour
     {
         Entity entity = entityManager.CreateEntity(GetArcheType(PredifinedArchetype.Building));
 
-        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material });
-        entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
         entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
         entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
+        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material });
+        entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
 
         return entity;
     }

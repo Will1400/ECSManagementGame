@@ -2,6 +2,6 @@
 using System.Collections;
 using Unity.Entities;
 
-public struct IsInCacheTag : ISystemStateComponentData
+public struct IsStationary : ISystemStateComponentData
 {
 }
