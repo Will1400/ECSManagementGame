@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -30,7 +32,14 @@ public class ConstructionSystem : ComponentSystem
             if (construction.remainingConstructionTime <= 0)
             {
                 var prefab = PrefabManager.Instance.GetPrefabByName(construction.finishedPrefabName.ToString());
-                Object.Instantiate(prefab, translation.Value, prefab.transform.rotation).AddComponent(typeof(ConvertToEntity));
+                Entity finishedEntity = ArcheTypeManager.Instance.GetSetupBuildingEntity(prefab.GetComponent<MeshFilter>().sharedMesh, prefab.GetComponent<Renderer>().sharedMaterial, prefab);
+
+
+                var occupation = GridHelper.CalculateGridOccupationFromBounds(EntityManager.GetComponentData<WorldRenderBounds>(finishedEntity).Value);
+
+                EntityManager.AddComponentData(finishedEntity, new Translation { Value = translation.Value});
+                EntityManager.AddComponentData(finishedEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
+
                 workerData.CurrentWorkers = -1;
                 workerData.ActiveWorkers = -1;
                 EntityManager.RemoveComponent<UnderConstruction>(entity);

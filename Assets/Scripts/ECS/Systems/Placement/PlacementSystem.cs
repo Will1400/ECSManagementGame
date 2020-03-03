@@ -9,23 +9,9 @@ using Unity.Collections;
 
 public class PlacementSystem : ComponentSystem
 {
-    public EntityArchetype entityPlacementArchetype;
-
     Entity currentEntity;
     string prefabName;
 
-    protected override void OnStartRunning()
-    {
-        base.OnStartRunning();
-        entityPlacementArchetype = EntityManager.CreateArchetype(typeof(BeingPlacedTag),
-                                                                 typeof(FollowsMousePositionTag),
-                                                                 typeof(Translation),
-                                                                 typeof(Rotation),
-                                                                 typeof(Scale),
-                                                                 typeof(RenderMesh),
-                                                                 typeof(RenderBounds),
-                                                                 typeof(LocalToWorld));
-    }
     protected override void OnUpdate()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -53,11 +39,14 @@ public class PlacementSystem : ComponentSystem
 
     private void Place()
     {
-        var constructionEntity = EntityManager.CreateEntity(typeof(UnderConstruction),
-                                                           typeof(BuildingWorkerData),
-                                                           typeof(Translation));
+        var constructionEntity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
+
         float3 position = EntityManager.GetComponentData<Translation>(currentEntity).Value;
 
+
+        var occupation = GridHelper.CalculateGridOccupationFromBounds(EntityManager.GetComponentData<WorldRenderBounds>(currentEntity).Value);
+
+        EntityManager.AddComponentData(constructionEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
         EntityManager.AddComponentData(constructionEntity, new Translation { Value = position });
         EntityManager.AddComponentData(constructionEntity, new BuildingWorkerData { MaxWorkers = 4, WorkPosition = position });
         EntityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = prefabName });
@@ -68,7 +57,7 @@ public class PlacementSystem : ComponentSystem
     void Spawn(GameObject prefab)
     {
         Cancel();
-        currentEntity = EntityManager.CreateEntity(entityPlacementArchetype);
+        currentEntity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.BeingPlaced));
         GameManager.Instance.CursorState = CursorState.Building;
         prefabName = prefab.name;
 

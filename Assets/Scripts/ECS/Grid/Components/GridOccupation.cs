@@ -2,11 +2,10 @@
 using System.Collections;
 using Unity.Entities;
 using Unity.Collections;
+using Unity.Mathematics;
 
 public struct GridOccupation : IComponentData
 {
-    public GridPosition StartX;
-    public GridPosition EndX;
-    public GridPosition StartY;
-    public GridPosition EndY;
+    public int2 Start;
+    public int2 End;
 }

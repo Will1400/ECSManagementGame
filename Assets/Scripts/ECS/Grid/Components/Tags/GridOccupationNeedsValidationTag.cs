@@ -2,6 +2,6 @@
 using System.Collections;
 using Unity.Entities;
 
-public struct GridPositionNeedsValidationTag : IComponentData
+public struct GridOccupationNeedsValidationTag : IComponentData
 {
 }

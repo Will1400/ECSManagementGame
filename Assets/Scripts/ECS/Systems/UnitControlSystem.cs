@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
-using Unity.Entities;
-using Unity.Mathematics;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
+using UnityEngine;
 
 public class UnitControlSystem : JobComponentSystem
 {
