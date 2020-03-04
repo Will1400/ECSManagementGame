@@ -23,6 +23,6 @@ public struct GridOccupation : IComponentData, IEquatable<GridOccupation>
         hash = (hash * 7) + Start.y;
         hash = (hash * 7) + End.x;
         hash = (hash * 7) + End.y;
-    return hash;
+        return hash;
     }
 }

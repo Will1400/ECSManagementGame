@@ -28,6 +28,7 @@ public class PlacementSystem : ComponentSystem
             Cancel();
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9).Position;
+            mouseWorldPosition.y = 1;
             GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Citizen"), mouseWorldPosition, Quaternion.identity);
         }
 
@@ -47,7 +48,6 @@ public class PlacementSystem : ComponentSystem
 
             if (Input.GetButton("Cancel") || Input.GetButton("Secondary Mouse"))
                 Cancel();
-
         }
     }
 
@@ -87,6 +87,7 @@ public class PlacementSystem : ComponentSystem
         if (currentEntity == Entity.Null)
             return;
 
+        prefabName = string.Empty;
         EntityManager.DestroyEntity(currentEntity);
         currentEntity = Entity.Null;
     }

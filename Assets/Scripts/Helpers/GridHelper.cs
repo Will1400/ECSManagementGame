@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using Unity.Mathematics;
+﻿using Unity.Mathematics;
 
 public class GridHelper
 {
