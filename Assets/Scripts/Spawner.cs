@@ -22,27 +22,28 @@ public class Spawner : MonoBehaviour
             EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             for (int i = 0; i < amountToSpawn; i++)
             {
-                //Instantiate(prefabToSpawn);
-                GameObject prefab = PrefabManager.Instance.GetBuilding(1);
+                Instantiate(prefabToSpawn);
 
-                Mesh prefabMesh = prefab.GetComponent<MeshFilter>().sharedMesh;
-                Renderer renderer = prefab.GetComponent<Renderer>();
-                Mesh = prefabMesh;
-                Material = renderer.sharedMaterial;
+                //GameObject prefab = PrefabManager.Instance.GetBuilding(1);
 
-                EntityArchetype type = entityManager.CreateArchetype(typeof(Translation),
-                                              typeof(Rotation),
-                                              typeof(Scale),
-                                              typeof(RenderMesh),
-                                              typeof(RenderBounds),
-                                              typeof(LocalToWorld));
+                //Mesh prefabMesh = prefab.GetComponent<MeshFilter>().sharedMesh;
+                //Renderer renderer = prefab.GetComponent<Renderer>();
+                //Mesh = prefabMesh;
+                //Material = renderer.sharedMaterial;
 
-                var entity = entityManager.CreateEntity(type);
+                //EntityArchetype type = entityManager.CreateArchetype(typeof(Translation),
+                //                              typeof(Rotation),
+                //                              typeof(Scale),
+                //                              typeof(RenderMesh),
+                //                              typeof(RenderBounds),
+                //                              typeof(LocalToWorld));
 
-                entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = Mesh, material = Material });
-                entityManager.AddComponentData(entity, new RenderBounds { Value = Mesh.bounds.ToAABB() });
-                entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
-                entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
+                //var entity = entityManager.CreateEntity(type);
+
+                //entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = Mesh, material = Material });
+                //entityManager.AddComponentData(entity, new RenderBounds { Value = Mesh.bounds.ToAABB() });
+                //entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
+                //entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
 
             }
         }

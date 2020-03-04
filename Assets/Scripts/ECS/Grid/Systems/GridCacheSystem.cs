@@ -72,7 +72,7 @@ public class GridCacheSystem : ComponentSystem
             for (int i = 0; i < GridOccupations.Length; i++)
             {
                 var gridOccupation = GridOccupations[i];
-                if (i.GetHashCode() != isInCache.OccupationHashCode)
+                if (gridOccupation.GetHashCode() != isInCache.OccupationHashCode)
                     continue;
 
                 for (int x = gridOccupation.Start.x; x <= gridOccupation.End.x; x++)

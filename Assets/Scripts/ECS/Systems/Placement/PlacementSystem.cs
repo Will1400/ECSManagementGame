@@ -7,6 +7,7 @@ using Unity.Transforms;
 using Unity.Rendering;
 using Unity.Collections;
 
+[UpdateAfter(typeof(GridValidationSystem))]
 public class PlacementSystem : ComponentSystem
 {
     Entity currentEntity;

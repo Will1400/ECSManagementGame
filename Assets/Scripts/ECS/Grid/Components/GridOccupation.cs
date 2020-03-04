@@ -18,6 +18,11 @@ public struct GridOccupation : IComponentData, IEquatable<GridOccupation>
 
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+        int hash = 13;
+        hash = (hash * 7) + Start.x;
+        hash = (hash * 7) + Start.y;
+        hash = (hash * 7) + End.x;
+        hash = (hash * 7) + End.y;
+    return hash;
     }
 }

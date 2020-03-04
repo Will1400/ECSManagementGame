@@ -8,12 +8,13 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Rendering;
 
+[UpdateBefore(typeof(GridValidationSystem))]
 public class PlacementPositionSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9).Position;
+        float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 9999, 1u << 9).Position;
         mouseWorldPosition = math.round(mouseWorldPosition);
 
         MoveJob job = new MoveJob
@@ -33,8 +34,8 @@ public class PlacementPositionSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, ref Translation translation, [WriteOnly] ref GridOccupation gridOccupation, [ReadOnly] ref WorldRenderBounds renderBounds)
         {
-            if (!translation.Value.Equals(position))
-            {
+            //if (!math.all(translation.Value == position))
+            //{
                 AABB bounds = renderBounds.Value;
                 int2 x = new int2((int)math.round(bounds.Center.x - bounds.Extents.x), (int)math.round(bounds.Center.x + bounds.Extents.x));
                 int2 y = new int2((int)math.round(bounds.Center.z - bounds.Extents.z), (int)math.round(bounds.Center.z + bounds.Extents.z));
@@ -42,7 +43,7 @@ public class PlacementPositionSystem : JobComponentSystem
                 gridOccupation.Start = new int2(x.x, y.x);
                 gridOccupation.End = new int2(x.y, y.y);
                 translation.Value = position;
-            }
+            //}
         }
     }
 }
