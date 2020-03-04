@@ -4,5 +4,5 @@ using Unity.Entities;
 
 public struct IsInCache : ISystemStateComponentData
 {
-    public int Index;
+    public int OccupationHashCode;
 }

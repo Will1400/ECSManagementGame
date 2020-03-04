@@ -32,6 +32,8 @@ public class ConstructionSystem : ComponentSystem
             if (construction.remainingConstructionTime <= 0)
             {
                 var prefab = PrefabManager.Instance.GetPrefabByName(construction.finishedPrefabName.ToString());
+                var material = prefab.GetComponent<Renderer>().sharedMaterial;
+                material.SetColor("_BaseColor", Color.white);
                 Entity finishedEntity = ArcheTypeManager.Instance.GetSetupBuildingEntity(prefab.GetComponent<MeshFilter>().sharedMesh, prefab.GetComponent<Renderer>().sharedMaterial, prefab);
 
 

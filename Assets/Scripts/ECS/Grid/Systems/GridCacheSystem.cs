@@ -14,12 +14,15 @@ public class GridCacheSystem : ComponentSystem
     /// 5 = Unwalkable
     /// 6 = Occupied
     /// </summary>
-    public NativeList<int> Grid;
+    public NativeArray<int> Grid;
     public NativeList<GridOccupation> GridOccupations;
+
+    public int2 GridSize;
 
     EntityQuery nonCachedGridOccupations;
     EntityQuery deletedGridOccupationsInCache;
-    EntityQuery ChangedGridOccupationsInCache;
+    //EntityQuery ChangedGridOccupationsInCache;
+
 
     protected override void OnCreate()
     {
@@ -27,10 +30,10 @@ public class GridCacheSystem : ComponentSystem
                                            .WithNone<IsInCache, BeingPlacedTag, GridOccupationIsInValidTag>()
                                            .ToEntityQuery();
 
-        ChangedGridOccupationsInCache = Entities.WithAll<GridOccupation, IsInCache>()
-                                                .WithNone<IsStationary, BeingPlacedTag>()
-                                                .ToEntityQuery();
-        ChangedGridOccupationsInCache.SetChangedVersionFilter(ComponentType.ReadOnly<GridOccupation>());
+        //ChangedGridOccupationsInCache = Entities.WithAll<GridOccupation, IsInCache>()
+        //                                        .WithNone<IsStationary, BeingPlacedTag>()
+        //                                        .ToEntityQuery();
+        //ChangedGridOccupationsInCache.SetChangedVersionFilter(ComponentType.ReadOnly<GridOccupation>());
 
         deletedGridOccupationsInCache = Entities.WithAll<IsInCache>()
                                           .WithNone<GridOccupation>()
@@ -38,7 +41,8 @@ public class GridCacheSystem : ComponentSystem
 
         Instance = this;
         GridOccupations = new NativeList<GridOccupation>(Allocator.Persistent);
-        Grid = new NativeList<int>(Allocator.Persistent);
+        GridSize = new int2(5000, 5000);
+        Grid = new NativeArray<int>(GridSize.x * GridSize.y, Allocator.Persistent);
     }
 
     protected override void OnUpdate()
@@ -47,25 +51,68 @@ public class GridCacheSystem : ComponentSystem
         Entities.With(nonCachedGridOccupations).ForEach((Entity entity, ref GridOccupation gridOccupation) =>
         {
             GridOccupations.Add(gridOccupation);
+            Debug.Log("Adding occupation to cache");
+
+            for (int x = gridOccupation.Start.x; x <= gridOccupation.End.x; x++)
+            {
+                for (int y = gridOccupation.Start.y; y <= gridOccupation.End.y; y++)
+                {
+                    Grid[x * GridSize.x + y] = 6;
+                }
+            }
 
             EntityManager.AddComponent<IsInCache>(entity);
-            EntityManager.AddComponentData(entity, new IsInCache { Index = GridOccupations.IndexOf(gridOccupation) });
+            EntityManager.AddComponentData(entity, new IsInCache { OccupationHashCode = gridOccupation.GetHashCode() });
         });
-
-        // Update Changed occupations
-        //Entities.With(ChangedGridOccupationsInCache).ForEach((Entity entity, ref IsInCache isInCache, ref GridOccupation gridOccupation) =>
-        //{
-        //});
 
         // Remove from cache
         Entities.With(deletedGridOccupationsInCache).ForEach((Entity entity, ref IsInCache isInCache) =>
         {
-            GridOccupations.RemoveAtSwapBack(isInCache.Index);
+            Debug.Log("Deleting occupation from cache");
+            for (int i = 0; i < GridOccupations.Length; i++)
+            {
+                var gridOccupation = GridOccupations[i];
+                if (i.GetHashCode() != isInCache.OccupationHashCode)
+                    continue;
 
-            EntityManager.RemoveComponent<GridOccupation>(entity);
+                for (int x = gridOccupation.Start.x; x <= gridOccupation.End.x; x++)
+                {
+                    for (int y = gridOccupation.Start.y; y <= gridOccupation.End.y; y++)
+                    {
+                        Grid[x * GridSize.x + y] = 0;
+                    }
+                }
+                GridOccupations.RemoveAtSwapBack(i);
+            }
             EntityManager.RemoveComponent<IsInCache>(entity);
-            EntityManager.RemoveComponent<IsStationary>(entity);
         });
+    }
+
+    public int CheckIndex(int x, int y)
+    {
+        if (x * GridSize.x + y > 0)
+            return Grid[x * GridSize.x + y];
+        else
+            return -1;
+    }
+
+    void GenerateGrid()
+    {
+        Grid.Dispose();
+        Grid = new NativeArray<int>(GridSize.x * GridSize.y, Allocator.Persistent);
+
+        for (int i = 0; i < GridOccupations.Length; i++)
+        {
+            var occupation = GridOccupations[i];
+
+            for (int x = occupation.Start.x; x <= occupation.End.x; x++)
+            {
+                for (int y = occupation.Start.y; y <= occupation.End.y; y++)
+                {
+                    Grid[x * GridSize.x + y] = 6;
+                }
+            }
+        }
     }
 
     protected override void OnDestroy()

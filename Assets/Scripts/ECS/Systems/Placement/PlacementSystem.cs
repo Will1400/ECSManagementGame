@@ -11,6 +11,7 @@ public class PlacementSystem : ComponentSystem
 {
     Entity currentEntity;
     string prefabName;
+    Material material;
 
     protected override void OnUpdate()
     {
@@ -24,16 +25,28 @@ public class PlacementSystem : ComponentSystem
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             Cancel();
-            GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Citizen"));
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9).Position;
+            GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Citizen"), mouseWorldPosition, Quaternion.identity);
         }
 
         if (GameManager.Instance.CursorState == CursorState.Building)
         {
+            if (EntityManager.HasComponent<GridOccupationIsValidTag>(currentEntity))
+            {
+                material.SetColor("_BaseColor", Color.green);
+
+                if (Input.GetMouseButtonDown(0))
+                    Place();
+            }
+            else
+            {
+                material.SetColor("_BaseColor", Color.red);
+            }
+
             if (Input.GetButton("Cancel") || Input.GetButton("Secondary Mouse"))
                 Cancel();
 
-            if (Input.GetMouseButtonDown(0))
-                Place();
         }
     }
 
@@ -42,8 +55,6 @@ public class PlacementSystem : ComponentSystem
         var constructionEntity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
 
         float3 position = EntityManager.GetComponentData<Translation>(currentEntity).Value;
-
-
         var occupation = GridHelper.CalculateGridOccupationFromBounds(EntityManager.GetComponentData<WorldRenderBounds>(currentEntity).Value);
 
         EntityManager.AddComponentData(constructionEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
@@ -62,8 +73,7 @@ public class PlacementSystem : ComponentSystem
         prefabName = prefab.name;
 
         Mesh mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
-        Material material = prefab.GetComponent<Renderer>().sharedMaterial;
-
+        material = new Material(prefab.GetComponent<Renderer>().sharedMaterial);
         EntityManager.AddSharedComponentData(currentEntity, new RenderMesh { mesh = mesh, material = material });
         EntityManager.AddComponentData(currentEntity, new RenderBounds { Value = mesh.bounds.ToAABB() });
         EntityManager.AddComponentData(currentEntity, new Scale { Value = prefab.transform.localScale.x });

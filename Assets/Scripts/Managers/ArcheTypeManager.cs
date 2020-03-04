@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Rendering;
 using Unity.Mathematics;
+using UnityEngine.Rendering;
 
 public class ArcheTypeManager : MonoBehaviour
 {
@@ -71,7 +72,7 @@ public class ArcheTypeManager : MonoBehaviour
 
         entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
         entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
-        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material });
+        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true});
         entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
 
         return entity;

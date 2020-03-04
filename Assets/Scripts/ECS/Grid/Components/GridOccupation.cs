@@ -15,4 +15,9 @@ public struct GridOccupation : IComponentData, IEquatable<GridOccupation>
         return Start.Equals(other.Start) &&
                End.Equals(other.End);
     }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }
