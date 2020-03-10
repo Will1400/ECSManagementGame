@@ -41,7 +41,7 @@ public class GridCacheSystem : ComponentSystem
 
         Instance = this;
         GridOccupations = new NativeList<GridOccupation>(Allocator.Persistent);
-        GridSize = new int2(5000, 5000);
+        GridSize = new int2(500, 500);
         Grid = new NativeArray<int>(GridSize.x * GridSize.y, Allocator.Persistent);
     }
 
