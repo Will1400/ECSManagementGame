@@ -21,7 +21,6 @@ public class AStar
 
         Heap<Node> openList = new Heap<Node>(gridSize.x * gridSize.y);
         HashSet<Node> closedList = new HashSet<Node>();
-
         openList.Add(startNode);
         Node currentNode = null;
 
