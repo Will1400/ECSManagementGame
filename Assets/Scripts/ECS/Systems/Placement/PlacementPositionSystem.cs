@@ -15,6 +15,7 @@ public class PlacementPositionSystem : ComponentSystem
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 9999, 1u << 9).Position;
+        mouseWorldPosition.y = 1;
         mouseWorldPosition = math.round(mouseWorldPosition);
 
         Entities.WithAll<BeingPlacedTag>().WithNone<IsInCache>().ForEach((ref Translation translation, ref GridOccupation gridOccupation, ref WorldRenderBounds renderBounds) =>

@@ -18,6 +18,7 @@ public enum PathfindingFailedReason
     FailedToResolve,
 }
 
+[UpdateBefore(typeof(NavMeshSystem))]
 public class NavMeshQuerySystem : JobComponentSystem
 {
 

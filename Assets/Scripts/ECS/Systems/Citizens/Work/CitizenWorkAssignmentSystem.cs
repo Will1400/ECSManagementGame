@@ -33,9 +33,10 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
                     {
                         EntityManager.AddComponent<GoingToWorkTag>(citizen);
                         EntityManager.AddComponent<CitizenWork>(citizen);
+                        EntityManager.AddComponent<NavAgentRequestingPath>(citizen);
 
                         EntityManager.AddComponentData(citizen, new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = tempWorkerData.WorkPosition });
-
+                        EntityManager.AddComponentData(citizen, new NavAgentRequestingPath { StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value, EndPosition = tempWorkerData.WorkPosition});
                         currentWorkers++;
                         EntityManager.RemoveComponent<IdleTag>(citizen);
                     }

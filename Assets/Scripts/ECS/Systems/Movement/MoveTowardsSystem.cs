@@ -28,7 +28,7 @@ public class MoveTowardsSystem : JobComponentSystem
             {
                 float3 direction = math.normalize(moveTowardsComponent.TargetPosition - translation.Value);
                 direction.y = 0;
-                translation.Value += direction * moveSpeedComponent.Speed * deltatime;
+                translation.Value += direction * moveSpeedComponent.Value * deltatime;
             }
         }
     }

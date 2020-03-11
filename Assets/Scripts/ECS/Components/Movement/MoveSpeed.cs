@@ -7,5 +7,5 @@ using UnityEngine;
 [GenerateAuthoringComponent]
 public struct MoveSpeed : IComponentData
 {
-    public float Speed;
+    public float Value;
 }

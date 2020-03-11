@@ -32,7 +32,7 @@ public class CitizenWorkMovement : JobComponentSystem
             {
                 float3 direction = math.normalize(work.WorkPosition - translation.Value);
                 direction.y = 0;
-                translation.Value += direction * moveSpeed.Speed * deltatime;
+                translation.Value += direction * moveSpeed.Value * deltatime;
             }
         }
     }
