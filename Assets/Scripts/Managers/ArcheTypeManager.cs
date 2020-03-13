@@ -60,6 +60,19 @@ public class ArcheTypeManager : MonoBehaviour
             typeof(WorldRenderBounds),
             typeof(RenderBounds),
             typeof(LocalToWorld)));
+
+        ArcheTypes.Add(PredifinedArchetype.Citizen, entityManager.CreateArchetype(
+           typeof(Translation),
+           typeof(Rotation),
+           typeof(Scale),
+           typeof(RenderMesh),
+           typeof(RenderBounds),
+           typeof(WorldRenderBounds),
+           typeof(LocalToWorld),
+           typeof(Citizen),
+           typeof(IdleTag),
+           typeof(MoveSpeed),
+           typeof(NavAgent)));
     }
 
     public EntityArchetype GetArcheType(PredifinedArchetype archetype)
@@ -76,6 +89,22 @@ public class ArcheTypeManager : MonoBehaviour
         entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
         entityManager.AddSharedComponentData(entity, new NavMeshObstacle { Area = 1, Size = mesh.bounds.extents });
         entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
+
+        return entity;
+    }
+
+    public Entity GetSetupCitizenEntity()
+    {
+        Entity entity = entityManager.CreateEntity(GetArcheType(PredifinedArchetype.Building));
+        var prefab = Resources.Load<GameObject>("Prefabs/Citizen");
+        var mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
+        var material = Resources.Load<Material>("Materials/Citizen/Default");
+        entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
+        entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
+        entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
+        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
+
+        entityManager.AddComponentData(entity, new MoveSpeed { Value = 5 });
 
         return entity;
     }

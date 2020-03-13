@@ -5,5 +5,6 @@ public enum PredifinedArchetype
 {
     ConstructionSite,
     Building,
-    BeingPlaced
+    BeingPlaced,
+    Citizen
 }

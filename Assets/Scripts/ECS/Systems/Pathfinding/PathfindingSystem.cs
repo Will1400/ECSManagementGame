@@ -53,11 +53,13 @@ public class PathfindingSystem : ComponentSystem
             EntityManager.AddBuffer<Float3BufferElement>(entity);
 
             var buffer = EntityManager.GetBuffer<Float3BufferElement>(entity);
+
             for (int j = 0; j < keyValuePair.Value.Length; j++)
             {
                 buffer.Add(keyValuePair.Value[j]);
             }
 
+            EntityManager.AddComponent<AgentHasPath>(entity);
             EntityManager.SetComponentData(entity, agent);
             EntityManager.RemoveComponent<NavAgentRequestingPath>(entity);
 

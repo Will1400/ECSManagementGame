@@ -10,38 +10,34 @@ public class NavAgentMovementSystem : ComponentSystem
 
     protected override void OnCreate()
     {
-        movingNavAgents = Entities.WithAll<NavAgent, MoveSpeed, Translation>().ToEntityQuery();
+        movingNavAgents = Entities.WithAll<NavAgent, MoveSpeed, Translation, AgentHasPath>().ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
-        Entities.With(movingNavAgents).ForEach((Entity entity, ref NavAgent agent, ref MoveSpeed speed, ref Translation translation) =>
+        Entities.With(movingNavAgents).ForEach((Entity entity, DynamicBuffer<Float3BufferElement> buffer, ref NavAgent agent, ref MoveSpeed speed, ref Translation translation) =>
         {
-            if (agent.Status == AgentStatus.Moving)
+
+            if (agent.CurrentWaypointIndex >= buffer.Length)
             {
-                var buffer = EntityManager.GetBuffer<Float3BufferElement>(entity);
+                agent.Status = AgentStatus.Idle;
+                EntityManager.RemoveComponent<AgentHasPath>(entity);
 
-                if (agent.CurrentWaypointIndex >= buffer.Length)
-                {
-                    agent.Status = AgentStatus.Idle;
-                    buffer.Clear();
-                    return;
-                }
+                return;
+            }
 
-                float3 destination = buffer[agent.CurrentWaypointIndex];
-                destination.y = 1;
+            float3 destination = buffer[agent.CurrentWaypointIndex];
+            destination.y = 1;
 
-                if (math.distance(translation.Value, destination) > .4f)
-                {
-                    float3 direction = math.normalize(destination - translation.Value);
-                    direction.y = 0;
-                    translation.Value += direction * speed.Value * Time.DeltaTime;
-                    //translation.Value = math.lerp(translation.Value, destination, speed.Value * Time.DeltaTime);
-                }
-                else
-                {
-                    agent.CurrentWaypointIndex++;
-                }
+            if (math.distance(translation.Value, destination) > .4f)
+            {
+                float3 direction = math.normalize(destination - translation.Value);
+                direction.y = 0;
+                translation.Value += direction * speed.Value * Time.DeltaTime;
+            }
+            else
+            {
+                agent.CurrentWaypointIndex++;
             }
         });
     }
