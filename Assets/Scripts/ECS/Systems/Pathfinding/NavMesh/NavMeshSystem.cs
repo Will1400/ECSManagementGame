@@ -8,12 +8,17 @@ using Unity.Rendering;
 using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Mathematics;
+using Unity.Jobs;
+using System.Linq;
 
 public class NavMeshSystem : ComponentSystem
 {
     private Bounds bounds;
     private NavMeshData navMeshData;
     private NavMeshDataInstance navMeshDataInstance;
+
+    NativeList<NavMeshBuildSource> obstacles;
+    NativeList<NavMeshBuildSource> surfaces;
 
     List<NavMeshBuildSource> sources;
     protected override void OnCreate()
@@ -24,56 +29,54 @@ public class NavMeshSystem : ComponentSystem
         navMeshData.position = new Vector3(bounds.extents.x, 0, bounds.extents.z);
         sources = new List<NavMeshBuildSource>();
 
+        obstacles = new NativeList<NavMeshBuildSource>(Allocator.Persistent);
+        surfaces = new NativeList<NavMeshBuildSource>(Allocator.Persistent);
     }
 
     protected override void OnUpdate()
     {
-        NativeArray<Entity> obstacles = Entities.WithAll<GridOccupation, RenderMesh, LocalToWorld, IsInCache>().ToEntityQuery().ToEntityArray(Allocator.TempJob);
-        NativeArray<Entity> surfaces = Entities.WithAll<NavMeshSurface, RenderMesh, LocalToWorld>().ToEntityQuery().ToEntityArray(Allocator.TempJob);
 
-        bool needsUpdate = false;
-        for (int i = 0; i < obstacles.Length; i++)
+        Entities.WithAllReadOnly<NavMeshObstacle, LocalToWorld>().ForEach((Entity obstacleEntity, ref LocalToWorld localToWorld) =>
         {
-            Entity entity = obstacles[i];
+            obstacles.Clear();
+            var obstacle = EntityManager.GetSharedComponentData<NavMeshObstacle>(obstacleEntity);
 
-            RenderMesh renderMesh = EntityManager.GetSharedComponentData<RenderMesh>(entity);
+            if (obstacle.Size.Equals(float3.zero))
+                obstacle.Size = EntityManager.GetSharedComponentData<RenderMesh>(obstacleEntity).mesh.bounds.size;
+
             NavMeshBuildSource buildingSource = new NavMeshBuildSource
             {
-                area = 1,
+                area = obstacle.Area,
                 shape = NavMeshBuildSourceShape.Box,
-                size = renderMesh.mesh.bounds.size,
-                transform = EntityManager.GetComponentData<LocalToWorld>(entity).Value
+                size = obstacle.Size,
+                transform = localToWorld.Value
             };
+            obstacles.Add(buildingSource);
+        });
 
-            if (!sources.Contains(buildingSource))
-            {
-                sources.Add(buildingSource);
-                needsUpdate = true;
-            }
-        }
-
-        for (int i = 0; i < surfaces.Length; i++)
+        Entities.WithAllReadOnly<NavMeshSurface, LocalToWorld>().ForEach((Entity surfaceEntity, ref LocalToWorld localToWorld) =>
         {
-            Entity entity = surfaces[i];
+            surfaces.Clear();
+            var obstacle = EntityManager.GetSharedComponentData<NavMeshSurface>(surfaceEntity);
 
-            RenderMesh renderMesh = EntityManager.GetSharedComponentData<RenderMesh>(entity);
+            if (obstacle.Size.Equals(float3.zero))
+                obstacle.Size = EntityManager.GetSharedComponentData<RenderMesh>(surfaceEntity).mesh.bounds.size;
+
             NavMeshBuildSource buildingSource = new NavMeshBuildSource
             {
-                area = 0,
+                area = obstacle.Area,
                 shape = NavMeshBuildSourceShape.Box,
-                size = renderMesh.mesh.bounds.size,
-                transform = EntityManager.GetComponentData<LocalToWorld>(entity).Value
+                size = obstacle.Size,
+                transform = localToWorld.Value
             };
+            surfaces.Add(buildingSource);
+        });
 
-            if (!sources.Contains(buildingSource))
-            {
-                sources.Add(buildingSource);
-                needsUpdate = true;
-            }
-        }
 
-        if (needsUpdate)
+        var combined = obstacles.ToArray().Concat(surfaces.ToArray()).ToList();
+        if (combined.Count > 0)
         {
+            sources = combined;
             NavMeshBuildSettings buildSettings = NavMesh.GetSettingsByID(0);
             NavMeshBuilder.UpdateNavMeshData(
                navMeshData,
@@ -82,29 +85,47 @@ public class NavMeshSystem : ComponentSystem
                bounds);
         }
 
+    }
+
+    protected override void OnDestroy()
+    {
         obstacles.Dispose();
         surfaces.Dispose();
     }
 
-    void OnDrawGizmosSelected()
-    {
-        if (navMeshData)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(navMeshData.sourceBounds.center, navMeshData.sourceBounds.size);
-        }
+    //struct ObstacleJob : IJobChunk
+    //{
+    //    public ArchetypeChunkSharedComponentType<NavMeshObstacle> NavMeshObstacleType;
+    //    public ArchetypeChunkSharedComponentType<RenderMesh> RenderMeshType;
+    //    public ArchetypeChunkComponentType<LocalToWorld> LocalToWorldType;
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(bounds.center, bounds.size);
+    //    public NativeQueue<MeshStash> MeshSources;
+    //    public NativeList<NavMeshBuildSource> Sources;
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(new float3(0, 0, 0), bounds.size);
-    }
+    //    public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
+    //    {
+    //        int obstacleIndex = chunk.GetSharedComponentIndex(NavMeshObstacleType);
+    //        int meshIndex = chunk.GetSharedComponentIndex(RenderMeshType);
+    //        var localToWorlds = chunk.GetNativeArray(LocalToWorldType);
 
-    struct MeshStash
-    {
-        public Matrix4x4 Transform;
-        public int Area;
-        public int MeshIndex;
-    }
+    //        for (int i = 0; i < chunk.Count; i++)
+    //        {
+    //            var transform = localToWorlds[i].Value;
+
+    //            MeshSources.Enqueue(new MeshStash
+    //            {
+    //                Transform = transform,
+    //                MeshIndex = meshIndex,
+    //                ObstacleIndex = obstacleIndex
+    //            });
+    //        }
+    //    }
+    //}
+
+    //public struct MeshStash
+    //{
+    //    public Matrix4x4 Transform;
+    //    public int MeshIndex;
+    //    public int ObstacleIndex;
+    //}
 }
