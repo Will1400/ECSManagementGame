@@ -7,6 +7,7 @@ using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Burst;
 
+[DisableAutoCreation]
 public class CitizenWorkMovement : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)

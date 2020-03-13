@@ -74,7 +74,7 @@ public class NavMeshQuerySystem : JobComponentSystem
         }
     }
 
-    private NavMeshWorld world;
+    public NavMeshWorld world;
     private NavMeshQuery locationQuery;
     private ConcurrentQueue<PathQueryData> QueryQueue;
     private NativeList<PathQueryData> ProgressQueue;
@@ -87,7 +87,7 @@ public class NavMeshQuerySystem : JobComponentSystem
     private NavMeshQuery[] queries;
     private Dictionary<int, UpdateQueryStatusJob> jobs;
     private static NavMeshQuerySystem _instance;
-    private static NavMeshQuerySystem instance
+    public static NavMeshQuerySystem instance
     {
         get
         {

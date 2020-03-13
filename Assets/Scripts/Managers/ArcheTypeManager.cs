@@ -47,7 +47,8 @@ public class ArcheTypeManager : MonoBehaviour
             typeof(RenderBounds),
             typeof(WorldRenderBounds),
             typeof(LocalToWorld),
-            typeof(GridOccupation)));
+            typeof(GridOccupation),
+            typeof(NavMeshObstacle)));
 
         ArcheTypes.Add(PredifinedArchetype.BeingPlaced, entityManager.CreateArchetype(
             typeof(BeingPlacedTag),
@@ -72,7 +73,8 @@ public class ArcheTypeManager : MonoBehaviour
 
         entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
         entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
-        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true});
+        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
+        entityManager.AddSharedComponentData(entity, new NavMeshObstacle { Area = 1, Size = mesh.bounds.extents });
         entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
 
         return entity;

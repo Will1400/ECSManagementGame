@@ -10,6 +10,7 @@ using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Jobs;
 using System.Linq;
+using UnityEngine.Experimental.AI;
 
 public class NavMeshSystem : ComponentSystem
 {
@@ -17,80 +18,130 @@ public class NavMeshSystem : ComponentSystem
     private NavMeshData navMeshData;
     private NavMeshDataInstance navMeshDataInstance;
 
-    NativeList<NavMeshBuildSource> obstacles;
-    NativeList<NavMeshBuildSource> surfaces;
+    /// Key is index of the entity
+    NativeHashMap<int, NavMeshBuildSource> indexedSources;
+    NativeList<int> expectedIds;
+    bool updateMesh;
 
     List<NavMeshBuildSource> sources;
     protected override void OnCreate()
     {
         navMeshData = new NavMeshData();
         navMeshDataInstance = NavMesh.AddNavMeshData(navMeshData);
-        bounds = new Bounds(Vector3.zero, new Vector3(200, 256, 200));
-        navMeshData.position = new Vector3(bounds.extents.x, 0, bounds.extents.z);
-        sources = new List<NavMeshBuildSource>();
+        bounds = new Bounds(Vector3.zero, new Vector3(400, 256, 400));
+        //navMeshData.position = new Vector3(bounds.extents.x, 0, bounds.extents.z);
 
-        obstacles = new NativeList<NavMeshBuildSource>(Allocator.Persistent);
-        surfaces = new NativeList<NavMeshBuildSource>(Allocator.Persistent);
+        indexedSources = new NativeHashMap<int, NavMeshBuildSource>(10, Allocator.Persistent);
+        expectedIds = new NativeList<int>(Allocator.Persistent);
+
+        updateMesh = true;
     }
 
     protected override void OnUpdate()
     {
+        expectedIds.Clear();
 
-        Entities.WithAllReadOnly<NavMeshObstacle, LocalToWorld>().ForEach((Entity obstacleEntity, ref LocalToWorld localToWorld) =>
+        Entities.WithAllReadOnly<NavMeshObstacle, LocalToWorld>().ForEach((Entity entity, ref LocalToWorld localToWorld) =>
         {
-            obstacles.Clear();
-            var obstacle = EntityManager.GetSharedComponentData<NavMeshObstacle>(obstacleEntity);
+            expectedIds.Add(entity.Index);
 
-            if (obstacle.Size.Equals(float3.zero))
-                obstacle.Size = EntityManager.GetSharedComponentData<RenderMesh>(obstacleEntity).mesh.bounds.size;
-
-            NavMeshBuildSource buildingSource = new NavMeshBuildSource
+            if (!indexedSources.ContainsKey(entity.Index))
             {
-                area = obstacle.Area,
-                shape = NavMeshBuildSourceShape.Box,
-                size = obstacle.Size,
-                transform = localToWorld.Value
-            };
-            obstacles.Add(buildingSource);
+                // Add new source
+                var obstacleData = EntityManager.GetSharedComponentData<NavMeshObstacle>(entity);
+
+                if (obstacleData.Size.Equals(float3.zero))
+                    obstacleData.Size = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh.bounds.size;
+
+                NavMeshBuildSource source = new NavMeshBuildSource
+                {
+                    area = obstacleData.Area,
+                    shape = NavMeshBuildSourceShape.Box,
+                    size = obstacleData.Size,
+                    transform = localToWorld.Value
+                };
+                indexedSources.Add(entity.Index, source);
+            }
+            else
+            {
+                // Update Position if needed
+                NavMeshBuildSource source = indexedSources[entity.Index];
+                if (source.transform != (Matrix4x4)localToWorld.Value)
+                {
+                    source.transform = localToWorld.Value;
+                    indexedSources[entity.Index] = source;
+                    updateMesh = true;
+                }
+            }
         });
 
-        Entities.WithAllReadOnly<NavMeshSurface, LocalToWorld>().ForEach((Entity surfaceEntity, ref LocalToWorld localToWorld) =>
+        Entities.WithAllReadOnly<NavMeshSurface, LocalToWorld>().ForEach((Entity entity, ref LocalToWorld localToWorld) =>
         {
-            surfaces.Clear();
-            var obstacle = EntityManager.GetSharedComponentData<NavMeshSurface>(surfaceEntity);
+            expectedIds.Add(entity.Index);
 
-            if (obstacle.Size.Equals(float3.zero))
-                obstacle.Size = EntityManager.GetSharedComponentData<RenderMesh>(surfaceEntity).mesh.bounds.size;
-
-            NavMeshBuildSource buildingSource = new NavMeshBuildSource
+            if (!indexedSources.ContainsKey(entity.Index))
             {
-                area = obstacle.Area,
-                shape = NavMeshBuildSourceShape.Box,
-                size = obstacle.Size,
-                transform = localToWorld.Value
-            };
-            surfaces.Add(buildingSource);
+                // Add new source
+                var surfaceData = EntityManager.GetComponentData<NavMeshSurface>(entity);
+
+                //if (surfaceData.Size.Equals(float3.zero))
+                var mesh  = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
+
+                NavMeshBuildSource source = new NavMeshBuildSource
+                {
+                    area = surfaceData.Area,
+                    shape = NavMeshBuildSourceShape.Mesh,
+                    sourceObject = mesh,
+                    //size = surfaceData.Size,
+                    transform = localToWorld.Value
+                };
+                indexedSources.Add(entity.Index, source);
+            }
+            else
+            {
+                // Update Position if needed
+                NavMeshBuildSource source = indexedSources[entity.Index];
+                if (source.transform != (Matrix4x4)localToWorld.Value)
+                {
+                    source.transform = localToWorld.Value;
+                    indexedSources[entity.Index] = source;
+                    updateMesh = true;
+                }
+            }
         });
 
-
-        var combined = obstacles.ToArray().Concat(surfaces.ToArray()).ToList();
-        if (combined.Count > 0)
+        for (int i = 0; i < expectedIds.Length; i++)
         {
-            sources = combined;
+            int key = expectedIds[i];
+
+            if (!indexedSources.ContainsKey(key))
+            {
+                indexedSources.Remove(key);
+                updateMesh = true;
+            }
+        }
+
+        if (updateMesh)
+        {
+            var temp = indexedSources.GetValueArray(Allocator.TempJob);
+            sources = temp.ToList();
             NavMeshBuildSettings buildSettings = NavMesh.GetSettingsByID(0);
             NavMeshBuilder.UpdateNavMeshData(
                navMeshData,
                buildSettings,
                sources,
                bounds);
-        }
 
+            temp.Dispose();
+            NavMeshQuerySystem.instance.world = NavMeshWorld.GetDefaultWorld();
+            updateMesh = false;
+        }
     }
 
     protected override void OnDestroy()
     {
-        obstacles.Dispose();
-        surfaces.Dispose();
+        indexedSources.Dispose();
+        expectedIds.Dispose();
     }
 
     //struct ObstacleJob : IJobChunk

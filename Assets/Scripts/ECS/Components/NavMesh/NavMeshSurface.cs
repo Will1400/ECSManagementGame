@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 [GenerateAuthoringComponent]
-public struct NavMeshSurface : ISharedComponentData
+public struct NavMeshSurface : IComponentData
 {
     public int Area;
     public float3 Size;
