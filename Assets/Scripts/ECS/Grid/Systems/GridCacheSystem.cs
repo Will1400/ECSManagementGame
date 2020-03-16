@@ -41,7 +41,7 @@ public class GridCacheSystem : ComponentSystem
 
         Instance = this;
         GridOccupations = new NativeList<GridOccupation>(Allocator.Persistent);
-        GridSize = new int2(500, 500);
+        GridSize = new int2(5000, 5000);
         Grid = new NativeArray<int>(GridSize.x * GridSize.y, Allocator.Persistent);
     }
 
@@ -90,7 +90,7 @@ public class GridCacheSystem : ComponentSystem
 
     public int CheckIndex(int x, int y)
     {
-        if (x * GridSize.x + y > 0)
+        if (x * GridSize.x + y > 0 && x * GridSize.x + y <= Grid.Length)
             return Grid[x * GridSize.x + y];
         else
             return -1;

@@ -3,29 +3,48 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
+using Unity.Jobs;
+using Unity.Collections;
 
-public class NavAgentMovementSystem : ComponentSystem
+public class NavAgentMovementSystem : JobComponentSystem
 {
-    EntityQuery movingNavAgents;
+    EntityCommandBuffer commandBuffer;
 
     protected override void OnCreate()
     {
-        movingNavAgents = Entities.WithAll<NavAgent, MoveSpeed, Translation, AgentHasPath>().ToEntityQuery();
+        commandBuffer = new EntityCommandBuffer(Allocator.Persistent);
+
+    }
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    {
+        var job = new MoveJob
+        {
+            DeltaTime = Time.DeltaTime,
+            CommandBuffer = commandBuffer.ToConcurrent()
+        }.Schedule(this, inputDeps);
+
+        job.Complete();
+
+        return job;
     }
 
-    protected override void OnUpdate()
+    protected override void OnDestroy()
     {
-        Entities.With(movingNavAgents).ForEach((Entity entity, DynamicBuffer<Float3BufferElement> buffer, ref NavAgent agent, ref MoveSpeed speed, ref Translation translation) =>
-        {
+        commandBuffer.Dispose();
+    }
+    struct MoveJob : IJobForEachWithEntity_EBCCC<Float3BufferElement, Translation, MoveSpeed, NavAgent>
+    {
+        public float DeltaTime;
+        public EntityCommandBuffer.Concurrent CommandBuffer;
 
+        public void Execute(Entity entity, int index, DynamicBuffer<Float3BufferElement> buffer, ref Translation translation, [ReadOnly]ref MoveSpeed speed, ref NavAgent agent)
+        {
             if (agent.CurrentWaypointIndex >= buffer.Length)
             {
                 agent.Status = AgentStatus.Idle;
-                EntityManager.RemoveComponent<AgentHasPath>(entity);
-
+                CommandBuffer.RemoveComponent<AgentHasPath>(index, entity);
                 return;
             }
-
             float3 destination = buffer[agent.CurrentWaypointIndex];
             destination.y = 1.5f;
 
@@ -33,12 +52,12 @@ public class NavAgentMovementSystem : ComponentSystem
             {
                 float3 direction = math.normalize(destination - translation.Value);
                 direction.y = 0;
-                translation.Value += direction * speed.Value * Time.DeltaTime;
+                translation.Value += direction * speed.Value * DeltaTime;
             }
             else
             {
                 agent.CurrentWaypointIndex++;
             }
-        });
+        }
     }
 }

@@ -33,7 +33,7 @@ public class PathfindingSystem : ComponentSystem
     {
         Entities.With(NewRequestedPaths).ForEach((Entity entity, ref NavAgent navAgent, ref NavAgentRequestingPath agentRequestingPath) =>
         {
-            if (navAgent.Status != AgentStatus.PathQueued)
+            if (navAgent.Status != AgentStatus.PathQueued && !queuedEntities.ContainsKey(entity.Index))
             {
                 queuedEntities.Add(entity.Index, entity);
                 navAgent.Status = AgentStatus.PathQueued;
@@ -53,6 +53,9 @@ public class PathfindingSystem : ComponentSystem
             EntityManager.AddBuffer<Float3BufferElement>(entity);
 
             var buffer = EntityManager.GetBuffer<Float3BufferElement>(entity);
+
+            if (buffer.Length > 0)
+                buffer.Clear();
 
             for (int j = 0; j < keyValuePair.Value.Length; j++)
             {

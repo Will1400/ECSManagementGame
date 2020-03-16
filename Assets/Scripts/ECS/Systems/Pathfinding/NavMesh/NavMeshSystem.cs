@@ -140,7 +140,7 @@ public class NavMeshSystem : ComponentSystem
                bounds);
 
             temp.Dispose();
-            NavMeshQuerySystem.instance.world = NavMeshWorld.GetDefaultWorld();
+            //NavMeshQuerySystem.instance.world = NavMeshWorld.GetDefaultWorld();
             updateMesh = false;
         }
     }

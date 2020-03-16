@@ -15,7 +15,6 @@ public class CameraMovement : MonoBehaviour
     [SerializeField]
     float2 zoomMinMax = new float2(3, 10);
 
-
     void Update()
     {
         Move();
