@@ -15,7 +15,6 @@ public class CameraMovement : MonoBehaviour
     [SerializeField]
     float2 zoomMinMax = new float2(3, 10);
 
-    public float Movement;
 
     void Update()
     {
@@ -31,9 +30,7 @@ public class CameraMovement : MonoBehaviour
         if (input.Equals( float3.zero))
             return;
 
-        float heightBasedSpeed = MathHelper.Map(zoomPercent, 0, 1, moveSpeed, moveSpeed * 10);
-        float3 finalMovement = math.normalize(input) * heightBasedSpeed * Time.deltaTime;
-        transform.Translate(finalMovement, Space.World);
+        transform.Translate(math.normalize(input) * MathHelper.Map(zoomPercent, 0, 1, moveSpeed, moveSpeed * 10) * Time.deltaTime, Space.World);
     }
 
     void Zoom()
