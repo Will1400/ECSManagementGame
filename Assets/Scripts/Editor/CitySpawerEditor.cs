@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(TreePlacer))]
-public class TreePlacerEditor : Editor
+[CustomEditor(typeof(CitySpawner))]
+public class CitySpawerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
 
-        if (GUILayout.Button("Replant Trees"))
+        if (GUILayout.Button("Spawn City"))
         {
-            TreePlacer placer = target as TreePlacer;
-            placer.Replant();
+            CitySpawner placer = target as CitySpawner;
+            placer.SpawnCity();
         }
     }
 }
