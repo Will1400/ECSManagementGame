@@ -25,7 +25,7 @@ public class CitizenArrivedAtWork : ComponentSystem
             {
                 EntityManager.RemoveComponent<GoingToWorkTag>(entity);
                 EntityManager.AddComponent<IsWorkingTag>(entity);
-                var workerData = EntityManager.GetComponentData<BuildingWorkerData>(citizenWork.WorkPlaceEntity);
+                var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
                 workerData.ActiveWorkers++;
                 EntityManager.AddComponentData(citizenWork.WorkPlaceEntity, workerData);
             }

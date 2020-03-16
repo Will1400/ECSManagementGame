@@ -11,7 +11,7 @@ public class RemoveCitizenFromWorkSystem : ComponentSystem
     {
         citizens = Entities.WithAll<RemoveFromWorkTag, CitizenWork>()
                            .ToEntityQuery();
-        workPlaces = Entities.WithAll<BuildingWorkerData>()
+        workPlaces = Entities.WithAll<WorkPlaceWorkerData>()
                           .ToEntityQuery();
 
     }
@@ -24,7 +24,7 @@ public class RemoveCitizenFromWorkSystem : ComponentSystem
             if (citizenWork.WorkPlaceEntity != null)
             {
                 var index = citizenWork.WorkPlaceEntity.Index;
-                Entities.With(workPlaces).ForEach((Entity workPlaceEntity, ref BuildingWorkerData workerData) =>
+                Entities.With(workPlaces).ForEach((Entity workPlaceEntity, ref WorkPlaceWorkerData workerData) =>
                 {
                     if (workPlaceEntity.Index == index)
                     {

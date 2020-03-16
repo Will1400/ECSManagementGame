@@ -12,6 +12,7 @@ using Unity.Jobs;
 using System.Linq;
 using UnityEngine.Experimental.AI;
 
+[UpdateAfter(typeof(PlacementSystem))]
 public class NavMeshSystem : ComponentSystem
 {
     private Bounds bounds;
@@ -28,7 +29,7 @@ public class NavMeshSystem : ComponentSystem
     {
         navMeshData = new NavMeshData();
         navMeshDataInstance = NavMesh.AddNavMeshData(navMeshData);
-        bounds = new Bounds(Vector3.zero, new Vector3(400, 256, 400));
+        bounds = new Bounds(Vector3.zero, new Vector3(1000, 256, 1000));
         //navMeshData.position = new Vector3(bounds.extents.x, 0, bounds.extents.z);
 
         indexedSources = new NativeHashMap<int, NavMeshBuildSource>(10, Allocator.Persistent);
@@ -51,7 +52,12 @@ public class NavMeshSystem : ComponentSystem
                 var obstacleData = EntityManager.GetSharedComponentData<NavMeshObstacle>(entity);
 
                 if (obstacleData.Size.Equals(float3.zero))
-                    obstacleData.Size = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh.bounds.size;
+                {
+                    Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
+
+                    obstacleData.Size = mesh.bounds.size;
+                    EntityManager.SetSharedComponentData(entity, obstacleData);
+                }
 
                 NavMeshBuildSource source = new NavMeshBuildSource
                 {
@@ -60,6 +66,7 @@ public class NavMeshSystem : ComponentSystem
                     size = obstacleData.Size,
                     transform = localToWorld.Value
                 };
+
                 indexedSources.Add(entity.Index, source);
             }
             else
@@ -85,7 +92,7 @@ public class NavMeshSystem : ComponentSystem
                 var surfaceData = EntityManager.GetComponentData<NavMeshSurface>(entity);
 
                 //if (surfaceData.Size.Equals(float3.zero))
-                var mesh  = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
+                var mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
 
                 NavMeshBuildSource source = new NavMeshBuildSource
                 {

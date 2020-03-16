@@ -60,7 +60,7 @@ public class PlacementSystem : ComponentSystem
 
         EntityManager.AddComponentData(constructionEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
         EntityManager.AddComponentData(constructionEntity, new Translation { Value = position });
-        EntityManager.AddComponentData(constructionEntity, new BuildingWorkerData { MaxWorkers = 4, WorkPosition = position });
+        EntityManager.AddComponentData(constructionEntity, new WorkPlaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });
         EntityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = prefabName });
 
         Cancel();

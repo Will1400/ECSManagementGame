@@ -14,19 +14,19 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
     {
         idleCitizensQuery = Entities.WithAll<Citizen, IdleTag>()
                                     .ToEntityQuery();
-        needsWorkersQuery = Entities.WithAll<BuildingWorkerData>()
+        needsWorkersQuery = Entities.WithAll<WorkPlaceWorkerData>()
                                     .WithNone<RemoveWorkPlaceTag>()
                                     .ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
-        Entities.With(needsWorkersQuery).ForEach((Entity workPlace, ref BuildingWorkerData workerData) =>
+        Entities.With(needsWorkersQuery).ForEach((Entity workPlace, ref WorkPlaceWorkerData workerData) =>
         {
             if (workerData.CurrentWorkers < workerData.MaxWorkers)
             {
                 int currentWorkers = workerData.CurrentWorkers;
-                BuildingWorkerData tempWorkerData = workerData;
+                WorkPlaceWorkerData tempWorkerData = workerData;
                 Entities.With(idleCitizensQuery).ForEach((Entity citizen) =>
                 {
                     if (currentWorkers < tempWorkerData.MaxWorkers)

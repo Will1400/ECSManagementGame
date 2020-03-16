@@ -35,7 +35,7 @@ public class ArcheTypeManager : MonoBehaviour
     {
         ArcheTypes.Add(PredifinedArchetype.ConstructionSite, entityManager.CreateArchetype(
             typeof(UnderConstruction),
-            typeof(BuildingWorkerData),
+            typeof(WorkPlaceWorkerData),
             typeof(Translation),
             typeof(GridOccupation)));
 
@@ -87,7 +87,7 @@ public class ArcheTypeManager : MonoBehaviour
         entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
         entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
         entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
-        entityManager.AddSharedComponentData(entity, new NavMeshObstacle { Area = 1, Size = mesh.bounds.extents });
+        entityManager.AddSharedComponentData(entity, new NavMeshObstacle { Area = 1});
         entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
 
         return entity;
