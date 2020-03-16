@@ -8,8 +8,8 @@ public class MathHelper
 {
     public static float Map(float value, float fromMin, float fromMax, float toMin, float toMax)
     {
-        var m = (toMax - toMin) / (fromMax - fromMin);
-        var c = toMin - (m * fromMin);
+        float m = (toMax - toMin) / (fromMax - fromMin);
+        float c = toMin - (m * fromMin);
 
         return m * value + c;
     }
