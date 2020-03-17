@@ -90,7 +90,7 @@ public class GridCacheSystem : ComponentSystem
 
     public int CheckIndex(int x, int y)
     {
-        if (x * GridSize.x + y > 0 && x * GridSize.x + y <= Grid.Length)
+        if (x * GridSize.x + y > 0 && x * GridSize.x + y < Grid.Length)
             return Grid[x * GridSize.x + y];
         else
             return -1;

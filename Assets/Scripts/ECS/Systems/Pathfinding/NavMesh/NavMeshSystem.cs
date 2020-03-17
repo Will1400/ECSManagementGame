@@ -29,8 +29,7 @@ public class NavMeshSystem : ComponentSystem
     {
         navMeshData = new NavMeshData();
         navMeshDataInstance = NavMesh.AddNavMeshData(navMeshData);
-        bounds = new Bounds(Vector3.zero, new Vector3(1000, 256, 1000));
-        //navMeshData.position = new Vector3(bounds.extents.x, 0, bounds.extents.z);
+        bounds = new Bounds(Vector3.zero, new Vector3(5000, 256, 5000));
 
         indexedSources = new NativeHashMap<int, NavMeshBuildSource>(10, Allocator.Persistent);
         expectedIds = new NativeList<int>(Allocator.Persistent);

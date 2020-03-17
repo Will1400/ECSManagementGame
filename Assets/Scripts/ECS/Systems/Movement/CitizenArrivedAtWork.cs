@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
+using Unity.Collections;
 
 [UpdateAfter(typeof(CitizenWorkMovement))]
 public class CitizenArrivedAtWork : ComponentSystem
@@ -11,24 +12,19 @@ public class CitizenArrivedAtWork : ComponentSystem
 
     protected override void OnCreate()
     {
-        citizensGoingToWork = Entities.WithAll<Citizen, GoingToWorkTag, CitizenWork, Translation>().ToEntityQuery();
+        citizensGoingToWork = Entities.WithAll<Citizen, HasArrivedAtWorkTag, CitizenWork>().ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
-        Entities.With(citizensGoingToWork).ForEach((Entity entity, ref CitizenWork citizenWork, ref Translation translation) =>
+        Entities.With(citizensGoingToWork).ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
-            float3 correctedTranslation = translation.Value;
-            correctedTranslation.y = citizenWork.WorkPosition.y;
-            float distance = math.distance(correctedTranslation, citizenWork.WorkPosition);
-            if (distance <= .5f)
-            {
-                EntityManager.RemoveComponent<GoingToWorkTag>(entity);
-                EntityManager.AddComponent<IsWorkingTag>(entity);
-                var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
-                workerData.ActiveWorkers++;
-                EntityManager.AddComponentData(citizenWork.WorkPlaceEntity, workerData);
-            }
+            EntityManager.RemoveComponent<GoingToWorkTag>(entity);
+            EntityManager.AddComponent<IsWorkingTag>(entity);
+            var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
+            workerData.ActiveWorkers++;
+            EntityManager.AddComponentData(citizenWork.WorkPlaceEntity, workerData);
+            EntityManager.RemoveComponent<HasArrivedAtWorkTag>(entity);
         });
     }
 }

@@ -4468,7 +4468,6 @@ MonoBehaviour:
   zoomMinMax:
     x: 6
     y: 100
-  Movement: 0
 --- !u!1001 &425004076
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7909,6 +7908,7 @@ GameObject:
   m_Component:
   - component: {fileID: 683806040}
   - component: {fileID: 683806039}
+  - component: {fileID: 683806041}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -7947,6 +7947,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &683806041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 683806038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fad1b02ea3cd11e48a2c4af67477fee3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  count: 1000
 --- !u!1001 &684100329
 PrefabInstance:
   m_ObjectHideFlags: 0
