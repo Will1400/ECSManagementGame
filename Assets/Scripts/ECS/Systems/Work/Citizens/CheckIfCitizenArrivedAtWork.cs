@@ -19,7 +19,6 @@ public class CheckIfCitizenArrivedAtWork : JobComponentSystem
     {
         var job = new CheckIfArrivedAtWorkJob
         {
-            //CommandBuffer = commandBuffer.ToConcurrent()
             CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
         }.Schedule(this, inputDeps);
 

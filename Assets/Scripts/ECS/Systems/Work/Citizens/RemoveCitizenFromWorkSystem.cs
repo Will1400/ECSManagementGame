@@ -5,20 +5,15 @@ using Unity.Entities;
 public class RemoveCitizenFromWorkSystem : ComponentSystem
 {
     EntityQuery citizens;
-    EntityQuery workPlaces;
 
     protected override void OnCreate()
     {
         citizens = Entities.WithAll<RemoveFromWorkTag, CitizenWork>()
                            .ToEntityQuery();
-        workPlaces = Entities.WithAll<WorkPlaceWorkerData>()
-                          .ToEntityQuery();
-
     }
 
     protected override void OnUpdate()
     {
-
         Entities.With(citizens).ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
             if (citizenWork.WorkPlaceEntity != null)

@@ -20,7 +20,6 @@ public class NavAgentMovementSystem : JobComponentSystem
         });
     }
 
-
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         var job = new ChunkMoveJob
@@ -79,21 +78,19 @@ public class NavAgentMovementSystem : JobComponentSystem
 
     struct ChunkMoveJob : IJobChunk
     {
-        [ReadOnly]
-        public ArchetypeChunkEntityType EntityType;
-
-        public ArchetypeChunkComponentType<Translation> TranslationType;
-        public ArchetypeChunkComponentType<NavAgent> NavAgentType;
-
-        [ReadOnly]
-        public ArchetypeChunkBufferType<Float3BufferElement> BufferElementType;
-        [ReadOnly]
-        public ArchetypeChunkComponentType<MoveSpeed> MoveSpeedType;
+        public EntityCommandBuffer.Concurrent CommandBuffer;
 
         [ReadOnly]
         public float DeltaTime;
 
-        public EntityCommandBuffer.Concurrent CommandBuffer;
+        [ReadOnly]
+        public ArchetypeChunkEntityType EntityType;
+        public ArchetypeChunkComponentType<Translation> TranslationType;
+        public ArchetypeChunkComponentType<NavAgent> NavAgentType;
+        [ReadOnly]
+        public ArchetypeChunkBufferType<Float3BufferElement> BufferElementType;
+        [ReadOnly]
+        public ArchetypeChunkComponentType<MoveSpeed> MoveSpeedType;
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
@@ -109,7 +106,6 @@ public class NavAgentMovementSystem : JobComponentSystem
                 var buffer = buffers[i];
                 var translation = translations[i];
                 var agent = navAgents[i];
-                var moveSpeed = moveSpeeds[i];
 
                 if (agent.CurrentWaypointIndex >= buffer.Length)
                 {
@@ -125,7 +121,7 @@ public class NavAgentMovementSystem : JobComponentSystem
                 {
                     float3 direction = math.normalize(destination - translation.Value);
                     direction.y = 0;
-                    translation.Value += direction * moveSpeed.Value * DeltaTime;
+                    translation.Value += direction * moveSpeeds[i].Value * DeltaTime;
 
                     translations[i] = translation;
                 }
@@ -135,11 +131,6 @@ public class NavAgentMovementSystem : JobComponentSystem
                     navAgents[i] = agent;
                 }
             }
-            //entities.Dispose();
-
-            //translations.Dispose();
-            //navAgents.Dispose();
-            //moveSpeeds.Dispose();
         }
     }
 }

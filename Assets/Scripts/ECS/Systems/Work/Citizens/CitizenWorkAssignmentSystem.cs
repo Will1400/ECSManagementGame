@@ -56,7 +56,6 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
                         break;
                     }
                 }
-                //EntityManager.SetComponentData(workPlace, workerData);
                 workerData.CurrentWorkers = currentWorkers;
             }
         });
