@@ -5,7 +5,6 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
 
-[UpdateAfter(typeof(CitizenWorkMovement))]
 public class CitizenArrivedAtWork : ComponentSystem
 {
     EntityQuery citizensGoingToWork;
