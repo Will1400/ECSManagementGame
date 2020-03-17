@@ -62,7 +62,7 @@ public class PathfindingSystem : ComponentSystem
                 buffer.Add(keyValuePair.Value[j]);
             }
 
-            EntityManager.AddComponent<AgentHasPath>(entity);
+            EntityManager.AddComponent<NavAgentHasPathTag>(entity);
             EntityManager.SetComponentData(entity, agent);
             EntityManager.RemoveComponent<NavAgentRequestingPath>(entity);
 

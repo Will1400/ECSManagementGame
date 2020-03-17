@@ -2,6 +2,6 @@
 using System.Collections;
 using Unity.Entities;
 
-public struct AgentHasPath : IComponentData
+public struct NavAgentHasPathTag : IComponentData
 {
 }
