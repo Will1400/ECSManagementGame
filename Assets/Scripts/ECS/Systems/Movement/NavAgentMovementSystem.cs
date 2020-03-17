@@ -5,6 +5,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Jobs;
 using Unity.Collections;
+using Unity.Burst;
 
 public class NavAgentMovementSystem : JobComponentSystem
 {
@@ -75,7 +76,7 @@ public class NavAgentMovementSystem : JobComponentSystem
     //    }
     //}
 
-
+    [BurstCompile]
     struct ChunkMoveJob : IJobChunk
     {
         public EntityCommandBuffer.Concurrent CommandBuffer;
@@ -111,7 +112,7 @@ public class NavAgentMovementSystem : JobComponentSystem
                 {
                     agent.Status = AgentStatus.Idle;
                     navAgents[i] = agent;
-                    CommandBuffer.RemoveComponent(chunkIndex, entities[i], typeof(NavAgentHasPathTag));
+                    CommandBuffer.RemoveComponent(chunkIndex, entities[i], ComponentType.ReadOnly<NavAgentHasPathTag>());
                     break;
                 }
                 float3 destination = buffer[agent.CurrentWaypointIndex];
