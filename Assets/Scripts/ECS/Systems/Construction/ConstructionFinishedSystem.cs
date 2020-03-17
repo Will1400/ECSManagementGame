@@ -28,6 +28,8 @@ public class ConstructionFinishedSystem : ComponentSystem
 
             var occupation = EntityManager.GetComponentData<GridOccupation>(entity);
             EntityManager.AddComponentData(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });
+            EntityManager.AddComponent<Static>(finishedEntity);
+            EntityManager.AddComponent<Frozen>(finishedEntity);
 
             workerData.CurrentWorkers = -1;
             workerData.ActiveWorkers = -1;

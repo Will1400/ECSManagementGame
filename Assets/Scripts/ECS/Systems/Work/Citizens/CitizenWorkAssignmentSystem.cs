@@ -21,28 +21,46 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
+        //var workPlaces = Entities.With(needsWorkersQuery).ToEntityQuery().ToEntityArray(Allocator.TempJob);
+        var idleCitizens = Entities.With(idleCitizensQuery).ToEntityQuery().ToEntityArray(Allocator.TempJob);
+        int citizenIndex = 0;
         Entities.With(needsWorkersQuery).ForEach((Entity workPlace, ref WorkPlaceWorkerData workerData) =>
         {
+            if (idleCitizens.Length == 0)
+                return;
+
             if (workerData.CurrentWorkers < workerData.MaxWorkers)
             {
                 int currentWorkers = workerData.CurrentWorkers;
                 WorkPlaceWorkerData tempWorkerData = workerData;
-                Entities.With(idleCitizensQuery).ForEach((Entity citizen) =>
+
+                Entity citizen;
+                for (int i = citizenIndex; i < idleCitizens.Length; i++)
                 {
                     if (currentWorkers < tempWorkerData.MaxWorkers)
                     {
+                        citizen = idleCitizens[i];
                         EntityManager.AddComponent<GoingToWorkTag>(citizen);
                         EntityManager.AddComponent<CitizenWork>(citizen);
                         EntityManager.AddComponent<NavAgentRequestingPath>(citizen);
 
                         EntityManager.AddComponentData(citizen, new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = tempWorkerData.WorkPosition });
-                        EntityManager.AddComponentData(citizen, new NavAgentRequestingPath { StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value, EndPosition = tempWorkerData.WorkPosition});
+                        EntityManager.AddComponentData(citizen, new NavAgentRequestingPath { StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value, EndPosition = tempWorkerData.WorkPosition });
                         currentWorkers++;
                         EntityManager.RemoveComponent<IdleTag>(citizen);
+
+                        citizenIndex++;
                     }
-                });
+                    else
+                    {
+                        break;
+                    }
+                }
+                //EntityManager.SetComponentData(workPlace, workerData);
                 workerData.CurrentWorkers = currentWorkers;
             }
         });
+
+        idleCitizens.Dispose();
     }
 }

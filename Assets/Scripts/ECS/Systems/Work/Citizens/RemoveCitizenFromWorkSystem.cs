@@ -24,14 +24,12 @@ public class RemoveCitizenFromWorkSystem : ComponentSystem
             if (citizenWork.WorkPlaceEntity != null)
             {
                 var index = citizenWork.WorkPlaceEntity.Index;
-                Entities.With(workPlaces).ForEach((Entity workPlaceEntity, ref WorkPlaceWorkerData workerData) =>
-                {
-                    if (workPlaceEntity.Index == index)
-                    {
-                        workerData.ActiveWorkers--;
-                        workerData.CurrentWorkers--;
-                    }
-                });
+                var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
+
+                workerData.ActiveWorkers--;
+                workerData.CurrentWorkers--;
+
+                EntityManager.SetComponentData(citizenWork.WorkPlaceEntity, workerData);
             }
 
             EntityManager.RemoveComponent<IsWorkingTag>(entity);
