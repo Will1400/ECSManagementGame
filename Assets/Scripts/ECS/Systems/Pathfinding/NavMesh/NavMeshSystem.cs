@@ -139,7 +139,6 @@ public class NavMeshSystem : ComponentSystem
                bounds);
 
             temp.Dispose();
-            //NavMeshQuerySystem.instance.world = NavMeshWorld.GetDefaultWorld();
             updateMesh = false;
         }
     }
@@ -151,7 +150,7 @@ public class NavMeshSystem : ComponentSystem
     }
 
     //struct ObstacleJob : IJobChunk
-    //{
+    //{1
     //    public ArchetypeChunkSharedComponentType<NavMeshObstacle> NavMeshObstacleType;
     //    public ArchetypeChunkSharedComponentType<RenderMesh> RenderMeshType;
     //    public ArchetypeChunkComponentType<LocalToWorld> LocalToWorldType;
