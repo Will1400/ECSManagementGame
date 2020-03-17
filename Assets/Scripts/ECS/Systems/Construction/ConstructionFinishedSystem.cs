@@ -19,10 +19,7 @@ public class ConstructionFinishedSystem : ComponentSystem
         Entities.With(allSitesQuery).ForEach((Entity entity, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
         {
             var prefab = PrefabManager.Instance.GetPrefabByName(construction.finishedPrefabName.ToString());
-            var material = prefab.GetComponent<Renderer>().sharedMaterial;
-            material.SetColor("_BaseColor", Color.white);
             Entity finishedEntity = ArcheTypeManager.Instance.GetSetupBuildingEntity(prefab.GetComponent<MeshFilter>().sharedMesh, prefab.GetComponent<Renderer>().sharedMaterial, prefab);
-
 
             EntityManager.AddComponentData(finishedEntity, new Translation { Value = translation.Value });
 
