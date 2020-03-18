@@ -29,7 +29,7 @@ public class PlacementSystem : ComponentSystem
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9).Position;
             mouseWorldPosition.y = 1.5f;
-            ArcheTypeManager.Instance.GetSetupCitizenEntity(mouseWorldPosition);
+            EntityCreationManager.Instance.GetSetupCitizenEntity(mouseWorldPosition);
         }
 
         if (GameManager.Instance.CursorState == CursorState.Building)

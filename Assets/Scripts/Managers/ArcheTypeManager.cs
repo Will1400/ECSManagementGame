@@ -79,34 +79,4 @@ public class ArcheTypeManager : MonoBehaviour
     {
         return ArcheTypes[archetype];
     }
-
-    public Entity GetSetupBuildingEntity(Mesh mesh, Material material, GameObject prefab)
-    {
-        Entity entity = entityManager.CreateEntity(GetArcheType(PredifinedArchetype.Building));
-
-        entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
-        entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
-        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
-        entityManager.AddComponentData(entity, new NavMeshObstacle { Area = 1});
-        entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
-
-        return entity;
-    }
-
-    public Entity GetSetupCitizenEntity(float3 position)
-    {
-        Entity entity = entityManager.CreateEntity(GetArcheType(PredifinedArchetype.Citizen));
-        var prefab = Resources.Load<GameObject>("Prefabs/Citizen");
-        var mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
-        var material = Resources.Load<Material>("Materials/Citizen/Default");
-        entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
-        entityManager.AddComponentData(entity, new Translation { Value = position });
-        entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
-        entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
-        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
-
-        entityManager.AddComponentData(entity, new MoveSpeed { Value = 5 });
-
-        return entity;
-    }
 }
