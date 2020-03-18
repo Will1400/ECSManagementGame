@@ -51,7 +51,6 @@ public class GridCacheSystem : ComponentSystem
         Entities.With(nonCachedGridOccupations).ForEach((Entity entity, ref GridOccupation gridOccupation) =>
         {
             GridOccupations.Add(gridOccupation);
-            Debug.Log("Adding occupation to cache");
 
             for (int x = gridOccupation.Start.x; x <= gridOccupation.End.x; x++)
             {
@@ -68,7 +67,6 @@ public class GridCacheSystem : ComponentSystem
         // Remove from cache
         Entities.With(deletedGridOccupationsInCache).ForEach((Entity entity, ref IsInCache isInCache) =>
         {
-            Debug.Log("Deleting occupation from cache");
             for (int i = 0; i < GridOccupations.Length; i++)
             {
                 var gridOccupation = GridOccupations[i];

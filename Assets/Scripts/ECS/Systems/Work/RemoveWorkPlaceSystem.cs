@@ -32,24 +32,24 @@ public class RemoveWorkPlaceSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (workPlacesToRemoveQuery.CalculateChunkCount() > 0)
+        if (workPlacesToRemoveQuery.CalculateChunkCount() <= 0)
+            return;
+
+        NativeArray<Entity> workingCitizens = workingCitizensQuery.ToEntityArray(Allocator.TempJob);
+        NativeArray<CitizenWork> workingCitizensWorkerData = workingCitizensQuery.ToComponentDataArray<CitizenWork>(Allocator.TempJob);
+
+        var job = new RemoveWorkPlaceJob
         {
-            NativeArray<Entity> workingCitizens = workingCitizensQuery.ToEntityArray(Allocator.TempJob);
-            NativeArray<CitizenWork> workingCitizensWorkerData = workingCitizensQuery.ToComponentDataArray<CitizenWork>(Allocator.TempJob);
+            EntityType = GetArchetypeChunkEntityType(),
+            WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(),
+            WorkingCitizens = workingCitizens,
+            WorkingCitizensWorkerData = workingCitizensWorkerData,
+            CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
+        }.Schedule(workPlacesToRemoveQuery);
+        job.Complete();
 
-            var job = new RemoveWorkPlaceJob
-            {
-                EntityType = GetArchetypeChunkEntityType(),
-                WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(),
-                WorkingCitizens = workingCitizens,
-                WorkingCitizensWorkerData = workingCitizensWorkerData,
-                CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
-            }.Schedule(workPlacesToRemoveQuery);
-            job.Complete();
-
-            workingCitizens.Dispose();
-            workingCitizensWorkerData.Dispose();
-        }
+        workingCitizens.Dispose();
+        workingCitizensWorkerData.Dispose();
     }
 
     [BurstCompile]
