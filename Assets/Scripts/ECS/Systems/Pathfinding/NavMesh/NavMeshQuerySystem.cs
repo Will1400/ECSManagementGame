@@ -260,7 +260,7 @@ public class NavMeshQuerySystem : JobComponentSystem
                 }
                 else
                 {
-                    Debug.LogWarning(endStatus);
+                    //Debug.LogWarning(endStatus);
                     statuses[0] = 1;
                     statuses[1] = 2;
                 }

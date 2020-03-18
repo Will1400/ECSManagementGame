@@ -75,10 +75,12 @@ public class PathfindingSystem : ComponentSystem
     void OnPathRequestFailed(int id, PathfindingFailedReason reason)
     {
         var entity = queuedEntities[id];
-        var agent = EntityManager.GetComponentData<NavAgent>(entity);
-        agent.Status = AgentStatus.Idle;
-        EntityManager.SetComponentData(entity, agent);
-        queuedEntities.Remove(id);
+        //var agent = EntityManager.GetComponentData<NavAgent>(entity);
+        //agent.Status = AgentStatus.Idle;
+        //EntityManager.SetComponentData(entity, agent);
+        //queuedEntities.Remove(id);
+
+        readyPaths.Add(id, new float3[] { EntityManager.GetComponentData<NavAgentRequestingPath>(entity).EndPosition });
     }
 
     void OnPathRequestCompleted(int id, Vector3[] points)
