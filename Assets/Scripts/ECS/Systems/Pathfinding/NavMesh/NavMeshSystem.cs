@@ -108,20 +108,23 @@ public class NavMeshSystem : JobComponentSystem
 
         while (sourceQueue.TryDequeue(out SourceStash source))
         {
-            if (indexedSources.ContainsKey(source.OwnersIndex))
-            {
-                var existingValue = indexedSources[source.OwnersIndex];
-                if (existingValue.transform != source.NavMeshBuildSource.transform)
-                {
-                    indexedSources[source.OwnersIndex] = source.NavMeshBuildSource;
-                    updateMesh = true;
-                }
-            }
-            else
+            if (!indexedSources.ContainsKey(source.OwnersIndex))
             {
                 indexedSources.Add(source.OwnersIndex, source.NavMeshBuildSource);
                 updateMesh = true;
             }
+
+            // Code for updating the position of the source  - disabled for performance
+            
+            //else
+            //{
+            //    var existingValue = indexedSources[source.OwnersIndex];
+            //    if (existingValue.transform != source.NavMeshBuildSource.transform)
+            //    {
+            //        indexedSources[source.OwnersIndex] = source.NavMeshBuildSource;
+            //        updateMesh = true;
+            //    }
+            //}
         }
 
         if (updateMesh && (currentUpdateInfo == null || currentUpdateInfo.isDone))
