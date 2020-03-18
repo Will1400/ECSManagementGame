@@ -5,41 +5,63 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Jobs;
 using Unity.Collections;
+using Unity.Burst;
 
-public class CheckIfCitizenArrivedAtWork : JobComponentSystem
+public class CheckIfCitizenArrivedAtWork : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
+    EntityQuery citizensToCheckQuery;
 
     protected override void OnCreate()
     {
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+        citizensToCheckQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { typeof(CitizenWork),typeof(Translation), typeof(Citizen), typeof(GoingToWorkTag) }
+        });
     }
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    protected override void OnUpdate()
     {
         var job = new CheckIfArrivedAtWorkJob
         {
+            EntityType = GetArchetypeChunkEntityType(),
+            CitizenWorkType = GetArchetypeChunkComponentType<CitizenWork>(true),
+            TranslationType = GetArchetypeChunkComponentType<Translation>(true),
             CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
-        }.Schedule(this, inputDeps);
+        }.Schedule(citizensToCheckQuery);
 
         job.Complete();
-        return job;
     }
 
-    [RequireComponentTag(typeof(GoingToWorkTag))]
-    struct CheckIfArrivedAtWorkJob : IJobForEachWithEntity<Citizen, CitizenWork, Translation>
+    [BurstCompile]
+    struct CheckIfArrivedAtWorkJob : IJobChunk
     {
+        [ReadOnly]
+        public ArchetypeChunkEntityType EntityType;
+        [ReadOnly]
+        public ArchetypeChunkComponentType<Translation> TranslationType;
+        [ReadOnly]
+        public ArchetypeChunkComponentType<CitizenWork> CitizenWorkType;
+
         public EntityCommandBuffer.Concurrent CommandBuffer;
 
-        public void Execute(Entity entity, int index, ref Citizen citizen, ref CitizenWork citizenWork, ref Translation translation)
+        public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
-            float3 correctedTranslation = translation.Value;
-            correctedTranslation.y = citizenWork.WorkPosition.y;
-            float distance = math.distance(correctedTranslation, citizenWork.WorkPosition);
+            var entities = chunk.GetNativeArray(EntityType);
+            var translations = chunk.GetNativeArray(TranslationType);
+            var citizenWorks = chunk.GetNativeArray(CitizenWorkType);
 
-            if (distance <= .5f)
+            for (int i = 0; i < chunk.Count; i++)
             {
-                CommandBuffer.AddComponent<HasArrivedAtWorkTag>(index, entity);
+                float3 correctedTranslation = translations[i].Value;
+                correctedTranslation.y = citizenWorks[i].WorkPosition.y;
+                float distance = math.distance(correctedTranslation, citizenWorks[i].WorkPosition);
+
+                if (distance <= .5f)
+                {
+                    CommandBuffer.AddComponent<HasArrivedAtWorkTag>(chunkIndex, entities[i]);
+                }
             }
         }
     }
