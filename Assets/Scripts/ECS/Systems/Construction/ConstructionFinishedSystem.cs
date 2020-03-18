@@ -26,7 +26,6 @@ public class ConstructionFinishedSystem : ComponentSystem
             var occupation = EntityManager.GetComponentData<GridOccupation>(entity);
             EntityManager.AddComponentData(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });
 
-            workerData.CurrentWorkers = -1;
             workerData.ActiveWorkers = -1;
             EntityManager.RemoveComponent<UnderConstruction>(entity);
             EntityManager.AddComponent<RemoveWorkPlaceTag>(entity);
