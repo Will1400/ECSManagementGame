@@ -7,10 +7,13 @@ public class PrefabManager : MonoBehaviour
 {
     public static PrefabManager Instance;
 
+    [Header("All Prefabs inside the 'Prefabs' folder gets auto loaded")]
     [SerializeField]
     private List<GameObject> buildingPrefabs;
     [SerializeField]
     private List<GameObject> unitPrefabs;
+    [SerializeField]
+    private List<GameObject> autoLoadedPrefabs;
 
     private void Awake()
     {
@@ -18,6 +21,11 @@ public class PrefabManager : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        autoLoadedPrefabs.AddRange(Resources.LoadAll<GameObject>("Prefabs/"));
     }
 
     public GameObject GetBuilding(string buildingName)
@@ -56,6 +64,6 @@ public class PrefabManager : MonoBehaviour
         {
             name = name.Replace("(Clone)", string.Empty);
         }
-        return buildingPrefabs.Concat(unitPrefabs).FirstOrDefault(x => x.name == name);
+        return buildingPrefabs.Concat(unitPrefabs).Concat(autoLoadedPrefabs).FirstOrDefault(x => x.name == name);
     }
 }

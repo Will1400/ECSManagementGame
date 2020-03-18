@@ -56,9 +56,8 @@ public class CheckIfCitizenArrivedAtWork : SystemBase
             {
                 float3 correctedTranslation = translations[i].Value;
                 correctedTranslation.y = citizenWorks[i].WorkPosition.y;
-                float distance = math.distance(correctedTranslation, citizenWorks[i].WorkPosition);
 
-                if (distance <= .5f)
+                if (math.distance(correctedTranslation, citizenWorks[i].WorkPosition) <= .5f)
                 {
                     CommandBuffer.AddComponent<HasArrivedAtWorkTag>(chunkIndex, entities[i]);
                 }

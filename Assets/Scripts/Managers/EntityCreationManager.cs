@@ -27,12 +27,13 @@ public class EntityCreationManager : MonoBehaviour
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
     }
 
-    public Entity GetSetupBuildingEntity(Mesh mesh, Material material, float scale, quaternion rotation)
+    public Entity GetSetupBuildingEntity(Mesh mesh, Material material, float scale, quaternion rotation, float3 position)
     {
         Entity entity = entityManager.CreateEntity(archeTypeManager.GetArcheType(PredifinedArchetype.Building));
 
         entityManager.AddComponentData(entity, new Scale { Value = scale });
         entityManager.AddComponentData(entity, new Rotation { Value = rotation });
+        entityManager.AddComponentData(entity, new Translation { Value =  position});
         entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
         entityManager.AddComponentData(entity, new NavMeshObstacle { Area = 1 });
         entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
@@ -42,7 +43,7 @@ public class EntityCreationManager : MonoBehaviour
 
     public Entity GetSetupBuildingEntity(GameObject prefab)
     {
-        return GetSetupBuildingEntity(prefab.GetComponent<MeshFilter>().sharedMesh,prefab.GetComponent<Renderer>().sharedMaterial, prefab.transform.localScale.x, transform.rotation);
+        return GetSetupBuildingEntity(prefab.GetComponent<MeshFilter>().sharedMesh,prefab.GetComponent<Renderer>().sharedMaterial, prefab.transform.localScale.x, transform.rotation, transform.position);
     }
 
     public Entity GetSetupCitizenEntity(float3 position)

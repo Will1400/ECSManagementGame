@@ -20,7 +20,7 @@ public class PlacementSystem : ComponentSystem
         {
             if (currentEntity == Entity.Null)
             {
-                Spawn(PrefabManager.Instance.GetBuilding(0));
+                Spawn(PrefabManager.Instance.GetPrefabByName("TallHouse"));
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))

@@ -15,7 +15,7 @@ public class PlacementPositionSystem : ComponentSystem
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 9999, 1u << 9).Position;
-        mouseWorldPosition.y = 1;
+        mouseWorldPosition.y++;
         mouseWorldPosition = math.round(mouseWorldPosition);
 
         Entities.WithAll<BeingPlacedTag>().WithNone<IsInCache>().ForEach((ref Translation translation, ref GridOccupation gridOccupation, ref WorldRenderBounds renderBounds) =>
@@ -25,7 +25,11 @@ public class PlacementPositionSystem : ComponentSystem
 
             gridOccupation.Start = new int2(result.x, result.y);
             gridOccupation.End = new int2(result.z, result.w);
-            translation.Value = mouseWorldPosition;
+
+            var heightAdjustedPosition = mouseWorldPosition;
+            heightAdjustedPosition.y = translation.Value.y;
+
+            translation.Value = heightAdjustedPosition;
         });
     }
 }

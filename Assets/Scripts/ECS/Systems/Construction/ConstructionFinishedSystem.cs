@@ -21,6 +21,8 @@ public class ConstructionFinishedSystem : ComponentSystem
             var prefab = PrefabManager.Instance.GetPrefabByName(construction.finishedPrefabName.ToString());
             Entity finishedEntity = EntityCreationManager.Instance.GetSetupBuildingEntity(prefab);
 
+            translation.Value.y = prefab.transform.position.y;
+
             EntityManager.AddComponentData(finishedEntity, new Translation { Value = translation.Value });
             EntityManager.AddComponentData(finishedEntity, new Rotation { Value = prefab.transform.rotation });
 
