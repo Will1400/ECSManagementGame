@@ -13,7 +13,7 @@ using System.Linq;
 using UnityEngine.Experimental.AI;
 
 [UpdateAfter(typeof(PlacementSystem))]
-public class NavMeshSystem : ComponentSystem
+public class NavMeshSystem : JobComponentSystem
 {
     private Bounds bounds;
     private NavMeshData navMeshData;
@@ -21,10 +21,15 @@ public class NavMeshSystem : ComponentSystem
 
     /// Key is index of the entity
     NativeHashMap<int, NavMeshBuildSource> indexedSources;
-    NativeList<int> expectedIds;
+    NativeQueue<SourceStash> sourceQueue;
     bool updateMesh;
-
     List<NavMeshBuildSource> sources;
+
+    AsyncOperation currentUpdateInfo;
+
+    EntityQuery obstacleQuery;
+    EntityQuery surfaceQuery;
+
     protected override void OnCreate()
     {
         navMeshData = new NavMeshData();
@@ -32,107 +37,88 @@ public class NavMeshSystem : ComponentSystem
         bounds = new Bounds(Vector3.zero, new Vector3(5000, 256, 5000));
 
         indexedSources = new NativeHashMap<int, NavMeshBuildSource>(10, Allocator.Persistent);
-        expectedIds = new NativeList<int>(Allocator.Persistent);
+        sourceQueue = new NativeQueue<SourceStash>(Allocator.Persistent);
 
         updateMesh = true;
+
+
+        obstacleQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { typeof(NavMeshObstacle), typeof(LocalToWorld) }
+        });
+        surfaceQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { typeof(NavMeshSurface), typeof(LocalToWorld) }
+        });
     }
 
-    protected override void OnUpdate()
+    protected override JobHandle OnUpdate(JobHandle InputDeps)
     {
-        expectedIds.Clear();
-
-        Entities.WithAllReadOnly<NavMeshObstacle, LocalToWorld>().ForEach((Entity entity, ref LocalToWorld localToWorld) =>
+        Entities.ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshObstacle obstacleData) =>
         {
-            expectedIds.Add(entity.Index);
-
-            if (!indexedSources.ContainsKey(entity.Index))
+            if (obstacleData.Size.Equals(float3.zero))
             {
-                // Add new source
-                var obstacleData = EntityManager.GetSharedComponentData<NavMeshObstacle>(entity);
-
-                if (obstacleData.Size.Equals(float3.zero))
-                {
-                    Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
-
-                    obstacleData.Size = mesh.bounds.size;
-                    EntityManager.SetSharedComponentData(entity, obstacleData);
-                }
-
-                NavMeshBuildSource source = new NavMeshBuildSource
-                {
-                    area = obstacleData.Area,
-                    shape = NavMeshBuildSourceShape.Box,
-                    size = obstacleData.Size,
-                    transform = localToWorld.Value
-                };
-
-                indexedSources.Add(entity.Index, source);
+                Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
+                obstacleData.Size = mesh.bounds.size;
             }
-            else
+        }).WithoutBurst().Run();
+
+        Entities.ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshSurface surfaceData) =>
+        {
+            if (surfaceData.Size.Equals(float3.zero))
             {
-                // Update Position if needed
-                NavMeshBuildSource source = indexedSources[entity.Index];
-                if (source.transform != (Matrix4x4)localToWorld.Value)
+                Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
+                surfaceData.Size = mesh.bounds.size;
+            }
+        }).WithoutBurst().Run();
+
+        if (sourceQueue.Count > 0)
+            sourceQueue.Clear();
+
+        JobHandle obstacleJob = new ObstacleJob
+        {
+            EntityType = GetArchetypeChunkEntityType(),
+            LocalToWorldType = GetArchetypeChunkComponentType<LocalToWorld>(),
+            NavMeshObstacleType = GetArchetypeChunkComponentType<NavMeshObstacle>(),
+            Sources = sourceQueue.AsParallelWriter()
+        }.Schedule(obstacleQuery, InputDeps);
+
+        obstacleJob.Complete();
+
+        JobHandle surfaceJob = new SurfaceJob
+        {
+            EntityType = GetArchetypeChunkEntityType(),
+            LocalToWorldType = GetArchetypeChunkComponentType<LocalToWorld>(),
+            NavMeshSurfaceType = GetArchetypeChunkComponentType<NavMeshSurface>(),
+            Sources = sourceQueue.AsParallelWriter()
+        }.Schedule(surfaceQuery, InputDeps);
+
+        surfaceJob.Complete();
+
+        while (sourceQueue.TryDequeue(out SourceStash source))
+        {
+            if (indexedSources.ContainsKey(source.OwnersIndex))
+            {
+                var existingValue = indexedSources[source.OwnersIndex];
+                if (existingValue.transform != source.NavMeshBuildSource.transform)
                 {
-                    source.transform = localToWorld.Value;
-                    indexedSources[entity.Index] = source;
+                    indexedSources[source.OwnersIndex] = source.NavMeshBuildSource;
                     updateMesh = true;
                 }
             }
-        });
-
-        Entities.WithAllReadOnly<NavMeshSurface, LocalToWorld>().ForEach((Entity entity, ref LocalToWorld localToWorld) =>
-        {
-            expectedIds.Add(entity.Index);
-
-            if (!indexedSources.ContainsKey(entity.Index))
-            {
-                // Add new source
-                var surfaceData = EntityManager.GetComponentData<NavMeshSurface>(entity);
-
-                //if (surfaceData.Size.Equals(float3.zero))
-                var mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
-
-                NavMeshBuildSource source = new NavMeshBuildSource
-                {
-                    area = surfaceData.Area,
-                    shape = NavMeshBuildSourceShape.Mesh,
-                    sourceObject = mesh,
-                    //size = surfaceData.Size,
-                    transform = localToWorld.Value
-                };
-                indexedSources.Add(entity.Index, source);
-            }
             else
             {
-                // Update Position if needed
-                NavMeshBuildSource source = indexedSources[entity.Index];
-                if (source.transform != (Matrix4x4)localToWorld.Value)
-                {
-                    source.transform = localToWorld.Value;
-                    indexedSources[entity.Index] = source;
-                    updateMesh = true;
-                }
-            }
-        });
-
-        for (int i = 0; i < expectedIds.Length; i++)
-        {
-            int key = expectedIds[i];
-
-            if (!indexedSources.ContainsKey(key))
-            {
-                indexedSources.Remove(key);
+                indexedSources.Add(source.OwnersIndex, source.NavMeshBuildSource);
                 updateMesh = true;
             }
         }
 
-        if (updateMesh)
+        if (updateMesh && (currentUpdateInfo == null || currentUpdateInfo.isDone))
         {
             var temp = indexedSources.GetValueArray(Allocator.TempJob);
             sources = temp.ToList();
             NavMeshBuildSettings buildSettings = NavMesh.GetSettingsByID(0);
-            NavMeshBuilder.UpdateNavMeshData(
+            currentUpdateInfo = NavMeshBuilder.UpdateNavMeshDataAsync(
                navMeshData,
                buildSettings,
                sources,
@@ -141,47 +127,101 @@ public class NavMeshSystem : ComponentSystem
             temp.Dispose();
             updateMesh = false;
         }
+
+        return obstacleJob;
     }
 
     protected override void OnDestroy()
     {
         indexedSources.Dispose();
-        expectedIds.Dispose();
+        sourceQueue.Dispose();
     }
 
-    //struct ObstacleJob : IJobChunk
-    //{1
-    //    public ArchetypeChunkSharedComponentType<NavMeshObstacle> NavMeshObstacleType;
-    //    public ArchetypeChunkSharedComponentType<RenderMesh> RenderMeshType;
-    //    public ArchetypeChunkComponentType<LocalToWorld> LocalToWorldType;
+    [BurstCompile]
+    struct ObstacleJob : IJobChunk
+    {
+        [ReadOnly]
+        public ArchetypeChunkEntityType EntityType;
 
-    //    public NativeQueue<MeshStash> MeshSources;
-    //    public NativeList<NavMeshBuildSource> Sources;
+        public ArchetypeChunkComponentType<NavMeshObstacle> NavMeshObstacleType;
+        public ArchetypeChunkComponentType<LocalToWorld> LocalToWorldType;
 
-    //    public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
-    //    {
-    //        int obstacleIndex = chunk.GetSharedComponentIndex(NavMeshObstacleType);
-    //        int meshIndex = chunk.GetSharedComponentIndex(RenderMeshType);
-    //        var localToWorlds = chunk.GetNativeArray(LocalToWorldType);
+        public NativeQueue<SourceStash>.ParallelWriter Sources;
 
-    //        for (int i = 0; i < chunk.Count; i++)
-    //        {
-    //            var transform = localToWorlds[i].Value;
+        public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
+        {
+            NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
+            NativeArray<LocalToWorld> localToWorlds = chunk.GetNativeArray(LocalToWorldType);
+            NativeArray<NavMeshObstacle> obstacles = chunk.GetNativeArray(NavMeshObstacleType);
 
-    //            MeshSources.Enqueue(new MeshStash
-    //            {
-    //                Transform = transform,
-    //                MeshIndex = meshIndex,
-    //                ObstacleIndex = obstacleIndex
-    //            });
-    //        }
-    //    }
-    //}
+            for (int i = 0; i < chunk.Count; i++)
+            {
+                var entity = entities[i];
+                var localToWorld = localToWorlds[i];
+                var obstacleData = obstacles[i];
+                // Add new source
 
-    //public struct MeshStash
-    //{
-    //    public Matrix4x4 Transform;
-    //    public int MeshIndex;
-    //    public int ObstacleIndex;
-    //}
+                SourceStash source = new SourceStash
+                {
+                    NavMeshBuildSource = new NavMeshBuildSource
+                    {
+                        area = obstacleData.Area,
+                        shape = NavMeshBuildSourceShape.Box,
+                        size = obstacleData.Size,
+                        transform = localToWorld.Value
+                    },
+                    OwnersIndex = entity.Index
+                };
+
+                Sources.Enqueue(source);
+            }
+        }
+    }
+
+    [BurstCompile]
+    struct SurfaceJob : IJobChunk
+    {
+        [ReadOnly]
+        public ArchetypeChunkEntityType EntityType;
+
+        public ArchetypeChunkComponentType<NavMeshSurface> NavMeshSurfaceType;
+        public ArchetypeChunkComponentType<LocalToWorld> LocalToWorldType;
+
+        public NativeQueue<SourceStash>.ParallelWriter Sources;
+
+        public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
+        {
+            NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
+            NativeArray<LocalToWorld> localToWorlds = chunk.GetNativeArray(LocalToWorldType);
+            NativeArray<NavMeshSurface> surfaces = chunk.GetNativeArray(NavMeshSurfaceType);
+
+            for (int i = 0; i < chunk.Count; i++)
+            {
+                var entity = entities[i];
+                var localToWorld = localToWorlds[i];
+                var surfaceData = surfaces[i];
+
+                // Add new source
+                SourceStash source = new SourceStash
+                {
+                    NavMeshBuildSource = new NavMeshBuildSource
+                    {
+                        area = surfaceData.Area,
+                        shape = NavMeshBuildSourceShape.Box,
+                        size = surfaceData.Size,
+                        transform = localToWorld.Value
+                    },
+                    OwnersIndex = entity.Index
+                };
+
+                Sources.Enqueue(source);
+            }
+        }
+    }
+
+    struct SourceStash
+    {
+        public int OwnersIndex;
+        public NavMeshBuildSource NavMeshBuildSource;
+    }
 }

@@ -86,8 +86,8 @@ public class ArcheTypeManager : MonoBehaviour
 
         entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
         entityManager.AddComponentData(entity, new Rotation { Value = prefab.transform.rotation });
-        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.Off, receiveShadows = true });
-        entityManager.AddSharedComponentData(entity, new NavMeshObstacle { Area = 1});
+        entityManager.AddSharedComponentData(entity, new RenderMesh { mesh = mesh, material = material, castShadows = ShadowCastingMode.On, receiveShadows = true });
+        entityManager.AddComponentData(entity, new NavMeshObstacle { Area = 1});
         entityManager.AddComponentData(entity, new RenderBounds { Value = mesh.bounds.ToAABB() });
 
         return entity;

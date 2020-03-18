@@ -7,7 +7,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
-public class NavAgentMovementSystem : JobComponentSystem
+public class NavAgentMovementSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery navAgentsToMoveQuery;
@@ -17,26 +17,25 @@ public class NavAgentMovementSystem : JobComponentSystem
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         navAgentsToMoveQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(CitizenWork), typeof(MoveSpeed), typeof(Translation), typeof(NavAgent), typeof(Float3BufferElement), typeof(NavAgentHasPathTag) }
+            All = new ComponentType[] { typeof(CitizenWork), typeof(MoveSpeed), typeof(Translation), typeof(NavAgent), typeof(NavAgentPathPointElement), typeof(NavAgentHasPathTag) }
         });
     }
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    protected override void OnUpdate()
     {
         var job = new ChunkMoveJob
         {
             TranslationType = GetArchetypeChunkComponentType<Translation>(),
             NavAgentType = GetArchetypeChunkComponentType<NavAgent>(),
-            BufferElementType = GetArchetypeChunkBufferType<Float3BufferElement>(true),
+            BufferElementType = GetArchetypeChunkBufferType<NavAgentPathPointElement>(true),
             MoveSpeedType = GetArchetypeChunkComponentType<MoveSpeed>(true),
             EntityType = GetArchetypeChunkEntityType(),
 
             DeltaTime = Time.DeltaTime,
             CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
-        }.Schedule(navAgentsToMoveQuery, inputDeps);
+        }.Schedule(navAgentsToMoveQuery);
 
         job.Complete();
-        return job;
     }
 
     //[RequireComponentTag(typeof(AgentHasPath))]
@@ -89,7 +88,7 @@ public class NavAgentMovementSystem : JobComponentSystem
         public ArchetypeChunkComponentType<Translation> TranslationType;
         public ArchetypeChunkComponentType<NavAgent> NavAgentType;
         [ReadOnly]
-        public ArchetypeChunkBufferType<Float3BufferElement> BufferElementType;
+        public ArchetypeChunkBufferType<NavAgentPathPointElement> BufferElementType;
         [ReadOnly]
         public ArchetypeChunkComponentType<MoveSpeed> MoveSpeedType;
 
@@ -97,7 +96,7 @@ public class NavAgentMovementSystem : JobComponentSystem
         {
             NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
-            BufferAccessor<Float3BufferElement> buffers = chunk.GetBufferAccessor(BufferElementType);
+            BufferAccessor<NavAgentPathPointElement> buffers = chunk.GetBufferAccessor(BufferElementType);
             NativeArray<Translation> translations = chunk.GetNativeArray(TranslationType);
             NativeArray<NavAgent> navAgents = chunk.GetNativeArray(NavAgentType);
             NativeArray<MoveSpeed> moveSpeeds = chunk.GetNativeArray(MoveSpeedType);

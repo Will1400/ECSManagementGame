@@ -49,10 +49,11 @@ public class PathfindingSystem : ComponentSystem
             var agent = EntityManager.GetComponentData<NavAgent>(entity);
             agent.Status = AgentStatus.Moving;
             agent.TotalWaypoints = keyValuePair.Value.Length;
+            agent.CurrentWaypointIndex = 0;
 
-            EntityManager.AddBuffer<Float3BufferElement>(entity);
+            EntityManager.AddBuffer<NavAgentPathPointElement>(entity);
 
-            var buffer = EntityManager.GetBuffer<Float3BufferElement>(entity);
+            var buffer = EntityManager.GetBuffer<NavAgentPathPointElement>(entity);
 
             if (buffer.Length > 0)
                 buffer.Clear();
