@@ -30,8 +30,12 @@ public class NavMeshSystem : JobComponentSystem
     EntityQuery obstacleQuery;
     EntityQuery surfaceQuery;
 
+    EndSimulationEntityCommandBufferSystem bufferSystem;
+
     protected override void OnCreate()
     {
+        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+
         navMeshData = new NavMeshData();
         navMeshDataInstance = NavMesh.AddNavMeshData(navMeshData);
         bounds = new Bounds(Vector3.zero, new Vector3(5000, 256, 5000));
@@ -44,32 +48,39 @@ public class NavMeshSystem : JobComponentSystem
 
         obstacleQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(NavMeshObstacle), typeof(LocalToWorld) }
+            All = new ComponentType[] { typeof(NavMeshObstacle), typeof(LocalToWorld), typeof(NavMeshSourceHasSizeTag) }
         });
         surfaceQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(NavMeshSurface), typeof(LocalToWorld) }
+            All = new ComponentType[] { typeof(NavMeshSurface), typeof(LocalToWorld), typeof(NavMeshSourceHasSizeTag) }
         });
     }
 
     protected override JobHandle OnUpdate(JobHandle InputDeps)
     {
-        Entities.ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshObstacle obstacleData) =>
+        var commandBuffer = bufferSystem.CreateCommandBuffer();
+        Entities.WithNone<NavMeshSourceHasSizeTag>().ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshObstacle obstacleData) =>
         {
             if (obstacleData.Size.Equals(float3.zero))
             {
                 Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
                 obstacleData.Size = mesh.bounds.size;
             }
+
+            commandBuffer.AddComponent<NavMeshSourceHasSizeTag>(entity);
+
         }).WithoutBurst().Run();
 
-        Entities.ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshSurface surfaceData) =>
+        Entities.WithNone<NavMeshSourceHasSizeTag>().ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshSurface surfaceData) =>
         {
             if (surfaceData.Size.Equals(float3.zero))
             {
                 Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
                 surfaceData.Size = mesh.bounds.size;
             }
+
+            commandBuffer.AddComponent<NavMeshSourceHasSizeTag>(entity);
+
         }).WithoutBurst().Run();
 
         if (sourceQueue.Count > 0)
