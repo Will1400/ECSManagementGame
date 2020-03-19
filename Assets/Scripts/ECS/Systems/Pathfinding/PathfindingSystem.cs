@@ -27,6 +27,7 @@ public class PathfindingSystem : ComponentSystem
 
         NewRequestedPaths = Entities.WithAll<NavAgent, NavAgentRequestingPath>()
                                     .ToEntityQuery();
+
     }
 
     protected override void OnUpdate()

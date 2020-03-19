@@ -25,7 +25,7 @@ public class PrefabManager : MonoBehaviour
 
     private void Start()
     {
-        autoLoadedPrefabs.AddRange(Resources.LoadAll<GameObject>("Prefabs/"));
+        autoLoadedPrefabs.AddRange(Resources.LoadAll<GameObject>("Prefabs/AutoLoadedPrefabs/"));
     }
 
     public GameObject GetBuilding(string buildingName)

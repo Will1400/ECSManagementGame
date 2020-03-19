@@ -45,7 +45,7 @@ public class NavMeshQuerySystem : JobComponentSystem
     /// <summary>
     /// Cache query results
     /// </summary>
-    public bool UseCache = false;
+    public bool UseCache = true;
 
     /// <summary>
     /// Current version of the cache
@@ -198,6 +198,7 @@ public class NavMeshQuerySystem : JobComponentSystem
         instance.PurgeCache();
     }
 
+    [BurstCompile]
     private struct UpdateQueryStatusJob : IJob
     {
         public NavMeshQuery query;
@@ -250,7 +251,7 @@ public class NavMeshQuerySystem : JobComponentSystem
                     }
                     else
                     {
-                        Debug.LogWarning(pathStatus);
+                        //Debug.LogWarning(pathStatus);
                         statuses[0] = 1;
                         statuses[1] = 2;
                     }
@@ -319,13 +320,13 @@ public class NavMeshQuerySystem : JobComponentSystem
                 }
                 else
                 {
-                    Debug.Log("index not available");
+                    //Debug.Log("index not available");
                     QueryQueue.Enqueue(pending);
                 }
             }
             if (j > MaxQueries)
             {
-                Debug.LogError("Infinite loop detected");
+                //Debug.LogError("Infinite loop detected");
                 break;
             }
         }
@@ -504,6 +505,7 @@ public class PathUtils
         return ++n;
     }
 
+    [BurstCompile]
     public static PathQueryStatus FindStraightPath(NavMeshQuery query, Vector3 startPos, Vector3 endPos, NativeSlice<PolygonId> path, int pathSize, ref NativeArray<NavMeshLocation> straightPath, ref NativeArray<StraightPathFlags> straightPathFlags, ref NativeArray<float> vertexSide, ref int straightPathCount, int maxStraightPath)
     {
         if (!query.IsValid(path[0]))

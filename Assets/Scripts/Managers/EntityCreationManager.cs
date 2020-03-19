@@ -49,7 +49,7 @@ public class EntityCreationManager : MonoBehaviour
     public Entity GetSetupCitizenEntity(float3 position)
     {
         Entity entity = entityManager.CreateEntity(archeTypeManager.GetArcheType(PredifinedArchetype.Citizen));
-        var prefab = Resources.Load<GameObject>("Prefabs/Citizen");
+        var prefab = Resources.Load<GameObject>("Prefabs/OtherPrefabs/Citizen");
         var mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
         var material = Resources.Load<Material>("Materials/Citizen/Default");
         entityManager.AddComponentData(entity, new Scale { Value = prefab.transform.localScale.x });
