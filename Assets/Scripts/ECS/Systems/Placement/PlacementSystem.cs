@@ -10,9 +10,19 @@ using Unity.Collections;
 [UpdateAfter(typeof(GridValidationSystem))]
 public class PlacementSystem : ComponentSystem
 {
+    public static PlacementSystem Instance;
+
     Entity currentEntity;
     string prefabName;
     Material material;
+
+    bool openBuildingMenuWhenDone;
+
+    protected override void OnCreate()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
 
     protected override void OnUpdate()
     {
@@ -64,9 +74,12 @@ public class PlacementSystem : ComponentSystem
         EntityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = prefabName });
 
         Cancel();
+
+        if (openBuildingMenuWhenDone)
+            BuildUIManager.Instance.OpenPanel();
     }
 
-    void Spawn(GameObject prefab)
+    public void Spawn(GameObject prefab)
     {
         Cancel();
         currentEntity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.BeingPlaced));
@@ -79,6 +92,12 @@ public class PlacementSystem : ComponentSystem
         EntityManager.AddComponentData(currentEntity, new RenderBounds { Value = mesh.bounds.ToAABB() });
         EntityManager.AddComponentData(currentEntity, new Scale { Value = prefab.transform.localScale.x });
         EntityManager.AddComponentData(currentEntity, new Rotation { Value = prefab.transform.rotation });
+    }
+
+    public void Spawn(GameObject prefab, bool openBuildingMenuWhenDone)
+    {
+        Spawn(prefab);
+       this.openBuildingMenuWhenDone = openBuildingMenuWhenDone;
     }
 
     void Cancel()

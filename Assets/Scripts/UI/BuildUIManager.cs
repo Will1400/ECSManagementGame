@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class BuildUIManager : MonoBehaviour
@@ -33,6 +35,12 @@ public class BuildUIManager : MonoBehaviour
 
     private void Start()
     {
+        ClosePanel();
+        foreach (Transform item in contentHolder)
+        {
+            item.gameObject.SetActive(false);
+        }
+
         PrefabContexts = new Dictionary<string, List<GameObject>>();
         buildItemContexts = new Dictionary<string, List<GameObject>>();
 
@@ -53,7 +61,8 @@ public class BuildUIManager : MonoBehaviour
                 GameObject instantiatedBuildOption = Instantiate(buildItemPrefab);
                 instantiatedBuildOption.transform.SetParent(contentHolder, false);
 
-                instantiatedBuildOption.GetComponent<BuildItem>().Initialize(objectList[j].name, defaultSprite);
+                var sprite = Resources.Load<Sprite>($"Sprites/BuildingPreviews/{objectList[j].name}");
+                instantiatedBuildOption.GetComponent<BuildItem>().Initialize(objectList[j].name, sprite ? sprite : defaultSprite);
 
                 setupBuildOptions.Add(instantiatedBuildOption);
             }
@@ -68,6 +77,8 @@ public class BuildUIManager : MonoBehaviour
     {
         if (Input.GetButtonDown("Build"))
             TogglePanel();
+        if (Input.GetKeyDown(KeyCode.Escape))
+            ClosePanel();
     }
 
     public void SwitchContextTo(string name)
@@ -87,6 +98,11 @@ public class BuildUIManager : MonoBehaviour
                 objectsToEnable[j].SetActive(true);
             }
         }
+    }
+
+    public void OpenPanel()
+    {
+        buildPanel.SetActive(true);
     }
 
     public void ClosePanel()
