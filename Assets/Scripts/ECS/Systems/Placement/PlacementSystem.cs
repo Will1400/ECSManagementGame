@@ -73,10 +73,13 @@ public class PlacementSystem : ComponentSystem
         EntityManager.AddComponentData(constructionEntity, new WorkPlaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });
         EntityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = prefabName });
 
-        Cancel();
+        if (!Input.GetButton("Shift"))
+        {
+            Cancel();
 
-        if (openBuildingMenuWhenDone)
-            BuildUIManager.Instance.OpenPanel();
+            if (openBuildingMenuWhenDone)
+                BuildUIManager.Instance.OpenPanel();
+        }
     }
 
     public void Spawn(GameObject prefab)
@@ -92,12 +95,13 @@ public class PlacementSystem : ComponentSystem
         EntityManager.AddComponentData(currentEntity, new RenderBounds { Value = mesh.bounds.ToAABB() });
         EntityManager.AddComponentData(currentEntity, new Scale { Value = prefab.transform.localScale.x });
         EntityManager.AddComponentData(currentEntity, new Rotation { Value = prefab.transform.rotation });
+        EntityManager.AddComponentData(currentEntity, new Translation { Value = prefab.transform.position });
     }
 
     public void Spawn(GameObject prefab, bool openBuildingMenuWhenDone)
     {
         Spawn(prefab);
-       this.openBuildingMenuWhenDone = openBuildingMenuWhenDone;
+        this.openBuildingMenuWhenDone = openBuildingMenuWhenDone;
     }
 
     void Cancel()
