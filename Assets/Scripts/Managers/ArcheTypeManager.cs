@@ -73,6 +73,16 @@ public class ArcheTypeManager : MonoBehaviour
            typeof(IdleTag),
            typeof(MoveSpeed),
            typeof(NavAgent)));
+
+        ArcheTypes.Add(PredifinedArchetype.Resource, entityManager.CreateArchetype(
+         typeof(Translation),
+         typeof(Rotation),
+         typeof(Scale),
+         typeof(RenderMesh),
+         typeof(RenderBounds),
+         typeof(WorldRenderBounds),
+         typeof(LocalToWorld),
+         typeof(ResourceData)));
     }
 
     public EntityArchetype GetArcheType(PredifinedArchetype archetype)
