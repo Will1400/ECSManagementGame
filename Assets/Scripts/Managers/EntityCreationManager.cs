@@ -70,7 +70,7 @@ public class EntityCreationManager : MonoBehaviour
 
     public Entity GetSetupResourceProducerEntity(ResourceType resourceType, int amount, float productionTime)
     {
-        Entity entity = entityManager.CreateEntity(archeTypeManager.GetArcheType(PredifinedArchetype.Building));
+        Entity entity = entityManager.CreateEntity(archeTypeManager.GetArcheType(PredifinedArchetype.Resource));
         var prefab = PrefabManager.Instance.GetPrefabByName("Stone");
         var mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
         SetDefaultData(entity, prefab.transform.position, prefab.transform.rotation, prefab.transform.localScale.x, mesh, prefab.GetComponent<Renderer>().sharedMaterial, ShadowCastingMode.On, true);

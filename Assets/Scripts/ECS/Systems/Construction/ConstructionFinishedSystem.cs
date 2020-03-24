@@ -18,13 +18,21 @@ public class ConstructionFinishedSystem : ComponentSystem
     {
         Entities.With(allSitesQuery).ForEach((Entity entity, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
         {
-            var prefab = PrefabManager.Instance.GetPrefabByName(construction.finishedPrefabName.ToString());
-            Entity finishedEntity = EntityCreationManager.Instance.GetSetupBuildingEntity(prefab);
-
-            translation.Value.y = prefab.transform.position.y;
+            Entity finishedEntity;
+            //if (construction.finishedPrefabName.ToString() != "TallHouse")
+            //{
+            //    var prefab = PrefabManager.Instance.GetPrefabByName(construction.finishedPrefabName.ToString());
+            //    finishedEntity = EntityCreationManager.Instance.GetSetupBuildingEntity(prefab);
+            //    translation.Value.y = prefab.transform.position.y;
+            //    EntityManager.AddComponentData(finishedEntity, new Rotation { Value = prefab.transform.rotation });
+            //}
+            //else
+            //{
+            finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(construction.finishedPrefabName.ToString());
+            translation.Value.y = EntityManager.GetComponentData<Translation>(finishedEntity).Value.y;
+            //}
 
             EntityManager.AddComponentData(finishedEntity, new Translation { Value = translation.Value });
-            EntityManager.AddComponentData(finishedEntity, new Rotation { Value = prefab.transform.rotation });
 
             var occupation = EntityManager.GetComponentData<GridOccupation>(entity);
             EntityManager.AddComponentData(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });

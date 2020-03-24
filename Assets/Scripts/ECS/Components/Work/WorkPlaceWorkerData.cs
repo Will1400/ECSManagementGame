@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
+[GenerateAuthoringComponent]
 public struct WorkPlaceWorkerData : IComponentData
 {
     public int MaxWorkers;
