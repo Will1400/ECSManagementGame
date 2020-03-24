@@ -4,7 +4,9 @@ using Unity.Entities;
 using Unity.Collections;
 using Unity.Mathematics;
 using System;
+using System.Runtime.Serialization;
 
+[Serializable]
 public struct GridOccupation : IComponentData, IEquatable<GridOccupation>
 {
     public int2 Start;

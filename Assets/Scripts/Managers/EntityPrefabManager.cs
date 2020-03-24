@@ -7,25 +7,46 @@ using Unity.Rendering;
 using UnityEngine.Rendering;
 using System.Linq;
 using Unity.Mathematics;
+using System;
+using System.Runtime.Serialization;
 
 public class EntityPrefabManager : MonoBehaviour
 {
+    public IComponentData test;
+
     public static EntityPrefabManager Instance;
 
     public Dictionary<string, Entity> Prefabs = new Dictionary<string, Entity>();
 
     EntityManager EntityManager;
 
-    //readonly ComponentType[] renderComponents = new ComponentType[]
-    //{
-    //    ComponentType.ReadOnly<Translation>(),
-    //    ComponentType.ReadOnly<Rotation>(),
-    //    ComponentType.ReadOnly<Scale>(),
-    //    ComponentType.ReadOnly<RenderMesh>(),
-    //    ComponentType.ReadOnly<RenderBounds>(),
-    //    ComponentType.ReadOnly<WorldRenderBounds>(),
-    //    ComponentType.ReadOnly<LocalToWorld>()
-    //};
+    readonly ComponentType[] renderComponents = new ComponentType[]
+    {
+        ComponentType.ReadOnly<Translation>(),
+        ComponentType.ReadOnly<Rotation>(),
+        ComponentType.ReadOnly<Scale>(),
+        ComponentType.ReadOnly<RenderMesh>(),
+        ComponentType.ReadOnly<RenderBounds>(),
+        ComponentType.ReadOnly<WorldRenderBounds>(),
+        ComponentType.ReadOnly<LocalToWorld>()
+    };
+
+    Dictionary<string, ComponentType> componentTypeNames = new Dictionary<string, ComponentType>() { 
+        // Rendering
+        { "Translation", ComponentType.ReadOnly<Translation>() },
+        { "Rotation", ComponentType.ReadOnly<Rotation>() },
+        { "Scale", ComponentType.ReadOnly<Scale>() },
+        { "RenderMesh", ComponentType.ReadOnly<RenderMesh>() },
+        { "RenderBounds", ComponentType.ReadOnly<RenderBounds>() },
+        { "WorldRenderBounds", ComponentType.ReadOnly<WorldRenderBounds>() },
+        { "LocalToWorld", ComponentType.ReadOnly<LocalToWorld>() },
+
+        // Custom
+        { "GridOccupation", ComponentType.ReadOnly<GridOccupation>() },
+        { "NavMeshObstacle", ComponentType.ReadOnly<NavMeshObstacle>() },
+
+
+    };
 
     private void Awake()
     {
@@ -37,7 +58,7 @@ public class EntityPrefabManager : MonoBehaviour
     {
         EntityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         CreatePrefabsFixed();
-        //CreatePrefabs();
+        CreatePrefabs();
     }
 
     public Entity SpawnEntityPrefab(string name)
@@ -133,112 +154,113 @@ public class EntityPrefabManager : MonoBehaviour
         Prefabs.Add("Mine", entity);
     }
 
-    //void CreatePrefabs()
-    //{
-    //    var prefabInfos = new List<EntityPrefabInfo>
-    //    {
-    //        new EntityPrefabInfo
-    //        {
-    //            Name = "TallHouse",
-    //            ShouldRender = true,
-    //            AddDefaultComponents = true,
-    //            RenderInfo = new RenderInfo
-    //            {
-    //                ReceiveShadows = true,
-    //                ShadowCastingMode = ShadowCastingMode.On,
-    //                Material = Resources.Load<Material>("Models/MedievalHouse/MedievalHouse"),
-    //                Mesh = Resources.Load<Mesh>("Models/MedievalHouse/medieval")
-    //            },
-    //            TransformInfo = new TransformInfo
-    //            {
-    //                Position = new float3(0, 1.38f, 0),
-    //                Rotation = quaternion.Euler(-90, 0, 0),
-    //                Scale = 100
-    //            },
-    //            CustomComponents = new IComponentData[] { new GridOccupation { }, new NavMeshObstacle { Area = 1 } }
-    //        },
+    void CreatePrefabs()
+    {
+        var prefabInfos = new List<EntityPrefabInfo>
+        {
+            new EntityPrefabInfo
+            {
+                Name = "TallHouse",
+                ShouldRender = true,
+                AddDefaultComponents = true,
+                RenderInfo = new RenderInfo
+                {
+                    ReceiveShadows = true,
+                    ShadowCastingMode = ShadowCastingMode.On,
+                    Material = Resources.Load<Material>("Models/MedievalHouse/MedievalHouse"),
+                    Mesh = Resources.Load<Mesh>("Models/MedievalHouse/medieval")
+                },
+                TransformInfo = new TransformInfo
+                {
+                    Position = new float3(0, 1.38f, 0),
+                    Rotation = quaternion.Euler(-90, 0, 0),
+                    Scale = 100
+                },
+                CustomComponents = new IComponentData[] { new GridOccupation { }, new NavMeshObstacle { Area = 1 } }
+            },
 
-    //        new EntityPrefabInfo
-    //        {
-    //            Name = "Inn",
-    //            ShouldRender = true,
-    //            AddDefaultComponents = true,
-    //            RenderInfo = new RenderInfo
-    //            {
-    //                ReceiveShadows = true,
-    //                ShadowCastingMode = ShadowCastingMode.On,
-    //                Material = Resources.Load<Material>("Models/Inn/InnMaterial"),
-    //                Mesh = Resources.Load<Mesh>("Models/Inn/housemedieval")
-    //            },
-    //            TransformInfo = new TransformInfo
-    //            {
-    //                Position = new float3(0, 7.97f, 0),
-    //                Rotation = quaternion.Euler(0, -180, 0),
-    //                Scale = 1
-    //            },
-    //            CustomComponents = new IComponentData[] { new GridOccupation { }, new NavMeshObstacle { Area = 1 } }
-    //        }
-    //    };
-
-
-    //    // Convert PrefabInfos to disabled entities
-    //    foreach (var prefabInfo in prefabInfos)
-    //    {
-    //        List<ComponentType> componentTypes = prefabInfo.CustomComponents.Select(x => (x.GetType())).ToList();
-    //        componentTypes.Add(ComponentType.ReadOnly<Disabled>());
-
-    //        if (prefabInfo.ShouldRender)
-    //        {
-    //            componentTypes.AddRange(renderComponents);
-    //        }
-
-    //        var entity = EntityManager.CreateEntity(prefabInfo.CustomComponents.Select(x => (x.GetType())).ToArray());
-
-    //        foreach (var component in prefabInfo.CustomComponents)
-    //        {
-    //            EntityManager.SetComponentData(entity, component);
-    //        }
-
-    //        if (prefabInfo.ShouldRender)
-    //        {
-    //            EntityManager.AddComponentData(entity, new Scale { Value = prefabInfo.TransformInfo.Scale });
-    //            EntityManager.AddComponentData(entity, new Translation { Value = prefabInfo.TransformInfo.Position });
-    //            EntityManager.AddComponentData(entity, new Rotation { Value = prefabInfo.TransformInfo.Rotation });
-    //            EntityManager.AddComponentData(entity, new RenderBounds { Value = prefabInfo.RenderInfo.Mesh.bounds.ToAABB() });
-    //            EntityManager.AddSharedComponentData(entity, new RenderMesh { mesh = prefabInfo.RenderInfo.Mesh, material = prefabInfo.RenderInfo.Material, castShadows = prefabInfo.RenderInfo.ShadowCastingMode, receiveShadows = prefabInfo.RenderInfo.ReceiveShadows });
-    //        }
-
-    //        Prefabs.Add(prefabInfo.Name, entity);
-    //    }
-    //}
+            new EntityPrefabInfo
+            {
+                Name = "Inn",
+                ShouldRender = true,
+                AddDefaultComponents = true,
+                RenderInfo = new RenderInfo
+                {
+                    ReceiveShadows = true,
+                    ShadowCastingMode = ShadowCastingMode.On,
+                    Material = Resources.Load<Material>("Models/Inn/InnMaterial"),
+                    Mesh = Resources.Load<Mesh>("Models/Inn/housemedieval")
+                },
+                TransformInfo = new TransformInfo
+                {
+                    Position = new float3(0, 7.97f, 0),
+                    Rotation = quaternion.Euler(0, -180, 0),
+                    Scale = 1
+                },
+                CustomComponents = new IComponentData[] { new GridOccupation { }, new NavMeshObstacle { Area = 1 } }
+            }
+        };
 
 
+        // Convert PrefabInfos to disabled entities
+        foreach (var prefabInfo in prefabInfos)
+        {
+            List<ComponentType> componentTypes = new List<ComponentType>();
 
-    //struct EntityPrefabInfo
-    //{
-    //    public string Name;
+            componentTypes.Add(ComponentType.ReadOnly<Disabled>());
 
-    //    public IComponentData[] CustomComponents;
+            if (prefabInfo.ShouldRender)
+            {
+                componentTypes.AddRange(renderComponents);
+            }
 
-    //    public bool AddDefaultComponents;
+            var entity = EntityManager.CreateEntity(componentTypes.ToArray());
 
-    //    public bool ShouldRender;
-    //    public RenderInfo RenderInfo;
-    //    public TransformInfo TransformInfo;
-    //}
+            foreach (var component in prefabInfo.CustomComponents)
+            {
+                EntityManager.SetComponentData(entity, component);
+            }
 
-    //struct RenderInfo
-    //{
-    //    public Mesh Mesh;
-    //    public Material Material;
-    //    public ShadowCastingMode ShadowCastingMode;
-    //    public bool ReceiveShadows;
-    //}
+            if (prefabInfo.ShouldRender)
+            {
+                EntityManager.AddComponentData(entity, new Scale { Value = prefabInfo.TransformInfo.Scale });
+                EntityManager.AddComponentData(entity, new Translation { Value = prefabInfo.TransformInfo.Position });
+                EntityManager.AddComponentData(entity, new Rotation { Value = prefabInfo.TransformInfo.Rotation });
+                EntityManager.AddComponentData(entity, new RenderBounds { Value = prefabInfo.RenderInfo.Mesh.bounds.ToAABB() });
+                EntityManager.AddSharedComponentData(entity, new RenderMesh { mesh = prefabInfo.RenderInfo.Mesh, material = prefabInfo.RenderInfo.Material, castShadows = prefabInfo.RenderInfo.ShadowCastingMode, receiveShadows = prefabInfo.RenderInfo.ReceiveShadows });
+            }
 
-    //struct TransformInfo
-    //{
-    //    public float3 Position;
-    //    public quaternion Rotation;
-    //    public float Scale;
-    //}
+            Prefabs.Add(prefabInfo.Name, entity);
+        }
+    }
+
+
+
+    struct EntityPrefabInfo
+    {
+        public string Name;
+
+        public IComponentData[] CustomComponents;
+
+        public bool AddDefaultComponents;
+
+        public bool ShouldRender;
+        public RenderInfo RenderInfo;
+        public TransformInfo TransformInfo;
+    }
+
+    struct RenderInfo
+    {
+        public Mesh Mesh;
+        public Material Material;
+        public ShadowCastingMode ShadowCastingMode;
+        public bool ReceiveShadows;
+    }
+
+    struct TransformInfo
+    {
+        public float3 Position;
+        public quaternion Rotation;
+        public float Scale;
+    }
 }
