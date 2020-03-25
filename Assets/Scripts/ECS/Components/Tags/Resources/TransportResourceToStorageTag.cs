@@ -2,7 +2,6 @@
 using System.Collections;
 using Unity.Entities;
 
-public struct ResourceStorage : IComponentData
+public struct TransportResourceToStorageTag : IComponentData
 {
-    public int MaxCapacity;
 }

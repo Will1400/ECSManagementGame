@@ -59,6 +59,7 @@ public class ResourceProductionSystem : SystemBase
             }
 
             EntityManager.SetComponentData(resourceEntity, new Translation { Value = position });
+            EntityManager.AddComponent<TransportResourceToStorageTag>(resourceEntity);
         }
     }
 
