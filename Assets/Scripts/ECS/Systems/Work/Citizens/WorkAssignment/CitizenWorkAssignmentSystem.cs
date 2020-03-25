@@ -29,7 +29,7 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
             if (idleCitizens.Length == 0)
                 return;
 
-            if (workerData.CurrentWorkers < workerData.MaxWorkers)
+            if (workerData.CurrentWorkers < workerData.MaxWorkers && workerData.IsWorkable)
             {
                 int currentWorkers = workerData.CurrentWorkers;
 

@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 
+[GenerateAuthoringComponent]
 public struct NavAgentPathPointElement : IBufferElementData
 {
     public float3 Value;

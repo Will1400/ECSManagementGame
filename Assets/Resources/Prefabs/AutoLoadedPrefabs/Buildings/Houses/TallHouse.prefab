@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1397476486362997145}
   - component: {fileID: 4559886188797117311}
   - component: {fileID: 8686556674344725220}
+  - component: {fileID: 1839193151800998228}
   m_Layer: 0
   m_Name: TallHouse
   m_TagString: Untagged
@@ -98,3 +99,20 @@ MonoBehaviour:
   End:
     x: 0
     y: 0
+--- !u!114 &1839193151800998228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6937537905966124670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b047508226778b84c9547e7c1fe1a1cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Values:
+  - ResourceType: 1
+    Amount: 10
+  - ResourceType: 0
+    Amount: 0

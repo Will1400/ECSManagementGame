@@ -72,6 +72,14 @@ public class PlacementSystem : ComponentSystem
         float3 position = EntityManager.GetComponentData<Translation>(currentEntity).Value;
         var occupation = GridHelper.CalculateGridOccupationFromBounds(EntityManager.GetComponentData<WorldRenderBounds>(currentEntity).Value);
 
+        DynamicBuffer<ResourceCostElement> buildCostBuffer = EntityManager.GetBuffer<ResourceCostElement>(currentEntity);
+        if (buildCostBuffer.IsCreated && buildCostBuffer.Length > 0)
+        {
+            DynamicBuffer<ResourceCostElement> resourceCostBuffer = EntityManager.AddBuffer<ResourceCostElement>(constructionEntity);
+
+            resourceCostBuffer.CopyFrom(EntityManager.GetBuffer<ResourceCostElement>(currentEntity));
+        }
+
         EntityManager.AddComponentData(constructionEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
         EntityManager.AddComponentData(constructionEntity, new Translation { Value = position });
         EntityManager.AddComponentData(constructionEntity, new WorkPlaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });

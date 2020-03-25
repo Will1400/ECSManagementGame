@@ -96,8 +96,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ResourceType: 1
   AmountPerProduction: 1
-  ProductionTime: 2
-  ProductionTimeRemaining: 2
+  ProductionTime: 4
+  ProductionTimeRemaining: 4
 --- !u!114 &8449974066738163723
 MonoBehaviour:
   m_ObjectHideFlags: 0
