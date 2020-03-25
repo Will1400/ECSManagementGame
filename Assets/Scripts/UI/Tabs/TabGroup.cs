@@ -10,15 +10,15 @@ public class TabGroup : MonoBehaviour
     [SerializeField]
     private Color tabIdle;
     [SerializeField]
-    private Color tabTextIdle;
+    private Color tabSecondaryIdle;
     [SerializeField]
     private Color tabHover;
     [SerializeField]
-    private Color tabTextHover;
+    private Color tabSecondaryHover;
     [SerializeField]
     private Color tabSelected;
     [SerializeField]
-    private Color tabTextSelected;
+    private Color tabSecondarySelected;
 
     TabButton selectedTab;
 
@@ -30,7 +30,7 @@ public class TabGroup : MonoBehaviour
     public void Subscribe(TabButton tabButton)
     {
         tabButtons.Add(tabButton);
-        tabButton.SetColor(tabIdle, tabTextIdle);
+        tabButton.SetColor(tabIdle, tabSecondaryIdle);
     }
 
     public void OnTabEnter(TabButton tabButton)
@@ -38,7 +38,7 @@ public class TabGroup : MonoBehaviour
         ResetTabs();
 
         if (tabButton != selectedTab)
-            tabButton.SetColor(tabHover, tabTextHover);
+            tabButton.SetColor(tabHover, tabSecondaryHover);
     }
 
     public void OnTabExit(TabButton tabButton)
@@ -55,16 +55,15 @@ public class TabGroup : MonoBehaviour
         selectedTab.Select();
 
         ResetTabs();
-        tabButton.SetColor(tabSelected, tabTextSelected);
+        tabButton.SetColor(tabSelected, tabSecondarySelected);
     }
-
 
     public void ResetTabs()
     {
         foreach (TabButton tabButton in tabButtons)
         {
             if (tabButton != selectedTab)
-                tabButton.SetColor(tabIdle, tabTextIdle);
+                tabButton.SetColor(tabIdle, tabSecondaryIdle);
         }
     }
 }

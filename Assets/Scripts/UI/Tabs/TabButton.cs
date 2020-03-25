@@ -11,7 +11,6 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
     public UnityEvent OnTabSelected;
     public UnityEvent OnTabDeselected;
 
-
     [SerializeField]
     private TabGroup tabGroup;
 
