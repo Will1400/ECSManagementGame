@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 1892502822005575624}
   - component: {fileID: 1892502822004477192}
   - component: {fileID: 6307335372598768366}
+  - component: {fileID: 8449974066738163723}
+  - component: {fileID: 1720184474132249670}
   m_Layer: 0
   m_Name: Mine
   m_TagString: Untagged
@@ -96,3 +98,40 @@ MonoBehaviour:
   AmountPerProduction: 1
   ProductionTime: 2
   ProductionTimeRemaining: 2
+--- !u!114 &8449974066738163723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892502822006739912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 954c5e4dcdca9d64c8e2fe85a3f7d66b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Start:
+    x: 0
+    y: 0
+  End:
+    x: 0
+    y: 0
+--- !u!114 &1720184474132249670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1892502822006739912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d20d186600f2244bbc8f1a404f656cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxWorkers: 4
+  ActiveWorkers: 0
+  CurrentWorkers: 0
+  WorkPosition:
+    x: 0
+    y: 0
+    z: 0

@@ -40,7 +40,9 @@ public class ResourceProductionSystem : SystemBase
 
         while (resourcesToCreate.TryDequeue(out ResourceCreationInfo creationInfo))
         {
-            var resourceEntity = EntityCreationManager.Instance.GetSetupResourceEntity(creationInfo.ResourceType, creationInfo.Amount);
+            Entity resourceEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(creationInfo.ResourceType.ToString());
+
+            EntityManager.SetComponentData(resourceEntity, new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount });
 
             var position = EntityManager.GetComponentData<Translation>(resourceEntity).Value;
 
@@ -49,7 +51,11 @@ public class ResourceProductionSystem : SystemBase
                 var occupation = EntityManager.GetComponentData<GridOccupation>(creationInfo.CreatedBy);
 
                 position.x = occupation.Start.x + ((occupation.End.x - occupation.Start.x) / 2);
-                position.z = occupation.Start.y + ((occupation.End.y - occupation.Start.y) / 2);
+                position.z = occupation.Start.y - 1;
+            }
+            else
+            {
+                position.xz = EntityManager.GetComponentData<Translation>(creationInfo.CreatedBy).Value.xz;
             }
 
             EntityManager.SetComponentData(resourceEntity, new Translation { Value = position });

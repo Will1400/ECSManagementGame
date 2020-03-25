@@ -7,6 +7,7 @@ using System;
 using System.Runtime.Serialization;
 
 [Serializable]
+[GenerateAuthoringComponent]
 public struct GridOccupation : IComponentData, IEquatable<GridOccupation>
 {
     public int2 Start;

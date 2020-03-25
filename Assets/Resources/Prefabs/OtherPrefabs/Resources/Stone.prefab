@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 638743152136173107}
   - component: {fileID: 624464376681273735}
   - component: {fileID: 614374355319988101}
-  - component: {fileID: 591842821575085375}
+  - component: {fileID: 9005705319120348856}
   m_Layer: 0
-  m_Name: Rock_1
+  m_Name: Stone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,17 +80,17 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &591842821575085375
-MeshCollider:
+--- !u!114 &9005705319120348856
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 636300760328424635}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 4300000, guid: b2d7d77df4449b24fb2fffe6ca115874, type: 3}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88a6d11eb5d5a0f4b8e855e14d6a3051, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Amount: 0
+  ResourceType: 1

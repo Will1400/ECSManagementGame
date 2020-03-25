@@ -30,7 +30,7 @@ public class PlacementSystem : ComponentSystem
         {
             if (currentEntity == Entity.Null)
             {
-                Spawn(PrefabManager.Instance.GetPrefabByName("TallHouse"));
+                Spawn("TallHouse");
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -38,8 +38,12 @@ public class PlacementSystem : ComponentSystem
             Cancel();
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9).Position;
-            mouseWorldPosition.y = 1.5f;
-            EntityCreationManager.Instance.GetSetupCitizenEntity(mouseWorldPosition);
+            var entity = EntityPrefabManager.Instance.SpawnEntityPrefab("Citizen");
+
+            var position = EntityManager.GetComponentData<Translation>(entity);
+            position.Value.x = mouseWorldPosition.x;
+            position.Value.z = mouseWorldPosition.z;
+            EntityManager.SetComponentData(entity, position);
         }
 
         if (GameManager.Instance.CursorState == CursorState.Building)
@@ -82,25 +86,26 @@ public class PlacementSystem : ComponentSystem
         }
     }
 
-    public void Spawn(GameObject prefab)
+    public void Spawn(string name)
     {
         Cancel();
-        currentEntity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.BeingPlaced));
-        GameManager.Instance.CursorState = CursorState.Building;
-        prefabName = prefab.name;
 
-        Mesh mesh = prefab.GetComponent<MeshFilter>().sharedMesh;
-        material = new Material(prefab.GetComponent<Renderer>().sharedMaterial);
-        EntityManager.AddSharedComponentData(currentEntity, new RenderMesh { mesh = mesh, material = material });
-        EntityManager.AddComponentData(currentEntity, new RenderBounds { Value = mesh.bounds.ToAABB() });
-        EntityManager.AddComponentData(currentEntity, new Scale { Value = prefab.transform.localScale.x });
-        EntityManager.AddComponentData(currentEntity, new Rotation { Value = prefab.transform.rotation });
-        EntityManager.AddComponentData(currentEntity, new Translation { Value = prefab.transform.position });
+        currentEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(name);
+        EntityManager.AddComponent<BeingPlacedTag>(currentEntity);
+
+        prefabName = name;
+        var renderMesh = EntityManager.GetSharedComponentData<RenderMesh>(currentEntity);
+
+        material = new Material(renderMesh.material);
+        renderMesh.material = material;
+        EntityManager.SetSharedComponentData(currentEntity, renderMesh);
+
+        GameManager.Instance.CursorState = CursorState.Building;
     }
 
-    public void Spawn(GameObject prefab, bool openBuildingMenuWhenDone)
+    public void Spawn(string name, bool openBuildingMenuWhenDone)
     {
-        Spawn(prefab);
+        Spawn(name);
         this.openBuildingMenuWhenDone = openBuildingMenuWhenDone;
     }
 

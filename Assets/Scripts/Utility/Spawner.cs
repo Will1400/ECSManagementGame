@@ -25,7 +25,10 @@ public class Spawner : MonoBehaviour
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9).Position;
                 mouseWorldPosition.y = 1.5f;
-                var entity = EntityCreationManager.Instance.GetSetupCitizenEntity(mouseWorldPosition);
+
+                var entity = EntityPrefabManager.Instance.SpawnEntityPrefab("Citizen");
+                entityManager.SetComponentData(entity, new Translation { Value = mouseWorldPosition });
+
                 for (int i = 0; i < amountToSpawn - 1; i++)
                 {
                     entityManager.Instantiate(entity);

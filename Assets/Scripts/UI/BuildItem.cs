@@ -19,7 +19,7 @@ public class BuildItem : MonoBehaviour
 
     void StartBuildPlacement()
     {
-        PlacementSystem.Instance.Spawn(PrefabManager.Instance.GetPrefabByName(NameText.text), true);
+        PlacementSystem.Instance.Spawn(NameText.text, true);
         BuildUIManager.Instance.ClosePanel();
     }
 }

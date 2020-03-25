@@ -115,7 +115,7 @@ public class NavAgentMovementSystem : SystemBase
                     break;
                 }
                 float3 destination = buffer[agent.CurrentWaypointIndex];
-                destination.y = 1.5f;
+                destination.y = translation.Value.y;
 
                 if (math.distance(translation.Value, destination) > .4f)
                 {

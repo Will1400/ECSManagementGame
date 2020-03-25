@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 public class CitizenWorkAssignmentSystem : ComponentSystem
 {
@@ -15,13 +16,12 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
         idleCitizensQuery = Entities.WithAll<Citizen, IdleTag>()
                                     .ToEntityQuery();
         needsWorkersQuery = Entities.WithAll<WorkPlaceWorkerData>()
-                                    .WithNone<RemoveWorkPlaceTag>()
+                                    .WithNone<RemoveWorkPlaceTag, BeingPlacedTag>()
                                     .ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
-        //var workPlaces = Entities.With(needsWorkersQuery).ToEntityQuery().ToEntityArray(Allocator.TempJob);
         var idleCitizens = Entities.With(idleCitizensQuery).ToEntityQuery().ToEntityArray(Allocator.TempJob);
         int citizenIndex = 0;
         Entities.With(needsWorkersQuery).ForEach((Entity workPlace, ref WorkPlaceWorkerData workerData) =>
@@ -32,6 +32,7 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
             if (workerData.CurrentWorkers < workerData.MaxWorkers)
             {
                 int currentWorkers = workerData.CurrentWorkers;
+
                 WorkPlaceWorkerData tempWorkerData = workerData;
 
                 Entity citizen;

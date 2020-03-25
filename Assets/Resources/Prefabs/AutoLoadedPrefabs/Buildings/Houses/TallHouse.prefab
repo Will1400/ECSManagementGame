@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1237407354439659810}
   - component: {fileID: 1397476486362997145}
   - component: {fileID: 4559886188797117311}
-  - component: {fileID: 7353528377127084584}
+  - component: {fileID: 8686556674344725220}
   m_Layer: 0
   m_Name: TallHouse
   m_TagString: Untagged
@@ -80,16 +80,21 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &7353528377127084584
-BoxCollider:
+--- !u!114 &8686556674344725220
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6937537905966124670}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Size: {x: 0.09374313, y: 0.08077872, z: 0.11115437}
-  m_Center: {x: -0.008557454, y: 0.00079732935, z: 0.045470655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 954c5e4dcdca9d64c8e2fe85a3f7d66b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Start:
+    x: 0
+    y: 0
+  End:
+    x: 0
+    y: 0
