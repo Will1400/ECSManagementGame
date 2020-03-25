@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class TabGroup : MonoBehaviour
 {
     [SerializeField]
@@ -20,17 +22,46 @@ public class TabGroup : MonoBehaviour
     [SerializeField]
     private Color tabSecondarySelected;
 
+    [SerializeField]
     TabButton selectedTab;
 
     private void Awake()
     {
-        tabButtons = new List<TabButton>();
+        if (tabButtons == null)
+            tabButtons = new List<TabButton>();
+        else
+        {
+            foreach (TabButton tabButton in tabButtons)
+            {
+                tabButton.SetTabGroup(this);
+                tabButton.SetColor(tabIdle, tabSecondaryIdle);
+            }
+
+            OnTabSelected(tabButtons[0]);
+        }
+    }
+
+    public void SelectLeft()
+    {
+        int targetIndex = tabButtons.IndexOf(selectedTab) - 1;
+        if (targetIndex < 0)
+            targetIndex = tabButtons.Count - 1;
+        OnTabSelected(tabButtons[targetIndex % tabButtons.Count]);
+    }
+
+    public void SelectRight()
+    {
+        OnTabSelected(tabButtons[(tabButtons.IndexOf(selectedTab) + 1) % tabButtons.Count]);
+
     }
 
     public void Subscribe(TabButton tabButton)
     {
-        tabButtons.Add(tabButton);
-        tabButton.SetColor(tabIdle, tabSecondaryIdle);
+        if (!tabButtons.Contains(tabButton))
+        {
+            tabButtons.Add(tabButton);
+            tabButton.SetColor(tabIdle, tabSecondaryIdle);
+        }
     }
 
     public void OnTabEnter(TabButton tabButton)

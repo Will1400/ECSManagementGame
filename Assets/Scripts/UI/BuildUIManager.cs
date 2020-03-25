@@ -20,6 +20,8 @@ public class BuildUIManager : MonoBehaviour
     [SerializeField]
     GameObject buildPanel;
     [SerializeField]
+    TabGroup BuildTabGroup;
+    [SerializeField]
     Transform contentHolder;
 
     [SerializeField]
@@ -79,10 +81,21 @@ public class BuildUIManager : MonoBehaviour
             TogglePanel();
         if (Input.GetKeyDown(KeyCode.Escape))
             ClosePanel();
+
+        if (buildPanel.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.Q))
+                BuildTabGroup.SelectLeft();
+            if (Input.GetKeyDown(KeyCode.E))
+                BuildTabGroup.SelectRight();
+        }
     }
 
     public void SwitchContextTo(string name)
     {
+        if (buildItemContexts == null)
+            return;
+
         if (buildItemContexts.TryGetValue(name, out List<GameObject> objectsToEnable))
         {
             foreach (List<GameObject> item in buildItemContexts.Values)

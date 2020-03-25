@@ -30,7 +30,13 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
 
     void Start()
     {
-        tabGroup.Subscribe(this);
+        if (tabGroup != null)
+            tabGroup.Subscribe(this);
+    }
+
+    public void SetTabGroup(TabGroup tabGroup)
+    {
+        this.tabGroup = tabGroup;
     }
 
     public void SetColor(Color backgroundColor, Color textColor)
