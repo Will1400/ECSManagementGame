@@ -8,7 +8,7 @@ using Unity.Rendering;
 using Unity.Collections;
 
 [UpdateAfter(typeof(GridValidationSystem))]
-public class PlacementSystem : ComponentSystem
+public class PlacementSystem : SystemBase
 {
     public static PlacementSystem Instance;
 
