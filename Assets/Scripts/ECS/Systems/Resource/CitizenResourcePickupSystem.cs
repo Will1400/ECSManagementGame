@@ -35,6 +35,8 @@ public class CitizenResourcePickupSystem : SystemBase
             CommandBuffer.RemoveComponent<MovingToPickupResource>(nativeThreadIndex, entity);
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(nativeThreadIndex, entity);
 
+            CommandBuffer.RemoveComponent<TransportResourceToStorageTag>(nativeThreadIndex, movingToPickupResource.ResourceEntity);
+
             CommandBuffer.AddComponent<ResourceBeingCarriedTag>(nativeThreadIndex, movingToPickupResource.ResourceEntity);
             CommandBuffer.AddComponent<IsCarryingResourceTag>(nativeThreadIndex, entity);
 
