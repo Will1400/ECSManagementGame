@@ -5,18 +5,18 @@ using Unity.Transforms;
 
 public class ConstructionFinishedSystem : ComponentSystem
 {
-    EntityQuery allSitesQuery;
+    EntityQuery allFinishedSitesQuery;
 
     protected override void OnCreate()
     {
-        allSitesQuery = Entities.WithAll<UnderConstruction, WorkPlaceWorkerData, Translation>()
+        allFinishedSitesQuery = Entities.WithAll<UnderConstruction, WorkPlaceWorkerData, Translation>()
                         .WithAllReadOnly<ConstructionFinishedTag>()
                         .ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
-        Entities.With(allSitesQuery).ForEach((Entity entity, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
+        Entities.With(allFinishedSitesQuery).ForEach((Entity entity, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
         {
             Entity finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(construction.finishedPrefabName.ToString());
             translation.Value.y = EntityManager.GetComponentData<Translation>(finishedEntity).Value.y;

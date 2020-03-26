@@ -17,7 +17,8 @@ public class NavAgentMovementSystem : SystemBase
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         navAgentsToMoveQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(CitizenWork), typeof(MoveSpeed), typeof(Translation), typeof(NavAgent), typeof(NavAgentPathPointElement), typeof(NavAgentHasPathTag) }
+            All = new ComponentType[] {typeof(MoveSpeed), typeof(Translation), typeof(NavAgent), typeof(NavAgentPathPointElement), typeof(NavAgentHasPathTag) },
+            None = new ComponentType[] { typeof(HasArrivedAtDestinationTag) }
         });
     }
 
@@ -25,11 +26,11 @@ public class NavAgentMovementSystem : SystemBase
     {
         var job = new ChunkMoveJob
         {
+            EntityType = GetArchetypeChunkEntityType(),
             TranslationType = GetArchetypeChunkComponentType<Translation>(),
             NavAgentType = GetArchetypeChunkComponentType<NavAgent>(),
             BufferElementType = GetArchetypeChunkBufferType<NavAgentPathPointElement>(true),
             MoveSpeedType = GetArchetypeChunkComponentType<MoveSpeed>(true),
-            EntityType = GetArchetypeChunkEntityType(),
 
             DeltaTime = Time.DeltaTime,
             CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
@@ -96,10 +97,10 @@ public class NavAgentMovementSystem : SystemBase
         {
             NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
-            BufferAccessor<NavAgentPathPointElement> buffers = chunk.GetBufferAccessor(BufferElementType);
             NativeArray<Translation> translations = chunk.GetNativeArray(TranslationType);
             NativeArray<NavAgent> navAgents = chunk.GetNativeArray(NavAgentType);
             NativeArray<MoveSpeed> moveSpeeds = chunk.GetNativeArray(MoveSpeedType);
+            BufferAccessor<NavAgentPathPointElement> buffers = chunk.GetBufferAccessor(BufferElementType);
 
             for (int i = 0; i < chunk.Count; i++)
             {
@@ -107,11 +108,12 @@ public class NavAgentMovementSystem : SystemBase
                 var translation = translations[i];
                 var agent = navAgents[i];
 
-                if (agent.CurrentWaypointIndex >= buffer.Length)
+                if (agent.CurrentWaypointIndex >= buffer.Length && buffer.Length > 0)
                 {
                     agent.Status = AgentStatus.Idle;
                     navAgents[i] = agent;
-                    CommandBuffer.RemoveComponent(chunkIndex, entities[i], ComponentType.ReadOnly<NavAgentHasPathTag>());
+                    CommandBuffer.RemoveComponent<NavAgentHasPathTag>(chunkIndex, entities[i]);
+                    CommandBuffer.AddComponent<HasArrivedAtDestinationTag>(chunkIndex, entities[i]);
                     break;
                 }
                 float3 destination = buffer[agent.CurrentWaypointIndex];

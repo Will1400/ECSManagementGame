@@ -17,7 +17,8 @@ public class CheckIfCitizenArrivedAtWork : SystemBase
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         citizensToCheckQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(CitizenWork),typeof(Translation), typeof(Citizen), typeof(GoingToWorkTag) }
+            All = new ComponentType[] { typeof(CitizenWork), typeof(Translation), typeof(Citizen), typeof(GoingToWorkTag) },
+            None = new ComponentType[] { typeof(HasArrivedAtWorkTag) }
         });
     }
 

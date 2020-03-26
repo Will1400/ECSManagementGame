@@ -67,6 +67,7 @@ public class PathfindingSystem : ComponentSystem
             EntityManager.AddComponent<NavAgentHasPathTag>(entity);
             EntityManager.SetComponentData(entity, agent);
             EntityManager.RemoveComponent<NavAgentRequestingPath>(entity);
+            EntityManager.RemoveComponent<HasArrivedAtDestinationTag>(entity);
 
             queuedEntities.Remove(keyValuePair.Key);
         }
