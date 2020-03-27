@@ -44,25 +44,26 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
             int citizenIndex = 0;
             Entities.WithAll<ResourceData, TransportResourceToStorageTag>().ForEach((Entity entity, ref Translation translation) =>
             {
-                for (int i = citizenIndex; i < idlecitizens.Length; i++)
+                if (citizenIndex >= idlecitizens.Length)
+                    return;
+
+                var citizen = idlecitizens[citizenIndex];
+
+                var assignmentInfo = new AssignmentInfo
                 {
-                    var citizen = idlecitizens[i];
-
-                    var assignmentInfo = new AssignmentInfo
+                    Citizen = citizen,
+                    Resource = entity,
+                    ResourcePosition = translation.Value,
+                    TransportJob = new ResourceTransportJobData
                     {
-                        Citizen = citizen,
-                        Resource = entity,
-                        ResourcePosition = translation.Value,
-                        TransportJob = new ResourceTransportJobData
-                        {
-                            DestinationEntity = storageAreaEntities[0],
-                            ResourceEntity = entity,
-                            DestinationPosition = float3.zero
-                        }
-                    };
+                        DestinationEntity = storageAreaEntities[0],
+                        ResourceEntity = entity,
+                        DestinationPosition = float3.zero
+                    }
+                };
 
-                    assignmentQueue.Enqueue(assignmentInfo);
-                }
+                assignmentQueue.Enqueue(assignmentInfo);
+                citizenIndex++;
             }).Run();
 
             while (assignmentQueue.TryDequeue(out AssignmentInfo assignmentInfo))
