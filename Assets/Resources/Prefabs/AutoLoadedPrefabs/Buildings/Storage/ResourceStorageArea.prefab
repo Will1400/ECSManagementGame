@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2919759342189483465}
   - component: {fileID: -1924725323319534785}
   - component: {fileID: 6512652586641192627}
+  - component: {fileID: 9117858349630149084}
   m_Layer: 0
   m_Name: ResourceStorageArea
   m_TagString: Untagged
@@ -95,6 +96,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxCapacity: 100
+  StoragePosition:
+    x: 0
+    y: 0
+    z: 0
 --- !u!114 &-1924725323319534785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,5 +128,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b43fb81233733741b8ec006e0768186, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9117858349630149084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2897253395712879608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9686088c460cb046b557af4d27c1e7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

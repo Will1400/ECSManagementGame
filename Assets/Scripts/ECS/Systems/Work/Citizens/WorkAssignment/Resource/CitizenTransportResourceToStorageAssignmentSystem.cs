@@ -85,6 +85,8 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
 
                 EntityManager.AddComponentData(assignmentInfo.Citizen, assignmentInfo.TransportJob);
 
+                EntityManager.RemoveComponent<TransportResourceToStorageTag>(assignmentInfo.Resource);
+
                 EntityManager.RemoveComponent<IdleTag>(assignmentInfo.Citizen);
             }
 

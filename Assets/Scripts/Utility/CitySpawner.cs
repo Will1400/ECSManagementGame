@@ -21,18 +21,14 @@ public class CitySpawner : MonoBehaviour
         NativeArray<Entity> constructionSites = entityManager.Instantiate(entityPrefab, count, Allocator.Temp);
         int columnCount = (int)math.round(math.sqrt(count));
 
-        int row = -1;
         for (int i = 0; i < constructionSites.Length; i++)
         {
+
             float currentColumn = 15 * (i % columnCount);
-            float currentRow = 20 * (row + 1);
+            float currentRow = 20 * ((int)math.floor(i / columnCount) + 1);
 
-            if (i % columnCount == 0)
-            {
-                row++;
-            }
 
-            float3 position = new float3(100, 0, 0) + new float3(currentColumn, 0, currentRow);
+            float3 position = new float3(100, 0, 10) + new float3(currentColumn, 0, currentRow);
 
             var entity = constructionSites[i];
 
