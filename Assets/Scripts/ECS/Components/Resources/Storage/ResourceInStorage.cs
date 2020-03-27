@@ -10,4 +10,5 @@ public struct ResourceInStorage : IComponentData
 
     public int StorageEntityIndex;
     public float3 StorageAreaStartPosition;
+    public float3 StorageAreaEndPosition;
 }

@@ -17,7 +17,7 @@ public class ResourceInStorageArePositioningSystem : SystemBase
 
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceInStorage), typeof(Translation)}
+            All = new ComponentType[] { typeof(ResourceInStorage), typeof(Translation) }
         });
     }
 
@@ -52,15 +52,24 @@ public class ResourceInStorageArePositioningSystem : SystemBase
                 var translation = translations[i];
                 var resourceInStorage = resourceInStorages[i];
 
-                float currentZ = 1 * (resourceInStorage.StorageEntityIndex % 4);
-                float currentY = .25f * ((int)math.floor(resourceInStorage.StorageEntityIndex / 4) + 1);
-
-                float3 positionOffset = new float3(0, 0, .75f) + new float3(0, currentY, currentZ);
-
-                translation.Value = positionOffset + resourceInStorage.StorageAreaStartPosition;
-
-                translations[i] = translation;
+                translations[i] = Place(resourceInStorage.StorageEntityIndex, translation, resourceInStorage.StorageAreaStartPosition, resourceInStorage.StorageAreaEndPosition);
             }
+        }
+
+        [BurstCompile]
+        Translation Place(int index, Translation translation, float3 startPosition, float3 endPosition)
+        {
+            int columns = (int)(endPosition.x - startPosition.x);
+            int rows = (int)(endPosition.z - startPosition.z);
+
+            float currentX = 1.5f * (index % columns -3);
+            float currentZ = 1 * (((int)math.floor(index / rows) + 1) % rows);
+            float currentY = .25f * (((int)math.floor(index / rows) + 1) / rows);
+
+            float3 positionOffset = new float3(currentX, 0, .75f) + new float3(0, currentY, currentZ);
+
+            translation.Value = positionOffset + startPosition;
+            return translation;
         }
     }
 }

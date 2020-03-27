@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using System;
 using Unity.Collections;
 using System.Linq;
+using Unity.Burst;
 
 public class UIStatUpdatingSystem : SystemBase
 {
@@ -13,14 +14,45 @@ public class UIStatUpdatingSystem : SystemBase
     public Action<int> CitizenCountChanged;
     public Action<int> StoneResourceCountChanged;
 
-    int citizenCount;
-    int stoneResourceCount;
+    int numOfResourceTypes;
+
+    private int citizenCount;
+
+    public int CitizenCount
+    {
+        get { return citizenCount; }
+        set
+        {
+            if (value != citizenCount)
+            {
+                CitizenCountChanged?.Invoke(value);
+                citizenCount = value;
+            }
+        }
+    }
+
+    private int stoneResourceCount;
+    public int StoneResourceCount
+    {
+        get { return stoneResourceCount; }
+        set
+        {
+            if (value != stoneResourceCount)
+            {
+                StoneResourceCountChanged?.Invoke(value);
+                stoneResourceCount = value;
+            }
+        }
+    }
+
 
     EntityQuery citizensQuery;
     EntityQuery resourcesQuery;
 
     protected override void OnCreate()
     {
+        numOfResourceTypes = Enum.GetValues(typeof(ResourceType)).Length;
+
         if (Instance == null)
             Instance = this;
 
@@ -37,23 +69,76 @@ public class UIStatUpdatingSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        int newCitizenCount = citizensQuery.CalculateEntityCount();
+        CitizenCount = citizensQuery.CalculateEntityCount();
 
-        if (citizenCount != newCitizenCount)
+
+        NativeQueue<ResourceCountInfo> resourceCountInfoQueue = new NativeQueue<ResourceCountInfo>(Allocator.TempJob);
+
+
+        var countJob = new ResourceBasicCountJob
         {
-            CitizenCountChanged?.Invoke(newCitizenCount);
-            citizenCount = newCitizenCount;
+            ResourceDataType = GetArchetypeChunkComponentType<ResourceData>(true),
+            CountedResources = resourceCountInfoQueue.AsParallelWriter(),
+            NumOfResourceTypes = numOfResourceTypes
+        }.Schedule(resourcesQuery);
+        countJob.Complete();
+
+
+        NativeArray<int> resourceCounts = new NativeArray<int>(numOfResourceTypes, Allocator.Temp);
+
+        while (resourceCountInfoQueue.TryDequeue(out ResourceCountInfo countInfo))
+        {
+            resourceCounts[(int)countInfo.ResourceType] += countInfo.Count;
         }
 
-        NativeArray<ResourceData> resources = resourcesQuery.ToComponentDataArray<ResourceData>(Allocator.TempJob);
-
-        int newStoneResourceCount = resources.Where(x => x.ResourceType == ResourceType.Stone).Count();
-        if (stoneResourceCount != newStoneResourceCount)
+        for (int i = 0; i < resourceCounts.Length; i++)
         {
-            StoneResourceCountChanged?.Invoke(newStoneResourceCount);
-            stoneResourceCount = newStoneResourceCount;
+            if ((ResourceType)i == ResourceType.Stone)
+            {
+                StoneResourceCount = resourceCounts[i];
+            }
         }
 
-        resources.Dispose();
+        resourceCountInfoQueue.Dispose();
+    }
+
+    [BurstCompile]
+    struct ResourceBasicCountJob : IJobChunk
+    {
+        [ReadOnly]
+        public ArchetypeChunkComponentType<ResourceData> ResourceDataType;
+
+        [ReadOnly]
+        public int NumOfResourceTypes;
+
+        /// <summary>
+        /// Key is a ResourceType, value is the counted
+        /// </summary>
+        public NativeQueue<ResourceCountInfo>.ParallelWriter CountedResources;
+
+        public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
+        {
+            NativeArray<ResourceData> resourceDatas = chunk.GetNativeArray(ResourceDataType);
+
+            NativeArray<int> resourceCounts = new NativeArray<int>(NumOfResourceTypes, Allocator.Temp);
+
+            for (int i = 0; i < chunk.Count; i++)
+            {
+                resourceCounts[(int)resourceDatas[i].ResourceType] += resourceDatas[i].Amount;
+            }
+
+            for (int i = 0; i < NumOfResourceTypes; i++)
+            {
+                CountedResources.Enqueue(new ResourceCountInfo { ResourceType = (ResourceType)i, Count = resourceCounts[i] });
+            }
+
+            resourceCounts.Dispose();
+        }
+    }
+
+    struct ResourceCountInfo
+    {
+        public ResourceType ResourceType;
+        public int Count;
     }
 }

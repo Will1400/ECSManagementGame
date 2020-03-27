@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Collections;
 using Unity.Transforms;
 using Unity.Mathematics;
+using Unity.Burst;
 
 public class ResourceTransportMovementSystem : SystemBase
 {
@@ -35,6 +36,7 @@ public class ResourceTransportMovementSystem : SystemBase
 
     }
 
+    [BurstCompile]
     struct MoveToCarrierJob : IJobChunk
     {
         public EntityCommandBuffer.Concurrent CommandBuffer;

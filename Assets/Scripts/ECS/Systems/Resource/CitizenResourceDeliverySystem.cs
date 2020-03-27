@@ -31,7 +31,7 @@ public class CitizenResourceDeliverySystem : SystemBase
                 var resourceIndex = resourceBuffer.Length;
                 resourceBuffer.Add(transportJobData.ResourceEntity.Index);
 
-                var storageAreaStart = EntityManager.GetComponentData<GridOccupation>(transportJobData.DestinationEntity).Start;
+                var occupation = EntityManager.GetComponentData<GridOccupation>(transportJobData.DestinationEntity);
 
                 CommandBuffer.AddComponent<ResourceInStorage>(transportJobData.ResourceEntity);
                 CommandBuffer.SetComponent(transportJobData.ResourceEntity, new ResourceInStorage
@@ -39,7 +39,8 @@ public class CitizenResourceDeliverySystem : SystemBase
                     StorageEntityIndex = resourceIndex,
                     StorageEntity = transportJobData.DestinationEntity,
                     ResourceData = EntityManager.GetComponentData<ResourceData>(transportJobData.ResourceEntity),
-                    StorageAreaStartPosition = new float3(storageAreaStart.x, 0.5f, storageAreaStart.y)
+                    StorageAreaStartPosition = new float3(occupation.Start.x, 0.5f, occupation.Start.y),
+                    StorageAreaEndPosition = new float3(occupation.End.x, 0, occupation.End.y)
                 });
             }
 
