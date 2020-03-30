@@ -9,7 +9,8 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 public enum PathfindingFailedReason
 {
@@ -25,7 +26,7 @@ public class NavMeshQuerySystem : JobComponentSystem
     /// <summary>
     /// How many navmesh queries are run on each update.
     /// </summary>
-    public int MaxQueries = 256;
+    public int MaxQueries = 128;
 
     /// <summary>
     /// Maximum path size of each query
@@ -35,7 +36,7 @@ public class NavMeshQuerySystem : JobComponentSystem
     /// <summary>
     /// Maximum iteration on each update cycle
     /// </summary>
-    public int MaxIterations = 1024;
+    public int MaxIterations = 512;
 
     /// <summary>
     /// Max map width
@@ -45,7 +46,7 @@ public class NavMeshQuerySystem : JobComponentSystem
     /// <summary>
     /// Cache query results
     /// </summary>
-    public bool UseCache = true;
+    public bool UseCache = false;
 
     /// <summary>
     /// Current version of the cache
@@ -231,7 +232,8 @@ public class NavMeshQuerySystem : JobComponentSystem
                     var straightPathFlags = new NativeArray<StraightPathFlags>(maxPathSize, Allocator.Temp);
                     var vertexSide = new NativeArray<float>(maxPathSize, Allocator.Temp);
                     var cornerCount = 0;
-                    var pathStatus = PathUtils.FindStraightPath(
+
+                    PathQueryStatus pathStatus = PathUtils.FindStraightPath(
                         query,
                         data.from,
                         data.to,
@@ -466,7 +468,7 @@ public enum StraightPathFlags
 
 public class PathUtils
 {
-    public static float Perp2D(Vector3 u, Vector3 v)
+    public static float Perp2D(float3 u, float3 v)
     {
         return u.z * v.x - u.x * v.z;
     }

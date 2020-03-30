@@ -38,7 +38,7 @@ public class PathfindingSystem : ComponentSystem
             {
                 queuedEntities.Add(entity.Index, entity);
                 navAgent.Status = AgentStatus.PathQueued;
-                NavMeshQuerySystem.RequestPathStatic(entity.Index, agentRequestingPath.StartPosition, agentRequestingPath.EndPosition);
+                NavMeshQuerySystem.instance.RequestPath(entity.Index, agentRequestingPath.StartPosition, agentRequestingPath.EndPosition);
             }
         });
 
@@ -83,6 +83,7 @@ public class PathfindingSystem : ComponentSystem
         //queuedEntities.Remove(id);
 
         readyPaths.Add(id, new float3[] { EntityManager.GetComponentData<NavAgentRequestingPath>(entity).EndPosition });
+
     }
 
     void OnPathRequestCompleted(int id, Vector3[] points)

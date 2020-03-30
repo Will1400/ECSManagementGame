@@ -19,6 +19,9 @@ public class NavMeshSystem : JobComponentSystem
     private NavMeshData navMeshData;
     private NavMeshDataInstance navMeshDataInstance;
 
+    float updateCooldown = 5;
+    float remainingTimeUntilUpdateAvailable;
+
     /// Key is index of the entity
     NativeHashMap<int, NavMeshBuildSource> indexedSources;
     NativeQueue<SourceStash> sourceQueue;
@@ -58,6 +61,8 @@ public class NavMeshSystem : JobComponentSystem
 
     protected override JobHandle OnUpdate(JobHandle InputDeps)
     {
+        remainingTimeUntilUpdateAvailable -= Time.DeltaTime;
+
         var commandBuffer = bufferSystem.CreateCommandBuffer();
         Entities.WithNone<NavMeshSourceHasSizeTag>().ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshObstacle obstacleData) =>
         {
@@ -115,7 +120,7 @@ public class NavMeshSystem : JobComponentSystem
             }
 
             // Code for updating the position of the source  - disabled for performance
-            
+
             //else
             //{
             //    var existingValue = indexedSources[source.OwnersIndex];
@@ -127,7 +132,8 @@ public class NavMeshSystem : JobComponentSystem
             //}
         }
 
-        if (updateMesh && (currentUpdateInfo == null || currentUpdateInfo.isDone))
+
+        if (updateMesh && (currentUpdateInfo == null || currentUpdateInfo.isDone) && remainingTimeUntilUpdateAvailable <= 0)
         {
             var temp = indexedSources.GetValueArray(Allocator.TempJob);
             sources = temp.ToList();
@@ -139,7 +145,8 @@ public class NavMeshSystem : JobComponentSystem
                bounds);
 
             temp.Dispose();
-            NavMeshQuerySystem.instance.PurgeCache();
+            //NavMeshQuerySystem.instance.PurgeCache();
+            remainingTimeUntilUpdateAvailable = updateCooldown;
             updateMesh = false;
         }
 
