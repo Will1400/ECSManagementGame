@@ -42,7 +42,7 @@ public class ResourceInStorageArePositioningSystem : SystemBase
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
-            NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
+            //NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
             NativeArray<Translation> translations = chunk.GetNativeArray(TranslationType);
             NativeArray<ResourceInStorage> resourceInStorages = chunk.GetNativeArray(ResourceInStorageType);
@@ -59,14 +59,14 @@ public class ResourceInStorageArePositioningSystem : SystemBase
         [BurstCompile]
         Translation Place(int index, Translation translation, float3 startPosition, float3 endPosition)
         {
-            int columns = (int)(endPosition.x - startPosition.x);
+            int columns = (int)math.floor((endPosition.x - startPosition.x) / 1.5f);
             int rows = (int)(endPosition.z - startPosition.z);
 
-            float currentX = 1.5f * (index % columns -3);
-            float currentZ = 1 * (((int)math.floor(index / rows) + 1) % rows);
-            float currentY = .25f * (((int)math.floor(index / rows) + 1) / rows);
+            float currentX = 1.5f * (index % columns);
+            float currentZ = 1 * (((int)math.floor(index / columns)) % rows);
+            float currentY = .25f * (((int)math.floor(index / columns)) / rows);
 
-            float3 positionOffset = new float3(currentX, 0, .75f) + new float3(0, currentY, currentZ);
+            float3 positionOffset = new float3(1, 0, 1.5f) + new float3(currentX, currentY, currentZ);
 
             translation.Value = positionOffset + startPosition;
             return translation;

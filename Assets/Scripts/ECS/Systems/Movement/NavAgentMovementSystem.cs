@@ -17,7 +17,7 @@ public class NavAgentMovementSystem : SystemBase
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         navAgentsToMoveQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] {typeof(MoveSpeed), typeof(Translation), typeof(NavAgent), typeof(NavAgentPathPointElement), typeof(NavAgentHasPathTag) },
+            All = new ComponentType[] { typeof(MoveSpeed), typeof(Translation), typeof(NavAgent), typeof(NavAgentPathPointElement), typeof(NavAgentHasPathTag) },
             None = new ComponentType[] { typeof(HasArrivedAtDestinationTag) }
         });
     }
@@ -28,6 +28,7 @@ public class NavAgentMovementSystem : SystemBase
         {
             EntityType = GetArchetypeChunkEntityType(),
             TranslationType = GetArchetypeChunkComponentType<Translation>(),
+            RotationType = GetArchetypeChunkComponentType<Rotation>(),
             NavAgentType = GetArchetypeChunkComponentType<NavAgent>(),
             BufferElementType = GetArchetypeChunkBufferType<NavAgentPathPointElement>(true),
             MoveSpeedType = GetArchetypeChunkComponentType<MoveSpeed>(true),
@@ -87,6 +88,7 @@ public class NavAgentMovementSystem : SystemBase
         [ReadOnly]
         public ArchetypeChunkEntityType EntityType;
         public ArchetypeChunkComponentType<Translation> TranslationType;
+        public ArchetypeChunkComponentType<Rotation> RotationType;
         public ArchetypeChunkComponentType<NavAgent> NavAgentType;
         [ReadOnly]
         public ArchetypeChunkBufferType<NavAgentPathPointElement> BufferElementType;
@@ -98,6 +100,7 @@ public class NavAgentMovementSystem : SystemBase
             NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
             NativeArray<Translation> translations = chunk.GetNativeArray(TranslationType);
+            NativeArray<Rotation> rotations = chunk.GetNativeArray(RotationType);
             NativeArray<NavAgent> navAgents = chunk.GetNativeArray(NavAgentType);
             NativeArray<MoveSpeed> moveSpeeds = chunk.GetNativeArray(MoveSpeedType);
             BufferAccessor<NavAgentPathPointElement> buffers = chunk.GetBufferAccessor(BufferElementType);
@@ -106,6 +109,7 @@ public class NavAgentMovementSystem : SystemBase
             {
                 var buffer = buffers[i];
                 var translation = translations[i];
+                var rotation = rotations[i];
                 var agent = navAgents[i];
 
                 if (agent.CurrentWaypointIndex >= buffer.Length && buffer.Length > 0)
@@ -119,13 +123,16 @@ public class NavAgentMovementSystem : SystemBase
                 float3 destination = buffer[agent.CurrentWaypointIndex];
                 destination.y = translation.Value.y;
 
+
                 if (math.distance(translation.Value, destination) > .4f)
                 {
                     float3 direction = math.normalize(destination - translation.Value);
                     direction.y = 0;
+                    rotation.Value = quaternion.LookRotation(direction, new float3(0, 1, 0));
                     translation.Value += direction * moveSpeeds[i].Value * DeltaTime;
 
                     translations[i] = translation;
+                    rotations[i] = rotation;
                 }
                 else
                 {

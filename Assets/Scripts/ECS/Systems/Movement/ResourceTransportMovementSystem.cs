@@ -54,14 +54,17 @@ public class ResourceTransportMovementSystem : SystemBase
 
             for (int i = 0; i < chunk.Count; i++)
             {
+
+
                 var resourceEntity = transportJobDatas[i].ResourceEntity;
-                
+
                 float3 forward = math.forward(rotations[i].Value);
 
                 float3 finalPosition = translations[i].Value + (forward * 1);
                 finalPosition.y = 1;
 
                 CommandBuffer.SetComponent(chunkIndex, resourceEntity, new Translation { Value = finalPosition });
+                CommandBuffer.SetComponent(chunkIndex, resourceEntity, new Rotation { Value = rotations[i].Value });
             }
         }
     }

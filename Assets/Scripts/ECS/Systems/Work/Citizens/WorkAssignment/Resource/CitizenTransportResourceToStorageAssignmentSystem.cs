@@ -29,6 +29,7 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
         StorageAreasQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(ResourceStorageArea) },
+            None = new ComponentType[] { typeof(ResourceStorageFullTag) }
         });
     }
 
@@ -71,6 +72,19 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
                 if (math.all(assignmentInfo.TransportJob.DestinationPosition == float3.zero))
                 {
                     assignmentInfo.TransportJob.DestinationPosition = EntityManager.GetComponentData<Translation>(assignmentInfo.TransportJob.DestinationEntity).Value;
+                }
+
+                var storageData = EntityManager.GetComponentData<ResourceStorageArea>(assignmentInfo.TransportJob.DestinationEntity);
+
+                if (storageData.UsedCapacity >= storageData.MaxCapacity)
+                {
+                    EntityManager.AddComponent<ResourceStorageFullTag>(assignmentInfo.TransportJob.DestinationEntity);
+                    continue;
+                }
+                else
+                {
+                    storageData.UsedCapacity++;
+                    EntityManager.AddComponentData(assignmentInfo.TransportJob.DestinationEntity, storageData);
                 }
 
                 NavAgentRequestingPath requestingPath = new NavAgentRequestingPath

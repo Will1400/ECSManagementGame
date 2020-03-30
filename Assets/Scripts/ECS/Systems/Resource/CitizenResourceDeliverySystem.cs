@@ -3,8 +3,10 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Collections;
+using Unity.Transforms;
 
 [UpdateAfter(typeof(CitizenResourcePickupSystem))]
+[UpdateAfter(typeof(ResourceTransportMovementSystem))]
 public class CitizenResourceDeliverySystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
@@ -43,6 +45,8 @@ public class CitizenResourceDeliverySystem : SystemBase
                     StorageAreaEndPosition = new float3(occupation.End.x, 0, occupation.End.y)
                 });
             }
+
+            CommandBuffer.SetComponent(transportJobData.ResourceEntity, new Rotation { Value = quaternion.identity });
 
             CommandBuffer.RemoveComponent<ResourceTransportJobData>(citizen);
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(citizen);
