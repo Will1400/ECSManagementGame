@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1979877607388324834}
   - component: {fileID: 5453888210916812394}
   - component: {fileID: -8437385817585645554}
+  - component: {fileID: 2057154587401318059}
   m_Layer: 0
   m_Name: Inn
   m_TagString: Untagged
@@ -116,3 +117,20 @@ MonoBehaviour:
     Amount: 20
   - ResourceType: 0
     Amount: 0
+--- !u!114 &2057154587401318059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4851850016261904117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bf4629959ec0f46a9ed586a2b39891, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Area: 1
+  Size:
+    x: 0
+    y: 0
+    z: 0

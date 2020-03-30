@@ -101,11 +101,13 @@ public class PlacementSystem : SystemBase
     {
         Cancel();
 
-        currentEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(name);
-        EntityManager.AddComponent<BeingPlacedTag>(currentEntity);
-
+        // used for construction to spawn the right prefab
         prefabName = name;
-        var renderMesh = EntityManager.GetSharedComponentData<RenderMesh>(currentEntity);
+
+        currentEntity = EntityPrefabManager.Instance.SpawnBeingPlacedEntityPrefab(name);
+
+        // Save material for visual validation feedback
+        RenderMesh renderMesh = EntityManager.GetSharedComponentData<RenderMesh>(currentEntity);
 
         material = new Material(renderMesh.material);
         renderMesh.material = material;

@@ -55,4 +55,82 @@ public class EntityPrefabManager : MonoBehaviour
 
         return Entity.Null;
     }
+
+
+    public Entity GetEntityPrefab(string name)
+    {
+        if (Prefabs.TryGetValue(name, out Entity prefab))
+        {
+            Entity entity = EntityManager.Instantiate(prefab);
+            return entity;
+        }
+
+        return Entity.Null;
+    }
+
+    public Entity SpawnBeingPlacedEntityPrefab(string name)
+    {
+        if (Prefabs.TryGetValue(name, out Entity prefab))
+        {
+            Entity entity = SpawnVisualOnlyPrefab(name);
+
+            if (EntityManager.HasComponent<HasNoResourceCost>(prefab))
+            {
+                EntityManager.AddComponent<HasNoResourceCost>(entity);
+            }
+            else
+            {
+                EntityManager.AddBuffer<ResourceCostElement>(entity);
+
+                DynamicBuffer<ResourceCostElement> buildCostBuffer = EntityManager.GetBuffer<ResourceCostElement>(prefab);
+                if (buildCostBuffer.IsCreated && buildCostBuffer.Length > 0)
+                {
+                    DynamicBuffer<ResourceCostElement> resourceCostBuffer = EntityManager.AddBuffer<ResourceCostElement>(entity);
+
+                    resourceCostBuffer.CopyFrom(EntityManager.GetBuffer<ResourceCostElement>(prefab));
+                }
+            }
+
+            EntityManager.AddComponent<BeingPlacedTag>(entity);
+
+            // Add grid occupation
+            EntityManager.AddComponent<GridOccupation>(entity);
+            int4 positions = GridHelper.CalculateGridOccupationFromBounds(EntityManager.GetComponentData<RenderBounds>(entity).Value);
+            EntityManager.AddComponentData(entity, new GridOccupation { Start = new int2(positions.x, positions.y), End = new int2(positions.z, positions.w) });
+
+            return entity;
+        }
+
+        return Entity.Null;
+    }
+
+    public Entity SpawnVisualOnlyPrefab(string name)
+    {
+        if (Prefabs.TryGetValue(name, out Entity prefab))
+        {
+            var entity = EntityManager.CreateEntity(
+                ComponentType.ReadOnly<Translation>(),
+                ComponentType.ReadOnly<Rotation>(),
+                ComponentType.ReadOnly<Scale>(),
+                ComponentType.ReadOnly<RenderMesh>(),
+                ComponentType.ReadOnly<RenderBounds>(),
+                ComponentType.ReadOnly<WorldRenderBounds>(),
+                ComponentType.ReadOnly<LocalToWorld>());
+
+            if (EntityManager.HasComponent<NonUniformScale>(prefab))
+                EntityManager.AddComponentData(entity, EntityManager.GetComponentData<NonUniformScale>(prefab));
+            else if (EntityManager.HasComponent<Scale>(prefab))
+                EntityManager.AddComponentData(entity, EntityManager.GetComponentData<Scale>(prefab));
+            else
+                EntityManager.AddComponentData(entity, new Scale { Value = 1 });
+
+            EntityManager.AddComponentData(entity, EntityManager.GetComponentData<Translation>(prefab));
+            EntityManager.AddComponentData(entity, EntityManager.GetComponentData<Rotation>(prefab));
+            EntityManager.AddComponentData(entity, EntityManager.GetComponentData<RenderBounds>(prefab));
+            EntityManager.AddSharedComponentData(entity, EntityManager.GetSharedComponentData<RenderMesh>(prefab));
+            return entity;
+        }
+
+        return Entity.Null;
+    }
 }
