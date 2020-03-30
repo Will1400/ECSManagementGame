@@ -28,7 +28,7 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
 
         StorageAreasQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceStorageArea) },
+            All = new ComponentType[] { typeof(ResourceStorage), typeof(ResourceStorageAreaTag) },
             None = new ComponentType[] { typeof(ResourceStorageFullTag) }
         });
     }
@@ -74,7 +74,7 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
                     assignmentInfo.TransportJob.DestinationPosition = EntityManager.GetComponentData<Translation>(assignmentInfo.TransportJob.DestinationEntity).Value;
                 }
 
-                var storageData = EntityManager.GetComponentData<ResourceStorageArea>(assignmentInfo.TransportJob.DestinationEntity);
+                var storageData = EntityManager.GetComponentData<ResourceStorage>(assignmentInfo.TransportJob.DestinationEntity);
 
                 if (storageData.UsedCapacity >= storageData.MaxCapacity)
                 {

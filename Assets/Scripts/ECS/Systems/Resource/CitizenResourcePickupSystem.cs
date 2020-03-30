@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 using Unity.Entities;
 using Unity.Transforms;
 
@@ -27,26 +28,50 @@ public class CitizenResourcePickupSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        EntityCommandBuffer.Concurrent CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
+        EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
 
-        Entities.WithAll<HasArrivedAtDestinationTag>().ForEach((Entity entity, int entityInQueryIndex, ref Translation translation, ref MovingToPickupResource movingToPickupResource, ref ResourceTransportJobData resourceTransportJob) =>
+        Entities.WithAll<HasArrivedAtDestinationTag, MovingToPickupResource>().ForEach((Entity entity, int entityInQueryIndex, ref Translation translation, ref ResourceTransportJobData resourceTransportJob) =>
         {
+            var removeEntity = CommandBuffer.CreateEntity();
+            CommandBuffer.AddComponent<RemoveResourceFromStorage>(removeEntity);
+            CommandBuffer.SetComponent(removeEntity, new RemoveResourceFromStorage { ResourceEntity = resourceTransportJob.ResourceEntity });
+
             // Pickup
-            CommandBuffer.RemoveComponent<MovingToPickupResource>(entityInQueryIndex, entity);
-            CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entityInQueryIndex, entity);
+            CommandBuffer.RemoveComponent<MovingToPickupResource>(entity);
+            CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entity);
 
-            CommandBuffer.RemoveComponent<TransportResourceToStorageTag>(entityInQueryIndex, movingToPickupResource.ResourceEntity);
+            CommandBuffer.RemoveComponent<TransportResourceToStorageTag>(resourceTransportJob.ResourceEntity);
 
-            CommandBuffer.AddComponent<ResourceBeingCarriedTag>(entityInQueryIndex, movingToPickupResource.ResourceEntity);
-            CommandBuffer.AddComponent<IsCarryingResourceTag>(entityInQueryIndex, entity);
+            CommandBuffer.AddComponent<ResourceBeingCarriedTag>(resourceTransportJob.ResourceEntity);
+            CommandBuffer.AddComponent<IsCarryingResourceTag>(entity);
 
-            CommandBuffer.AddComponent<CarrierData>(entityInQueryIndex, movingToPickupResource.ResourceEntity);
-            CommandBuffer.SetComponent(entityInQueryIndex, movingToPickupResource.ResourceEntity, new CarrierData { Carrier = entity });
+            CommandBuffer.AddComponent<CarrierData>(resourceTransportJob.ResourceEntity);
+            CommandBuffer.SetComponent(resourceTransportJob.ResourceEntity, new CarrierData { Carrier = entity });
 
             // Move to destination
-            CommandBuffer.AddComponent<NavAgentRequestingPath>(entityInQueryIndex, entity);
-            CommandBuffer.SetComponent(entityInQueryIndex, entity, new NavAgentRequestingPath { StartPosition = translation.Value, EndPosition = resourceTransportJob.DestinationPosition });
+            CommandBuffer.AddComponent<NavAgentRequestingPath>(entity);
+            CommandBuffer.SetComponent(entity, new NavAgentRequestingPath { StartPosition = translation.Value, EndPosition = resourceTransportJob.DestinationPosition });
 
-        }).Schedule();
+        }).WithoutBurst().Run();
+
+        //Entities.WithAll<HasArrivedAtDestinationTag>().ForEach((Entity entity, int entityInQueryIndex, ref Translation translation, ref MovingToPickupResource movingToPickupResource, ref ResourceTransportJobData resourceTransportJob) =>
+        //{
+        //    // Pickup
+        //    CommandBuffer.RemoveComponent<MovingToPickupResource>(entity);
+        //    CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entity);
+
+        //    CommandBuffer.RemoveComponent<TransportResourceToStorageTag>(movingToPickupResource.ResourceEntity);
+
+        //    CommandBuffer.AddComponent<ResourceBeingCarriedTag>(movingToPickupResource.ResourceEntity);
+        //    CommandBuffer.AddComponent<IsCarryingResourceTag>(entity);
+
+        //    CommandBuffer.AddComponent<CarrierData>(movingToPickupResource.ResourceEntity);
+        //    CommandBuffer.SetComponent(movingToPickupResource.ResourceEntity, new CarrierData { Carrier = entity });
+
+        //    // Move to destination
+        //    CommandBuffer.AddComponent<NavAgentRequestingPath>(entity);
+        //    CommandBuffer.SetComponent(entity, new NavAgentRequestingPath { StartPosition = translation.Value, EndPosition = resourceTransportJob.DestinationPosition });
+
+        //}).Run();
     }
 }

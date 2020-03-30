@@ -5,6 +5,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+[UpdateAfter(typeof(CitizenResourcePickupSystem))]
 public class ResourceProductionSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
@@ -33,6 +34,7 @@ public class ResourceProductionSystem : SystemBase
             EntityType = GetArchetypeChunkEntityType(),
             ResourceProductionDataType = GetArchetypeChunkComponentType<ResourceProductionData>(),
             WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(),
+            ResourceStorageType = GetArchetypeChunkComponentType<ResourceStorage>(),
         }.Schedule(producingEntititesQuery);
 
         productionJob.Complete();
@@ -60,6 +62,27 @@ public class ResourceProductionSystem : SystemBase
 
             EntityManager.SetComponentData(resourceEntity, new Translation { Value = position });
             EntityManager.AddComponent<TransportResourceToStorageTag>(resourceEntity);
+
+            // Set storage capacity
+            var resourceStorage = EntityManager.GetComponentData<ResourceStorage>(creationInfo.CreatedBy);
+            resourceStorage.UsedCapacity++;
+            EntityManager.SetComponentData(creationInfo.CreatedBy, resourceStorage);
+
+            // Add to storage
+
+            //var resourceBuffer = EntityManager.GetBuffer<ResourceEntityIndexElement>(creationInfo.CreatedBy);
+            //var resourceIndex = resourceBuffer.Length;
+            //resourceBuffer.Add(resourceEntity.Index);
+
+            EntityManager.AddComponent<ResourceInStorage>(resourceEntity);
+            EntityManager.SetComponentData(resourceEntity, new ResourceInStorage
+            {
+                StorageEntityIndex = 0, // might be removed later
+                StorageEntity = creationInfo.CreatedBy,
+                ResourceData = new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount },
+                StorageAreaStartPosition = position,
+                StorageAreaEndPosition = position + new float3(1,1,1),
+            });
         }
     }
 
@@ -79,6 +102,7 @@ public class ResourceProductionSystem : SystemBase
         public ArchetypeChunkEntityType EntityType;
         public ArchetypeChunkComponentType<ResourceProductionData> ResourceProductionDataType;
         public ArchetypeChunkComponentType<WorkPlaceWorkerData> WorkPlaceWorkerDataType;
+        public ArchetypeChunkComponentType<ResourceStorage> ResourceStorageType;
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
@@ -86,11 +110,15 @@ public class ResourceProductionSystem : SystemBase
 
             var resourceProductionDatas = chunk.GetNativeArray(ResourceProductionDataType);
             var workerDatas = chunk.GetNativeArray(WorkPlaceWorkerDataType);
+            var resourceStorages = chunk.GetNativeArray(ResourceStorageType);
 
             for (int i = 0; i < chunk.Count; i++)
             {
                 var productionData = resourceProductionDatas[i];
                 var workerData = workerDatas[i];
+
+                if (resourceStorages[i].UsedCapacity >= resourceStorages[i].MaxCapacity)
+                    continue;
 
                 if (workerData.ActiveWorkers >= 0)
                 {
