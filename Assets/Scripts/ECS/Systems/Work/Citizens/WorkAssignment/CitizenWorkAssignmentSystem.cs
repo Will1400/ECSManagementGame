@@ -33,20 +33,18 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
             {
                 int currentWorkers = workerData.CurrentWorkers;
 
-                WorkPlaceWorkerData tempWorkerData = workerData;
-
                 Entity citizen;
                 for (int i = citizenIndex; i < idleCitizens.Length; i++)
                 {
-                    if (currentWorkers < tempWorkerData.MaxWorkers)
+                    if (currentWorkers < workerData.MaxWorkers)
                     {
                         citizen = idleCitizens[i];
                         EntityManager.AddComponent<GoingToWorkTag>(citizen);
                         EntityManager.AddComponent<CitizenWork>(citizen);
                         EntityManager.AddComponent<NavAgentRequestingPath>(citizen);
 
-                        EntityManager.AddComponentData(citizen, new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = tempWorkerData.WorkPosition });
-                        EntityManager.AddComponentData(citizen, new NavAgentRequestingPath { StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value, EndPosition = tempWorkerData.WorkPosition });
+                        EntityManager.AddComponentData(citizen, new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = workerData.WorkPosition });
+                        EntityManager.AddComponentData(citizen, new NavAgentRequestingPath { StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value, EndPosition = workerData.WorkPosition });
                         currentWorkers++;
                         EntityManager.RemoveComponent<IdleTag>(citizen);
 
