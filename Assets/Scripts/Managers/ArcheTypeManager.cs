@@ -38,6 +38,7 @@ public class ArcheTypeManager : MonoBehaviour
             typeof(UnderConstruction),
             typeof(WorkPlaceWorkerData),
             typeof(Translation),
+            typeof(ResourceStorage),
             typeof(GridOccupation)));
 
     

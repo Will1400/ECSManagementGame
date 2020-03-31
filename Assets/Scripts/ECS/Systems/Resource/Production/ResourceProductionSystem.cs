@@ -124,6 +124,7 @@ public class ResourceProductionSystem : SystemBase
                     productionData.ProductionTimeRemaining -= DeltaTime * (workerData.ActiveWorkers / .5f);
                     resourceProductionDatas[i] = productionData;
                 }
+
                 if (productionData.ProductionTimeRemaining <= 0)
                 {
                     ResourcesToCreate.Enqueue(new ResourceCreationInfo

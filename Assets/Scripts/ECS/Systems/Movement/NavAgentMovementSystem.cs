@@ -40,43 +40,6 @@ public class NavAgentMovementSystem : SystemBase
         job.Complete();
     }
 
-    //[RequireComponentTag(typeof(AgentHasPath))]
-    //struct MoveJob : IJobForEachWithEntity_EBCCC<Float3BufferElement, Translation, MoveSpeed, NavAgent>
-    //{
-    //    public ArchetypeChunkComponentType<Translation> TranslationType;
-    //    [ReadOnly]
-    //    public ArchetypeChunkComponentType<MoveSpeed> MoveSpeedType;
-    //    [ReadOnly]
-    //    public ArchetypeChunkComponentType<CitizenWork> CitizenWorkType;
-
-    //    public float DeltaTime;
-
-    //    public EntityCommandBuffer.Concurrent CommandBuffer;
-
-    //    public void Execute(Entity entity, int index, DynamicBuffer<Float3BufferElement> buffer, ref Translation translation, [ReadOnly]ref MoveSpeed speed, ref NavAgent agent)
-    //    {
-    //        if (agent.CurrentWaypointIndex >= buffer.Length)
-    //        {
-    //            agent.Status = AgentStatus.Idle;
-    //            CommandBuffer.RemoveComponent(index, entity, typeof(AgentHasPath));
-    //            return;
-    //        }
-    //        float3 destination = buffer[agent.CurrentWaypointIndex];
-    //        destination.y = 1.5f;
-
-    //        if (math.distance(translation.Value, destination) > .4f)
-    //        {
-    //            float3 direction = math.normalize(destination - translation.Value);
-    //            direction.y = 0;
-    //            translation.Value += direction * speed.Value * DeltaTime;
-    //        }
-    //        else
-    //        {
-    //            agent.CurrentWaypointIndex++;
-    //        }
-    //    }
-    //}
-
     [BurstCompile]
     struct ChunkMoveJob : IJobChunk
     {
@@ -120,9 +83,9 @@ public class NavAgentMovementSystem : SystemBase
                     CommandBuffer.AddComponent<HasArrivedAtDestinationTag>(chunkIndex, entities[i]);
                     break;
                 }
+
                 float3 destination = buffer[agent.CurrentWaypointIndex];
                 destination.y = translation.Value.y;
-
 
                 if (math.distance(translation.Value, destination) > .4f)
                 {
