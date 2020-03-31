@@ -9,8 +9,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using System.Diagnostics;
-using Debug = UnityEngine.Debug;
 
 public enum PathfindingFailedReason
 {
@@ -46,7 +44,7 @@ public class NavMeshQuerySystem : JobComponentSystem
     /// <summary>
     /// Cache query results
     /// </summary>
-    public bool UseCache = false;
+    public bool UseCache = true;
 
     /// <summary>
     /// Current version of the cache

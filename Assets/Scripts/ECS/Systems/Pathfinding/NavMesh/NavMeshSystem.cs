@@ -145,7 +145,10 @@ public class NavMeshSystem : JobComponentSystem
                bounds);
 
             temp.Dispose();
-            //NavMeshQuerySystem.instance.PurgeCache();
+
+            if (NavMeshQuerySystem.instance.UseCache)
+                NavMeshQuerySystem.instance.PurgeCache();
+
             remainingTimeUntilUpdateAvailable = updateCooldown;
             updateMesh = false;
         }

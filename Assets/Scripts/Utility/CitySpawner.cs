@@ -9,14 +9,16 @@ using UnityEngine;
 
 public class CitySpawner : MonoBehaviour
 {
+    public string PrefabName;
     public int count = 1000;
+
     public void SpawnCity()
     {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         var entityPrefab = entityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
 
-        entityManager.AddComponentData(entityPrefab, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = "TallHouse" });
+        entityManager.AddComponentData(entityPrefab, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = PrefabName });
 
         NativeArray<Entity> constructionSites = entityManager.Instantiate(entityPrefab, count, Allocator.Temp);
         int columnCount = (int)math.round(math.sqrt(count));
@@ -26,7 +28,6 @@ public class CitySpawner : MonoBehaviour
 
             float currentColumn = 15 * (i % columnCount);
             float currentRow = 20 * ((int)math.floor(i / columnCount) + 1);
-
 
             float3 position = new float3(100, 0, 10) + new float3(currentColumn, 0, currentRow);
 
