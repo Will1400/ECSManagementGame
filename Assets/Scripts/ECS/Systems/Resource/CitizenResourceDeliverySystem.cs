@@ -29,16 +29,11 @@ public class CitizenResourceDeliverySystem : SystemBase
         {
             if (EntityManager.Exists(transportJobData.DestinationEntity))
             {
-                var resourceBuffer = EntityManager.GetBuffer<ResourceEntityIndexElement>(transportJobData.DestinationEntity);
-                var resourceIndex = resourceBuffer.Length;
-                resourceBuffer.Add(transportJobData.ResourceEntity.Index);
-
                 var occupation = EntityManager.GetComponentData<GridOccupation>(transportJobData.DestinationEntity);
 
                 CommandBuffer.AddComponent<ResourceInStorage>(transportJobData.ResourceEntity);
                 CommandBuffer.SetComponent(transportJobData.ResourceEntity, new ResourceInStorage
                 {
-                    StorageEntityIndex = resourceIndex,
                     StorageEntity = transportJobData.DestinationEntity,
                     ResourceData = EntityManager.GetComponentData<ResourceData>(transportJobData.ResourceEntity),
                     StorageAreaStartPosition = new float3(occupation.Start.x, 0.5f, occupation.Start.y),

@@ -77,7 +77,6 @@ public class ResourceProductionSystem : SystemBase
             EntityManager.AddComponent<ResourceInStorage>(resourceEntity);
             EntityManager.SetComponentData(resourceEntity, new ResourceInStorage
             {
-                StorageEntityIndex = 0, // might be removed later
                 StorageEntity = creationInfo.CreatedBy,
                 ResourceData = new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount },
                 StorageAreaStartPosition = position,
