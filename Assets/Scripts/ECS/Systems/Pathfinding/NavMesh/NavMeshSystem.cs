@@ -19,7 +19,7 @@ public class NavMeshSystem : JobComponentSystem
     private NavMeshData navMeshData;
     private NavMeshDataInstance navMeshDataInstance;
 
-    float updateCooldown = 5;
+    float updateCooldown = 10;
     float remainingTimeUntilUpdateAvailable;
 
     /// Key is index of the entity

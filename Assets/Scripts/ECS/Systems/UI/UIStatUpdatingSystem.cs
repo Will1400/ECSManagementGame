@@ -4,7 +4,6 @@ using Unity.Entities;
 using UnityEngine.Events;
 using System;
 using Unity.Collections;
-using System.Linq;
 using Unity.Burst;
 
 public class UIStatUpdatingSystem : SystemBase
@@ -13,6 +12,9 @@ public class UIStatUpdatingSystem : SystemBase
 
     public Action<int> CitizenCountChanged;
     public Action<int> StoneResourceCountChanged;
+
+    NativeArray<int> resourceCounts;
+    NativeQueue<ResourceCountInfo> resourceCountInfoQueue;
 
     int numOfResourceTypes;
 
@@ -53,6 +55,9 @@ public class UIStatUpdatingSystem : SystemBase
     {
         numOfResourceTypes = Enum.GetValues(typeof(ResourceType)).Length;
 
+        resourceCounts = new NativeArray<int>(numOfResourceTypes, Allocator.Persistent);
+        resourceCountInfoQueue = new NativeQueue<ResourceCountInfo>(Allocator.Persistent);
+
         if (Instance == null)
             Instance = this;
 
@@ -69,11 +74,9 @@ public class UIStatUpdatingSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        ResetCountsArray();
+
         CitizenCount = citizensQuery.CalculateEntityCount();
-
-
-        NativeQueue<ResourceCountInfo> resourceCountInfoQueue = new NativeQueue<ResourceCountInfo>(Allocator.TempJob);
-
 
         var countJob = new ResourceBasicCountJob
         {
@@ -82,9 +85,6 @@ public class UIStatUpdatingSystem : SystemBase
             NumOfResourceTypes = numOfResourceTypes
         }.Schedule(resourcesQuery);
         countJob.Complete();
-
-
-        NativeArray<int> resourceCounts = new NativeArray<int>(numOfResourceTypes, Allocator.Temp);
 
         while (resourceCountInfoQueue.TryDequeue(out ResourceCountInfo countInfo))
         {
@@ -99,6 +99,20 @@ public class UIStatUpdatingSystem : SystemBase
             }
         }
 
+    }
+
+    [BurstCompile]
+    void ResetCountsArray()
+    {
+        for (int i = 0; i < numOfResourceTypes; i++)
+        {
+            resourceCounts[i] = 0;
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        resourceCounts.Dispose();
         resourceCountInfoQueue.Dispose();
     }
 
