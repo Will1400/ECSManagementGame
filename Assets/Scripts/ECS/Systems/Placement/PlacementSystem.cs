@@ -83,6 +83,8 @@ public class PlacementSystem : SystemBase
             }
         }
 
+        EntityManager.AddBuffer<ResourceDataElement>(constructionEntity);
+
         EntityManager.AddComponentData(constructionEntity, new ResourceStorage { MaxCapacity = -1, StoragePosition = position });
 
         EntityManager.AddComponentData(constructionEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });

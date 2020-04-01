@@ -27,18 +27,20 @@ public class ResourceProductionSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        var productionJob = new ProductionJob
+        if (resourcesToCreate.Count > 0)
+            resourcesToCreate.Clear();
+
+        var job = new ProductionJob
         {
             DeltaTime = Time.DeltaTime,
             ResourcesToCreate = resourcesToCreate.AsParallelWriter(),
             EntityType = GetArchetypeChunkEntityType(),
             ResourceProductionDataType = GetArchetypeChunkComponentType<ResourceProductionData>(),
-            WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(),
-            ResourceStorageType = GetArchetypeChunkComponentType<ResourceStorage>(),
+            WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(true),
+            ResourceStorageType = GetArchetypeChunkComponentType<ResourceStorage>(true),
         }.Schedule(producingEntititesQuery);
 
-        productionJob.Complete();
-
+        job.Complete();
 
         while (resourcesToCreate.TryDequeue(out ResourceCreationInfo creationInfo))
         {
@@ -80,7 +82,7 @@ public class ResourceProductionSystem : SystemBase
                 StorageEntity = creationInfo.CreatedBy,
                 ResourceData = new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount },
                 StorageAreaStartPosition = position,
-                StorageAreaEndPosition = position + new float3(1,1,1),
+                StorageAreaEndPosition = position + new float3(1, 1, 1),
             });
         }
     }
@@ -99,22 +101,25 @@ public class ResourceProductionSystem : SystemBase
 
         [ReadOnly]
         public ArchetypeChunkEntityType EntityType;
-        public ArchetypeChunkComponentType<ResourceProductionData> ResourceProductionDataType;
+        [ReadOnly]
         public ArchetypeChunkComponentType<WorkPlaceWorkerData> WorkPlaceWorkerDataType;
+        [ReadOnly]
         public ArchetypeChunkComponentType<ResourceStorage> ResourceStorageType;
+
+        public ArchetypeChunkComponentType<ResourceProductionData> ResourceProductionDataType;
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
             NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
-            var resourceProductionDatas = chunk.GetNativeArray(ResourceProductionDataType);
-            var workerDatas = chunk.GetNativeArray(WorkPlaceWorkerDataType);
-            var resourceStorages = chunk.GetNativeArray(ResourceStorageType);
+            NativeArray<ResourceProductionData> resourceProductionDatas = chunk.GetNativeArray(ResourceProductionDataType);
+            NativeArray<WorkPlaceWorkerData> workerDatas = chunk.GetNativeArray(WorkPlaceWorkerDataType);
+            NativeArray<ResourceStorage> resourceStorages = chunk.GetNativeArray(ResourceStorageType);
 
             for (int i = 0; i < chunk.Count; i++)
             {
-                var productionData = resourceProductionDatas[i];
-                var workerData = workerDatas[i];
+                ResourceProductionData productionData = resourceProductionDatas[i];
+                WorkPlaceWorkerData workerData = workerDatas[i];
 
                 if (resourceStorages[i].UsedCapacity >= resourceStorages[i].MaxCapacity)
                     continue;

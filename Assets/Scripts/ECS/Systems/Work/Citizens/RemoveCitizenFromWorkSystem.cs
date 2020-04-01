@@ -16,7 +16,7 @@ public class RemoveCitizenFromWorkSystem : ComponentSystem
     {
         Entities.With(citizens).ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
-            if (citizenWork.WorkPlaceEntity != Entity.Null && EntityManager.Exists(citizenWork.WorkPlaceEntity))
+            if (citizenWork.WorkPlaceEntity != Entity.Null && EntityManager.Exists(citizenWork.WorkPlaceEntity) & EntityManager.HasComponent<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity))
             {
                 var index = citizenWork.WorkPlaceEntity.Index;
                 var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);

@@ -53,7 +53,6 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
                 var assignmentInfo = new AssignmentInfo
                 {
                     Citizen = citizen,
-                    Resource = entity,
                     ResourcePosition = translation.Value,
                     TransportJob = new ResourceTransportJobData
                     {
@@ -93,13 +92,13 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
                     EndPosition = assignmentInfo.ResourcePosition
                 };
 
-                EntityManager.AddComponentData(assignmentInfo.Citizen, new MovingToPickupResource { ResourceEntity = assignmentInfo.Resource });
+                EntityManager.AddComponentData(assignmentInfo.Citizen, new MovingToPickupResource { ResourceEntity = assignmentInfo.TransportJob.ResourceEntity });
 
                 EntityManager.AddComponentData(assignmentInfo.Citizen, requestingPath);
 
                 EntityManager.AddComponentData(assignmentInfo.Citizen, assignmentInfo.TransportJob);
 
-                EntityManager.RemoveComponent<TransportResourceToStorageTag>(assignmentInfo.Resource);
+                EntityManager.RemoveComponent<TransportResourceToStorageTag>(assignmentInfo.TransportJob.ResourceEntity);
 
                 EntityManager.RemoveComponent<IdleTag>(assignmentInfo.Citizen);
             }
@@ -113,7 +112,6 @@ public class CitizenTransportResourceToStorageAssignmentSystem : SystemBase
     struct AssignmentInfo
     {
         public Entity Citizen;
-        public Entity Resource;
         public float3 ResourcePosition;
         public ResourceTransportJobData TransportJob;
     }

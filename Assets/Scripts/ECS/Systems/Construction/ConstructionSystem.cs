@@ -32,6 +32,6 @@ public class ConstructionSystem : SystemBase
             {
                 CommandBuffer.AddComponent<ConstructionFinishedTag>(entityInQueryIndex, entity);
             }
-        }).Schedule();
+        }).Schedule(Dependency).Complete();
     }
 }

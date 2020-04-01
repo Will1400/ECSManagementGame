@@ -20,6 +20,8 @@ public class RemoveResourceFromStorageSystem : SystemBase
             var resourceStorage = EntityManager.GetComponentData<ResourceStorage>(storageEntity);
             resourceStorage.UsedCapacity--;
 
+            CommandBuffer.RemoveComponent<ResourceInStorage>(removeResourceFromStorage.ResourceEntity);
+
             EntityManager.SetComponentData(storageEntity, resourceStorage);
 
             CommandBuffer.DestroyEntity(entity);

@@ -10,6 +10,7 @@ using Unity.Transforms;
 public class CitizenResourceDeliverySystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
+
     EntityQuery citizensReadyForDeliveryQuery;
 
     protected override void OnCreate()
@@ -29,6 +30,16 @@ public class CitizenResourceDeliverySystem : SystemBase
         {
             if (EntityManager.Exists(transportJobData.DestinationEntity))
             {
+                if (!EntityManager.HasComponent<ResourceStorageAreaTag>(transportJobData.DestinationEntity))
+                {
+                    var buffer = EntityManager.GetBuffer<ResourceDataElement>(transportJobData.DestinationEntity);
+                    buffer.Add(EntityManager.GetComponentData<ResourceData>(transportJobData.ResourceEntity));
+                }
+                else
+                {
+                    CommandBuffer.AddComponent<ResourceIsAvailableTag>(transportJobData.ResourceEntity);
+                }
+
                 var occupation = EntityManager.GetComponentData<GridOccupation>(transportJobData.DestinationEntity);
 
                 CommandBuffer.AddComponent<ResourceInStorage>(transportJobData.ResourceEntity);
