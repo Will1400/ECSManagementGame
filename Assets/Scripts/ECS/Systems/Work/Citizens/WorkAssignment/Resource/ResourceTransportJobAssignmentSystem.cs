@@ -79,8 +79,7 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             CommandBuffer.AddComponent<ResourceTransportJobData>(citizen);
             CommandBuffer.SetComponent(citizen, transportJobData);
 
-            CommandBuffer.RemoveComponent<TransportResourceToStorageTag>(transportJobData.ResourceEntity);
-
+            CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(citizen);
             CommandBuffer.RemoveComponent<IdleTag>(citizen);
 
             CommandBuffer.DestroyEntity(entity);

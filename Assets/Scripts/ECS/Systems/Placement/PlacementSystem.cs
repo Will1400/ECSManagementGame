@@ -82,6 +82,10 @@ public class PlacementSystem : SystemBase
                 resourceCostBuffer.CopyFrom(EntityManager.GetBuffer<ResourceCostElement>(currentEntity));
             }
         }
+        else
+        {
+            EntityManager.AddComponent<HasNoResourceCost>(constructionEntity);
+        }
 
         EntityManager.AddBuffer<ResourceDataElement>(constructionEntity);
 

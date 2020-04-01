@@ -22,7 +22,7 @@ public class RemoveResourceFromStorageSystem : SystemBase
 
             CommandBuffer.RemoveComponent<ResourceInStorage>(removeResourceFromStorage.ResourceEntity);
 
-            EntityManager.SetComponentData(storageEntity, resourceStorage);
+            CommandBuffer.SetComponent(storageEntity, resourceStorage);
 
             CommandBuffer.DestroyEntity(entity);
         }).WithoutBurst().Run();

@@ -23,14 +23,17 @@ public class ConstructionSystem : SystemBase
 
         Entities.ForEach((Entity entity, int entityInQueryIndex, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData) =>
         {
-            if (workerData.ActiveWorkers >= 0)
+            if (workerData.IsWorkable)
             {
-                construction.remainingConstructionTime -= deltaTime * (workerData.ActiveWorkers / .5f);
-            }
+                if (workerData.ActiveWorkers >= 0)
+                {
+                    construction.remainingConstructionTime -= deltaTime * (workerData.ActiveWorkers / .5f);
+                }
 
-            if (construction.remainingConstructionTime <= 0)
-            {
-                CommandBuffer.AddComponent<ConstructionFinishedTag>(entityInQueryIndex, entity);
+                if (construction.remainingConstructionTime <= 0)
+                {
+                    CommandBuffer.AddComponent<ConstructionFinishedTag>(entityInQueryIndex, entity);
+                }
             }
         }).Schedule(Dependency).Complete();
     }

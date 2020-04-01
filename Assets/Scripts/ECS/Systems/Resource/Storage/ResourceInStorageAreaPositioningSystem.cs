@@ -6,7 +6,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Burst;
 
-public class ResourceInStorageArePositioningSystem : SystemBase
+public class ResourceInStorageAreaPositioningSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery resourcesInStorageQuery;

@@ -34,8 +34,11 @@ public class CitizenResourcePickupSystem : SystemBase
         {
             var removeEntity = CommandBuffer.CreateEntity(entityInQueryIndex);
             CommandBuffer.AddComponent<RemoveResourceFromStorage>(entityInQueryIndex, removeEntity);
-            CommandBuffer.SetComponent(entityInQueryIndex, removeEntity, new RemoveResourceFromStorage { ResourceEntity = resourceTransportJob.ResourceEntity });
-            
+            CommandBuffer.SetComponent(entityInQueryIndex, removeEntity, new RemoveResourceFromStorage
+            {
+                ResourceEntity = resourceTransportJob.ResourceEntity,
+            });
+
             // Pickup
             CommandBuffer.RemoveComponent<MovingToPickupResource>(entityInQueryIndex, entity);
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entityInQueryIndex, entity);

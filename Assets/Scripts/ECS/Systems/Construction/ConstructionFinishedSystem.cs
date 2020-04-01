@@ -5,10 +5,14 @@ using Unity.Transforms;
 
 public class ConstructionFinishedSystem : ComponentSystem
 {
+    EndSimulationEntityCommandBufferSystem bufferSystem;
+
     EntityQuery allFinishedSitesQuery;
 
     protected override void OnCreate()
     {
+        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+
         allFinishedSitesQuery = Entities.WithAll<UnderConstruction, WorkPlaceWorkerData, Translation>()
                         .WithAllReadOnly<ConstructionFinishedTag>()
                         .ToEntityQuery();
@@ -16,8 +20,22 @@ public class ConstructionFinishedSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
-        Entities.With(allFinishedSitesQuery).ForEach((Entity entity, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
+        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+
+        Entities.With(allFinishedSitesQuery).ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
         {
+            for (int i = 0; i < resourceDatas.Length; i++)
+            {
+                var resource = resourceDatas[i].Value;
+                var destroyEntity = CommandBuffer.CreateEntity();
+                CommandBuffer.AddComponent<DestroyResourceInStorage>(destroyEntity);
+                CommandBuffer.SetComponent(destroyEntity, new DestroyResourceInStorage
+                {
+                    ResourceData = resource,
+                    StorageId = entity.Index
+                });
+            }
+
             Entity finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(construction.finishedPrefabName.ToString());
             translation.Value.y = EntityManager.GetComponentData<Translation>(finishedEntity).Value.y;
 

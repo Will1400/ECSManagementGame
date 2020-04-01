@@ -5,7 +5,7 @@ using Unity.Transforms;
 using Unity.Collections;
 using System.Linq;
 
-public class ResourceTransportJobCreationSystem : SystemBase
+public class ResourceRequestTransportJobCreationSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
 
@@ -59,7 +59,7 @@ public class ResourceTransportJobCreationSystem : SystemBase
                 if (resourceRequest.Amount <= 0)
                     break;
 
-                if (resourcesInStorageAreas[i].ResourceData.ResourceType == resourceRequest.ResourceType)
+                if (resourcesInStorageAreas[i].ResourceData.ResourceType == resourceRequest.ResourceType && resourceEntities[i] != Entity.Null)
                 {
                     var resource = resourcesInStorageAreas[i];
 
@@ -76,7 +76,7 @@ public class ResourceTransportJobCreationSystem : SystemBase
                         resourceRequest.Amount -= resourcesInStorageAreas[i].ResourceData.Amount;
 
                         resourceEntities[i] = Entity.Null;
-                        resourcesInStorageAreas[i] = new ResourceInStorage { };
+                        resourcesInStorageAreas[i] = new ResourceInStorage { StorageEntity = resource.StorageEntity };
 
                     }
                 }

@@ -5,4 +5,5 @@ using Unity.Entities;
 public struct RemoveResourceFromStorage : IComponentData
 {
     public Entity ResourceEntity;
+    public Entity StorageEntity;
 }

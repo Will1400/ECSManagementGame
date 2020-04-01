@@ -14,13 +14,14 @@ public class CitySpawner : MonoBehaviour
 
     public void SpawnCity()
     {
-        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        EntityManager EntityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        var entityPrefab = entityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
+        var entityPrefab = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
 
-        entityManager.AddComponentData(entityPrefab, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = PrefabName });
+        EntityManager.AddBuffer<ResourceCostElement>(entityPrefab);
+        EntityManager.AddComponentData(entityPrefab, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = PrefabName });
 
-        NativeArray<Entity> constructionSites = entityManager.Instantiate(entityPrefab, count, Allocator.Temp);
+        NativeArray<Entity> constructionSites = EntityManager.Instantiate(entityPrefab, count, Allocator.Temp);
         int columnCount = (int)math.round(math.sqrt(count));
 
         for (int i = 0; i < constructionSites.Length; i++)
@@ -35,9 +36,9 @@ public class CitySpawner : MonoBehaviour
 
             var occupation = GridHelper.CalculateGridOccupationFromBounds(new AABB { Center = position, Extents = new float3(4.6f, 5.5f, 4f) });
 
-            entityManager.AddComponentData(entity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
-            entityManager.AddComponentData(entity, new Translation { Value = position });
-            entityManager.AddComponentData(entity, new WorkPlaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });
+            EntityManager.AddComponentData(entity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
+            EntityManager.AddComponentData(entity, new Translation { Value = position });
+            EntityManager.AddComponentData(entity, new WorkPlaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });
         }
 
         constructionSites.Dispose();

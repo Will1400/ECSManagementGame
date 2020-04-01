@@ -8,7 +8,8 @@ public struct ResourceInStorage : IComponentData
     public Entity StorageEntity;
     public ResourceData ResourceData;
 
-    //public int StorageEntityIndex;
+    //public int Storage
+    
     public float3 StorageAreaStartPosition;
     public float3 StorageAreaEndPosition;
 }
