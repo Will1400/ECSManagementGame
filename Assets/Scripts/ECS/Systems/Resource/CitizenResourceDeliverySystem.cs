@@ -54,11 +54,13 @@ public class CitizenResourceDeliverySystem : SystemBase
 
             CommandBuffer.SetComponent(transportJobData.ResourceEntity, new Rotation { Value = quaternion.identity });
 
+            
             CommandBuffer.RemoveComponent<ResourceTransportJobData>(citizen);
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(citizen);
             CommandBuffer.RemoveComponent<IsCarryingResourceTag>(citizen);
 
             CommandBuffer.RemoveComponent<CarrierData>(transportJobData.ResourceEntity);
+            CommandBuffer.RemoveComponent<ResourceIsUnderTransportationTag>(transportJobData.ResourceEntity);
             CommandBuffer.RemoveComponent<ResourceBeingCarriedTag>(transportJobData.ResourceEntity);
 
             CommandBuffer.AddComponent<IdleTag>(citizen);
