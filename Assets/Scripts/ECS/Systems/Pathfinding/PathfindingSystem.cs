@@ -8,6 +8,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 [UpdateAfter(typeof(NavMeshSystem))]
@@ -37,6 +38,10 @@ public class PathfindingSystem : ComponentSystem
             {
                 queuedEntities.Add(entity.Index, entity);
                 navAgent.Status = AgentStatus.PathQueued;
+
+                if (math.all( agentRequestingPath.StartPosition == float3.zero))
+                    agentRequestingPath.StartPosition = EntityManager.GetComponentData<Translation>(entity).Value;
+
                 NavMeshQuerySystem.instance.RequestPath(entity.Index, agentRequestingPath.StartPosition, agentRequestingPath.EndPosition);
             }
         });
@@ -76,13 +81,8 @@ public class PathfindingSystem : ComponentSystem
     void OnPathRequestFailed(int id, PathfindingFailedReason reason)
     {
         var entity = queuedEntities[id];
-        //var agent = EntityManager.GetComponentData<NavAgent>(entity);
-        //agent.Status = AgentStatus.Idle;
-        //EntityManager.SetComponentData(entity, agent);
-        //queuedEntities.Remove(id);
 
         readyPaths.Add(id, new float3[] { EntityManager.GetComponentData<NavAgentRequestingPath>(entity).EndPosition });
-
     }
 
     void OnPathRequestCompleted(int id, Vector3[] points)
