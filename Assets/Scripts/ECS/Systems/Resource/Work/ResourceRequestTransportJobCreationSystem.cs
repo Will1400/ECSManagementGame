@@ -9,18 +9,12 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
 
-    EntityQuery resourceRequestQuery;
     EntityQuery resourcesInStorageQuery;
     EntityQuery StorageAreasQuery;
 
     protected override void OnCreate()
     {
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
-        resourceRequestQuery = GetEntityQuery(new EntityQueryDesc
-        {
-            All = new ComponentType[] { typeof(ResourceRequest) },
-        });
 
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
@@ -35,23 +29,33 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 
     protected override void OnUpdate()
     {
+
+        if (resourcesInStorageQuery.CalculateChunkCount() == 0)
+            return;
+
         NativeArray<Entity> storageAreas = StorageAreasQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<Entity> resourceEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<ResourceInStorage> resourcesInStorageAreas = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorage>(Allocator.TempJob);
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
-        Entities.ForEach((Entity entity, int entityInQueryIndex, ref ResourceRequest resourceRequest) =>
+
+        // Destroy request if the entity does not exist
+        Entities.ForEach((Entity entity, ref ResourceRequest resourceRequest) =>
         {
             if (!EntityManager.Exists(resourceRequest.RequestingEntity))
             {
                 CommandBuffer.DestroyEntity(entity);
-                return;
             }
 
+        }).WithoutBurst().Run();
+
+        // Try to fulfill requests
+        Entities.ForEach((Entity entity, ref ResourceRequest resourceRequest) =>
+        {
             var transportJob = new ResourceTransportJobData
             {
                 DestinationEntity = resourceRequest.RequestingEntity,
-                DestinationPosition = EntityManager.GetComponentData<Translation>(resourceRequest.RequestingEntity).Value,
+                DestinationPosition = resourceRequest.RequestingEntityPosition,
             };
 
             for (int i = 0; i < resourcesInStorageAreas.Length; i++)
@@ -87,7 +91,7 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
                 CommandBuffer.DestroyEntity(entity);
             }
 
-        }).WithoutBurst().Run();
+        }).Run();
 
         storageAreas.Dispose();
         resourcesInStorageAreas.Dispose();

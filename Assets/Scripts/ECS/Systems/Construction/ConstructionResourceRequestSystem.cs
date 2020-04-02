@@ -31,7 +31,7 @@ public class ConstructionResourceRequestSystem : SystemBase
     {
         EntityCommandBuffer.Concurrent CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
 
-        Entities.WithAll<UnderConstruction>().WithNone<HasRequestedResourcesTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceCostElement> resourceCosts) =>
+        Entities.WithAll<UnderConstruction>().WithNone<HasRequestedResourcesTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceCostElement> resourceCosts, ref Translation translation) =>
         {
             for (int i = 0; i < resourceCosts.Length; i++)
             {
@@ -44,6 +44,7 @@ public class ConstructionResourceRequestSystem : SystemBase
                 {
                     Amount = resourceCosts[i].Value.Amount,
                     RequestingEntity = entity,
+                    RequestingEntityPosition = translation.Value,
                     ResourceType = resourceCosts[i].Value.ResourceType
                 });
             }

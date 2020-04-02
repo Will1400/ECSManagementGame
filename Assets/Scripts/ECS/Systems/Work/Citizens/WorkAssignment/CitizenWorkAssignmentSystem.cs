@@ -6,25 +6,41 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 
-public class CitizenWorkAssignmentSystem : ComponentSystem
+public class CitizenWorkAssignmentSystem : SystemBase
 {
+    EndSimulationEntityCommandBufferSystem bufferSystem;
+
     EntityQuery idleCitizensQuery;
     EntityQuery needsWorkersQuery;
 
     protected override void OnCreate()
     {
-        idleCitizensQuery = Entities.WithAll<Citizen, IdleTag>()
-                                    .ToEntityQuery();
-        needsWorkersQuery = Entities.WithAll<WorkPlaceWorkerData>()
-                                    .WithNone<RemoveWorkPlaceTag, BeingPlacedTag>()
-                                    .ToEntityQuery();
+        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+
+        idleCitizensQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { typeof(Citizen), typeof(IdleTag), typeof(Translation) }
+        });
+
+        needsWorkersQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { typeof(WorkPlaceWorkerData) },
+            None = new ComponentType[] { typeof(RemoveWorkPlaceTag) }
+        });
     }
 
     protected override void OnUpdate()
     {
-        var idleCitizens = Entities.With(idleCitizensQuery).ToEntityQuery().ToEntityArray(Allocator.TempJob);
+        if (idleCitizensQuery.CalculateChunkCount() == 0 || needsWorkersQuery.CalculateChunkCount() == 0)
+            return;
+
+        var idleCitizens = idleCitizensQuery.ToEntityArray(Allocator.TempJob);
+        var idleCitizensTranslation = idleCitizensQuery.ToComponentDataArray<Translation>(Allocator.TempJob);
+
+        EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
+
         int citizenIndex = 0;
-        Entities.With(needsWorkersQuery).ForEach((Entity workPlace, ref WorkPlaceWorkerData workerData) =>
+        Entities.WithNone<RemoveWorkPlaceTag>().ForEach((Entity workPlace, ref WorkPlaceWorkerData workerData) =>
         {
             if (idleCitizens.Length == 0)
                 return;
@@ -32,21 +48,18 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
             if (workerData.CurrentWorkers < workerData.MaxWorkers && workerData.IsWorkable)
             {
                 int currentWorkers = workerData.CurrentWorkers;
-
-                Entity citizen;
                 for (int i = citizenIndex; i < idleCitizens.Length; i++)
                 {
                     if (currentWorkers < workerData.MaxWorkers)
                     {
-                        citizen = idleCitizens[i];
-                        EntityManager.AddComponent<GoingToWorkTag>(citizen);
-                        EntityManager.AddComponent<CitizenWork>(citizen);
-                        EntityManager.AddComponent<NavAgentRequestingPath>(citizen);
+                        CommandBuffer.AddComponent<GoingToWorkTag>(idleCitizens[i]);
+                        CommandBuffer.AddComponent<CitizenWork>(idleCitizens[i]);
+                        CommandBuffer.AddComponent<NavAgentRequestingPath>(idleCitizens[i]);
 
-                        EntityManager.AddComponentData(citizen, new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = workerData.WorkPosition });
-                        EntityManager.AddComponentData(citizen, new NavAgentRequestingPath { StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value, EndPosition = workerData.WorkPosition });
+                        CommandBuffer.SetComponent(idleCitizens[i], new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = workerData.WorkPosition });
+                        CommandBuffer.SetComponent(idleCitizens[i], new NavAgentRequestingPath { StartPosition = idleCitizensTranslation[i].Value, EndPosition = workerData.WorkPosition });
                         currentWorkers++;
-                        EntityManager.RemoveComponent<IdleTag>(citizen);
+                        CommandBuffer.RemoveComponent<IdleTag>(idleCitizens[i]);
 
                         citizenIndex++;
                     }
@@ -57,8 +70,9 @@ public class CitizenWorkAssignmentSystem : ComponentSystem
                 }
                 workerData.CurrentWorkers = currentWorkers;
             }
-        });
+        }).Run();
 
         idleCitizens.Dispose();
+        idleCitizensTranslation.Dispose();
     }
 }
