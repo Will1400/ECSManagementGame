@@ -67,29 +67,16 @@ public class PlacementSystem : SystemBase
 
     private void Place()
     {
-        var constructionEntity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
+        var constructionEntity = EntityPrefabManager.Instance.SpawnConstructionEntityPrefab(prefabName);
+
+        if (constructionEntity == Entity.Null)
+        {
+            Cancel();
+            return;
+        }
 
         float3 position = EntityManager.GetComponentData<Translation>(currentEntity).Value;
         var occupation = GridHelper.CalculateGridOccupationFromBounds(EntityManager.GetComponentData<WorldRenderBounds>(currentEntity).Value);
-
-        if (!EntityManager.HasComponent<HasNoResourceCost>(currentEntity))
-        {
-            DynamicBuffer<ResourceCostElement> buildCostBuffer = EntityManager.GetBuffer<ResourceCostElement>(currentEntity);
-            if (buildCostBuffer.IsCreated && buildCostBuffer.Length > 0)
-            {
-                DynamicBuffer<ResourceCostElement> resourceCostBuffer = EntityManager.AddBuffer<ResourceCostElement>(constructionEntity);
-
-                resourceCostBuffer.CopyFrom(EntityManager.GetBuffer<ResourceCostElement>(currentEntity));
-            }
-        }
-        else
-        {
-            EntityManager.AddComponent<HasNoResourceCost>(constructionEntity);
-        }
-
-        EntityManager.AddBuffer<ResourceDataElement>(constructionEntity);
-
-        EntityManager.AddComponentData(constructionEntity, new ResourceStorage { MaxCapacity = -1, StoragePosition = position });
 
         EntityManager.AddComponentData(constructionEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
         EntityManager.AddComponentData(constructionEntity, new Translation { Value = position });

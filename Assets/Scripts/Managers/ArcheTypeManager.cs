@@ -41,19 +41,17 @@ public class ArcheTypeManager : MonoBehaviour
             typeof(ResourceStorage),
             typeof(ResourceDataElement),
             typeof(GridOccupation)));
-
     
-
-        ArcheTypes.Add(PredifinedArchetype.BeingPlaced, entityManager.CreateArchetype(
-            typeof(BeingPlacedTag),
-            typeof(GridOccupation),
-            typeof(Translation),
-            typeof(Rotation),
-            typeof(Scale),
-            typeof(RenderMesh),
-            typeof(WorldRenderBounds),
-            typeof(RenderBounds),
-            typeof(LocalToWorld)));
+        //ArcheTypes.Add(PredifinedArchetype.BeingPlaced, entityManager.CreateArchetype(
+        //    typeof(BeingPlacedTag),
+        //    typeof(GridOccupation),
+        //    typeof(Translation),
+        //    typeof(Rotation),
+        //    typeof(Scale),
+        //    typeof(RenderMesh),
+        //    typeof(WorldRenderBounds),
+        //    typeof(RenderBounds),
+        //    typeof(LocalToWorld)));
     }
 
     public EntityArchetype GetArcheType(PredifinedArchetype archetype)

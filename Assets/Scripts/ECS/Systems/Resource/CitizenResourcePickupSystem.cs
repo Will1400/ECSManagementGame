@@ -43,13 +43,8 @@ public class CitizenResourcePickupSystem : SystemBase
             CommandBuffer.RemoveComponent<MovingToPickupResource>(entityInQueryIndex, entity);
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entityInQueryIndex, entity);
 
-            CommandBuffer.RemoveComponent<TransportResourceToStorageTag>(entityInQueryIndex, resourceTransportJob.ResourceEntity);
 
-            CommandBuffer.AddComponent<ResourceBeingCarriedTag>(entityInQueryIndex, resourceTransportJob.ResourceEntity);
             CommandBuffer.AddComponent<IsCarryingResourceTag>(entityInQueryIndex, entity);
-
-            CommandBuffer.AddComponent<CarrierData>(entityInQueryIndex, resourceTransportJob.ResourceEntity);
-            CommandBuffer.SetComponent(entityInQueryIndex, resourceTransportJob.ResourceEntity, new CarrierData { Carrier = entity });
 
             // Move to destination
             CommandBuffer.AddComponent<NavAgentRequestingPath>(entityInQueryIndex, entity);

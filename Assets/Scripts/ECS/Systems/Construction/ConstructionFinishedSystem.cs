@@ -37,6 +37,13 @@ public class ConstructionFinishedSystem : ComponentSystem
             }
 
             Entity finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(construction.finishedPrefabName.ToString());
+
+            if (finishedEntity == Entity.Null)
+            {
+                CommandBuffer.DestroyEntity(entity);
+                return;
+            }
+
             translation.Value.y = EntityManager.GetComponentData<Translation>(finishedEntity).Value.y;
 
             if (EntityManager.HasComponent<WorkPlaceWorkerData>(finishedEntity))

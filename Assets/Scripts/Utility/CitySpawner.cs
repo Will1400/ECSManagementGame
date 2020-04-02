@@ -16,9 +16,11 @@ public class CitySpawner : MonoBehaviour
     {
         EntityManager EntityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        var entityPrefab = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
+        var entityPrefab = EntityPrefabManager.Instance.SpawnConstructionEntityPrefab(PrefabName);
 
-        EntityManager.AddBuffer<ResourceCostElement>(entityPrefab);
+        if (entityPrefab == Entity.Null)
+            return;
+
         EntityManager.AddComponentData(entityPrefab, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = PrefabName });
 
         NativeArray<Entity> constructionSites = EntityManager.Instantiate(entityPrefab, count, Allocator.Temp);
@@ -26,7 +28,6 @@ public class CitySpawner : MonoBehaviour
 
         for (int i = 0; i < constructionSites.Length; i++)
         {
-
             float currentColumn = 15 * (i % columnCount);
             float currentRow = 20 * ((int)math.floor(i / columnCount) + 1);
 

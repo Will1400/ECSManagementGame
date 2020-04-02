@@ -8,7 +8,6 @@ using UnityEngine.Rendering;
 using System.Linq;
 using Unity.Mathematics;
 using System;
-using System.Runtime.Serialization;
 
 public class EntityPrefabManager : MonoBehaviour
 {
@@ -67,6 +66,38 @@ public class EntityPrefabManager : MonoBehaviour
 
         return Entity.Null;
     }
+
+    public Entity SpawnConstructionEntityPrefab(string name)
+    {
+        if (Prefabs.TryGetValue(name, out Entity prefab))
+        {
+            Entity entity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
+
+            if (EntityManager.HasComponent<HasNoResourceCost>(prefab))
+            {
+                EntityManager.AddComponent<HasNoResourceCost>(entity);
+            }
+            else
+            {
+                EntityManager.AddBuffer<ResourceCostElement>(entity);
+
+                DynamicBuffer<ResourceCostElement> buildCostBuffer = EntityManager.GetBuffer<ResourceCostElement>(prefab);
+                if (buildCostBuffer.IsCreated && buildCostBuffer.Length > 0)
+                {
+                    DynamicBuffer<ResourceCostElement> resourceCostBuffer = EntityManager.AddBuffer<ResourceCostElement>(entity);
+
+                    resourceCostBuffer.CopyFrom(EntityManager.GetBuffer<ResourceCostElement>(prefab));
+                }
+            }
+
+            EntityManager.AddComponentData(entity, new ResourceStorage { MaxCapacity = -1 });
+
+            return entity;
+        }
+
+        return Entity.Null;
+    }
+
 
     public Entity SpawnBeingPlacedEntityPrefab(string name)
     {

@@ -11,7 +11,7 @@ public class CitizenArrivedAtWork : ComponentSystem
 
     protected override void OnCreate()
     {
-        citizensGoingToWork = Entities.WithAll<Citizen, HasArrivedAtWorkTag, CitizenWork>().ToEntityQuery();
+        citizensGoingToWork = Entities.WithAll<Citizen, HasArrivedAtDestinationTag, CitizenWork>().ToEntityQuery();
     }
 
     protected override void OnUpdate()
@@ -23,7 +23,7 @@ public class CitizenArrivedAtWork : ComponentSystem
             var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
             workerData.ActiveWorkers++;
             EntityManager.AddComponentData(citizenWork.WorkPlaceEntity, workerData);
-            EntityManager.RemoveComponent<HasArrivedAtWorkTag>(entity);
+            EntityManager.RemoveComponent<HasArrivedAtDestinationTag>(entity);
         });
     }
 }
