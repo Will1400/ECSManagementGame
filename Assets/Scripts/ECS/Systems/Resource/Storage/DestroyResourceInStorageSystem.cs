@@ -20,15 +20,18 @@ public class DestroyResourceInStorageSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        if (resourcesInStorageQuery.CalculateChunkCount() <= 0 || resourcesInStorageQuery.CalculateChunkCount() <= 0)
+            return;
+
         var CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
-        var resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorage>(Allocator.TempJob);
-        var resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
+        NativeArray<ResourceInStorage> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorage>(Allocator.TempJob);
+        NativeArray<Entity> resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
 
         Entities.ForEach((Entity entity, int entityInQueryIndex, ref DestroyResourceInStorage resourceToDestroyData) =>
         {
             for (int i = 0; i < resourcesInStorage.Length; i++)
             {
-                var resource = resourcesInStorage[i];
+                ResourceInStorage resource = resourcesInStorage[i];
                 if (resourcesInStorage[i].StorageEntity.Index == resourceToDestroyData.StorageId)
                 {
                     CommandBuffer.DestroyEntity(entityInQueryIndex, resourcesInStorageEntities[i]);

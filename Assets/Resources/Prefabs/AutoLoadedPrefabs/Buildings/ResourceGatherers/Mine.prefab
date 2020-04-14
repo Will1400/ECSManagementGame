@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d20d186600f2244bbc8f1a404f656cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsWorkable: 0
+  IsWorkable: 1
   MaxWorkers: 4
   ActiveWorkers: 0
   CurrentWorkers: 0
