@@ -45,7 +45,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
             if (idleCitizens.Length == 0)
                 return;
 
-            if (workerData.CurrentWorkers < workerData.MaxWorkers && workerData.IsWorkable)
+            if (workerData.CurrentWorkers < workerData.MaxWorkers && workerData.IsWorkable && math.all(workerData.WorkPosition != float3.zero))
             {
                 int currentWorkers = workerData.CurrentWorkers;
                 for (int i = citizenIndex; i < idleCitizens.Length; i++)

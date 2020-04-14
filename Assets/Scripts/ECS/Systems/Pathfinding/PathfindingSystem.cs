@@ -34,7 +34,7 @@ public class PathfindingSystem : SystemBase
                 queuedEntities.Add(entity.Index, entity);
                 navAgent.Status = AgentStatus.PathQueued;
 
-                if (math.all( agentRequestingPath.StartPosition == float3.zero))
+                if (math.all(agentRequestingPath.StartPosition == float3.zero))
                     agentRequestingPath.StartPosition = EntityManager.GetComponentData<Translation>(entity).Value;
 
                 NavMeshQuerySystem.instance.RequestPath(entity.Index, agentRequestingPath.StartPosition, agentRequestingPath.EndPosition);
@@ -76,8 +76,16 @@ public class PathfindingSystem : SystemBase
     void OnPathRequestFailed(int id, PathfindingFailedReason reason)
     {
         var entity = queuedEntities[id];
+        float3 endPosition = EntityManager.GetComponentData<NavAgentRequestingPath>(entity).EndPosition;
 
-        readyPaths.Add(id, new float3[] { EntityManager.GetComponentData<NavAgentRequestingPath>(entity).EndPosition });
+        if (math.all(endPosition == float3.zero))
+        {
+            queuedEntities.Remove(id);
+        }
+        else
+        {
+            readyPaths.Add(id, new float3[] { endPosition });
+        }
     }
 
     void OnPathRequestCompleted(int id, Vector3[] points)

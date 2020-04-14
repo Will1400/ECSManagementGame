@@ -18,7 +18,7 @@ public enum PathfindingFailedReason
 }
 
 [UpdateBefore(typeof(NavMeshSystem))]
-public class NavMeshQuerySystem : JobComponentSystem
+public class NavMeshQuerySystem : SystemBase
 {
 
     /// <summary>
@@ -274,12 +274,11 @@ public class NavMeshQuerySystem : JobComponentSystem
         }
     }
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    protected override void OnUpdate()
     {
-
         if (QueryQueue.Count == 0 && availableSlots.Count == MaxQueries)
         {
-            return inputDeps;
+            return;
         }
 
         int j = 0;
@@ -345,7 +344,7 @@ public class NavMeshQuerySystem : JobComponentSystem
                 results = results[index]
             };
             jobs[index] = job;
-            handles[index] = job.Schedule(inputDeps);
+            handles[index] = job.Schedule();
         }
 
         for (int i = takenSlots.Count - 1; i > -1; i--)
@@ -386,8 +385,6 @@ public class NavMeshQuerySystem : JobComponentSystem
                 takenSlots.RemoveAt(i);
             }
         }
-
-        return inputDeps;
     }
 
     protected override void OnCreate()
