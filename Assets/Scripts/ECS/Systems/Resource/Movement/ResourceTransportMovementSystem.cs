@@ -47,7 +47,6 @@ public class ResourceTransportMovementSystem : SystemBase
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
-
             NativeArray<Translation> translations = chunk.GetNativeArray(TranslationType);
             NativeArray<Rotation> rotations = chunk.GetNativeArray(RotationType);
             NativeArray<ResourceTransportJobData> transportJobDatas = chunk.GetNativeArray(ResourceTransportJobDataType);

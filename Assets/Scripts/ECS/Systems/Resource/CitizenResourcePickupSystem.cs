@@ -50,6 +50,6 @@ public class CitizenResourcePickupSystem : SystemBase
             CommandBuffer.AddComponent<NavAgentRequestingPath>(entityInQueryIndex, entity);
             CommandBuffer.SetComponent(entityInQueryIndex, entity, new NavAgentRequestingPath { StartPosition = translation.Value, EndPosition = resourceTransportJob.DestinationPosition });
 
-        }).Schedule();
+        }).Schedule(Dependency).Complete();
     }
 }

@@ -2,19 +2,20 @@
 using System.Collections;
 using Unity.Entities;
 
-public class RemoveCitizenFromWorkSystem : ComponentSystem
+public class RemoveCitizenFromWorkSystem : SystemBase
 {
-    EntityQuery citizens;
+    EndSimulationEntityCommandBufferSystem bufferSystem;
 
     protected override void OnCreate()
     {
-        citizens = Entities.WithAll<RemoveFromWorkTag, CitizenWork>()
-                           .ToEntityQuery();
+        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     protected override void OnUpdate()
     {
-        Entities.With(citizens).ForEach((Entity entity, ref CitizenWork citizenWork) =>
+        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+
+        Entities.WithAll<RemoveFromWorkTag>().ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
             if (citizenWork.WorkPlaceEntity != Entity.Null && EntityManager.Exists(citizenWork.WorkPlaceEntity) & EntityManager.HasComponent<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity))
             {
@@ -24,17 +25,17 @@ public class RemoveCitizenFromWorkSystem : ComponentSystem
                 workerData.ActiveWorkers--;
                 workerData.CurrentWorkers--;
 
-                EntityManager.SetComponentData(citizenWork.WorkPlaceEntity, workerData);
+                CommandBuffer.SetComponent(citizenWork.WorkPlaceEntity, workerData);
             }
 
-            EntityManager.RemoveComponent<IsWorkingTag>(entity);
-            EntityManager.RemoveComponent<RemoveFromWorkTag>(entity);
-            EntityManager.RemoveComponent<CitizenWork>(entity);
+            CommandBuffer.RemoveComponent<IsWorkingTag>(entity);
+            CommandBuffer.RemoveComponent<RemoveFromWorkTag>(entity);
+            CommandBuffer.RemoveComponent<CitizenWork>(entity);
 
             if (EntityManager.HasComponent<GoingToWorkTag>(entity))
-                EntityManager.RemoveComponent<GoingToWorkTag>(entity);
+                CommandBuffer.RemoveComponent<GoingToWorkTag>(entity);
 
-            EntityManager.AddComponent<IdleTag>(entity);
-        });
+            CommandBuffer.AddComponent<IdleTag>(entity);
+        }).WithoutBurst().Run();
     }
 }

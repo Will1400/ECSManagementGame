@@ -12,12 +12,10 @@ using Unity.Transforms;
 using UnityEngine;
 
 [UpdateAfter(typeof(NavMeshSystem))]
-public class PathfindingSystem : ComponentSystem
+public class PathfindingSystem : SystemBase
 {
     NativeHashMap<int, Entity> queuedEntities;
     Dictionary<int, float3[]> readyPaths;
-
-    EntityQuery NewRequestedPaths;
 
     protected override void OnCreate()
     {
@@ -25,14 +23,11 @@ public class PathfindingSystem : ComponentSystem
         readyPaths = new Dictionary<int, float3[]>();
         NavMeshQuerySystem.RegisterPathResolvedCallbackStatic(OnPathRequestCompleted);
         NavMeshQuerySystem.RegisterPathFailedCallbackStatic(OnPathRequestFailed);
-
-        NewRequestedPaths = Entities.WithAll<NavAgent, NavAgentRequestingPath>()
-                                    .ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
-        Entities.With(NewRequestedPaths).ForEach((Entity entity, ref NavAgent navAgent, ref NavAgentRequestingPath agentRequestingPath) =>
+        Entities.ForEach((Entity entity, ref NavAgent navAgent, ref NavAgentRequestingPath agentRequestingPath) =>
         {
             if (navAgent.Status != AgentStatus.PathQueued && !queuedEntities.ContainsKey(entity.Index))
             {
@@ -44,7 +39,7 @@ public class PathfindingSystem : ComponentSystem
 
                 NavMeshQuerySystem.instance.RequestPath(entity.Index, agentRequestingPath.StartPosition, agentRequestingPath.EndPosition);
             }
-        });
+        }).WithoutBurst().Run();
 
         for (int i = 0; i < readyPaths.Keys.Count; i++)
         {

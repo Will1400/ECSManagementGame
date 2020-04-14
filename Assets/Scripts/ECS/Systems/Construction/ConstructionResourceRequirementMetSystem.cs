@@ -23,6 +23,7 @@ public class ConstructionResourceRequirementMetSystem : SystemBase
 
         }).Schedule(Dependency).Complete();
 
+        // Make workplace workable if resource requirement is met
         Entities.ForEach((Entity entity, DynamicBuffer<ResourceCostElement> resourceCosts, DynamicBuffer<ResourceDataElement> resourceDatas, ref WorkPlaceWorkerData workerData) =>
         {
             if (workerData.IsWorkable)

@@ -9,7 +9,7 @@ using Unity.Collections;
 using Unity.Rendering;
 
 [UpdateBefore(typeof(GridValidationSystem))]
-public class PlacementPositionSystem : ComponentSystem
+public class PlacementPositionSystem : SystemBase
 {
     protected override void OnUpdate()
     {
@@ -30,6 +30,6 @@ public class PlacementPositionSystem : ComponentSystem
             heightAdjustedPosition.y = translation.Value.y;
 
             translation.Value = heightAdjustedPosition;
-        });
+        }).Schedule(Dependency).Complete();
     }
 }

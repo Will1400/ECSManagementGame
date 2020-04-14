@@ -34,6 +34,7 @@ public class UIStatUpdatingSystem : SystemBase
     }
 
     private int stoneResourceCount;
+
     public int StoneResourceCount
     {
         get { return stoneResourceCount; }

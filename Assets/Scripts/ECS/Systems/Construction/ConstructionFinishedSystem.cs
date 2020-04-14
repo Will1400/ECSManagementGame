@@ -3,26 +3,20 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 
-public class ConstructionFinishedSystem : ComponentSystem
+public class ConstructionFinishedSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    EntityQuery allFinishedSitesQuery;
 
     protected override void OnCreate()
     {
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
-        allFinishedSitesQuery = Entities.WithAll<UnderConstruction, WorkPlaceWorkerData, Translation>()
-                        .WithAllReadOnly<ConstructionFinishedTag>()
-                        .ToEntityQuery();
     }
 
     protected override void OnUpdate()
     {
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
 
-        Entities.With(allFinishedSitesQuery).ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
+        Entities.WithAll<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
         {
             for (int i = 0; i < resourceDatas.Length; i++)
             {
@@ -50,17 +44,17 @@ public class ConstructionFinishedSystem : ComponentSystem
             {
                 WorkPlaceWorkerData newWorkerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(finishedEntity);
                 newWorkerData.WorkPosition = workerData.WorkPosition;
-                EntityManager.SetComponentData(finishedEntity, newWorkerData);
+                CommandBuffer.SetComponent(finishedEntity, newWorkerData);
             }
 
-            EntityManager.AddComponentData(finishedEntity, new Translation { Value = translation.Value });
+            CommandBuffer.SetComponent(finishedEntity, new Translation { Value = translation.Value });
 
             var occupation = EntityManager.GetComponentData<GridOccupation>(entity);
-            EntityManager.AddComponentData(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });
+            CommandBuffer.SetComponent(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });
 
             workerData.ActiveWorkers = -1;
-            EntityManager.RemoveComponent<UnderConstruction>(entity);
-            EntityManager.AddComponent<RemoveWorkPlaceTag>(entity);
-        });
+            CommandBuffer.RemoveComponent<UnderConstruction>(entity);
+            CommandBuffer.AddComponent<RemoveWorkPlaceTag>(entity);
+        }).WithoutBurst().WithStructuralChanges().Run();
     }
 }

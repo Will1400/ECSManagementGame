@@ -5,25 +5,29 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
 
-public class CitizenArrivedAtWork : ComponentSystem
+public class CitizenArrivedAtWork : SystemBase
 {
-    EntityQuery citizensGoingToWork;
+    EndSimulationEntityCommandBufferSystem bufferSystem;
 
     protected override void OnCreate()
     {
-        citizensGoingToWork = Entities.WithAll<Citizen, HasArrivedAtDestinationTag, CitizenWork>().ToEntityQuery();
+        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
     protected override void OnUpdate()
     {
-        Entities.With(citizensGoingToWork).ForEach((Entity entity, ref CitizenWork citizenWork) =>
+        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+
+        Entities.WithAll<HasArrivedAtDestinationTag>().ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
-            EntityManager.RemoveComponent<GoingToWorkTag>(entity);
-            EntityManager.AddComponent<IsWorkingTag>(entity);
+            CommandBuffer.RemoveComponent<GoingToWorkTag>(entity);
+            CommandBuffer.AddComponent<IsWorkingTag>(entity);
+
             var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
             workerData.ActiveWorkers++;
-            EntityManager.AddComponentData(citizenWork.WorkPlaceEntity, workerData);
-            EntityManager.RemoveComponent<HasArrivedAtDestinationTag>(entity);
-        });
+            CommandBuffer.SetComponent(citizenWork.WorkPlaceEntity, workerData);
+
+            CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entity);
+        }).WithoutBurst().Run();
     }
 }

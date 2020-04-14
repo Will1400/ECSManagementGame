@@ -13,7 +13,7 @@ using System.Linq;
 using UnityEngine.Experimental.AI;
 
 [UpdateAfter(typeof(PlacementSystem))]
-public class NavMeshSystem : JobComponentSystem
+public class NavMeshSystem : SystemBase
 {
     private Bounds bounds;
     private NavMeshData navMeshData;
@@ -59,7 +59,7 @@ public class NavMeshSystem : JobComponentSystem
         });
     }
 
-    protected override JobHandle OnUpdate(JobHandle InputDeps)
+    protected override void OnUpdate()
     {
         remainingTimeUntilUpdateAvailable -= Time.DeltaTime;
 
@@ -97,7 +97,7 @@ public class NavMeshSystem : JobComponentSystem
             LocalToWorldType = GetArchetypeChunkComponentType<LocalToWorld>(),
             NavMeshObstacleType = GetArchetypeChunkComponentType<NavMeshObstacle>(),
             Sources = sourceQueue.AsParallelWriter()
-        }.Schedule(obstacleQuery, InputDeps);
+        }.Schedule(obstacleQuery);
 
         obstacleJob.Complete();
 
@@ -107,7 +107,7 @@ public class NavMeshSystem : JobComponentSystem
             LocalToWorldType = GetArchetypeChunkComponentType<LocalToWorld>(),
             NavMeshSurfaceType = GetArchetypeChunkComponentType<NavMeshSurface>(),
             Sources = sourceQueue.AsParallelWriter()
-        }.Schedule(surfaceQuery, InputDeps);
+        }.Schedule(surfaceQuery);
 
         surfaceJob.Complete();
 
@@ -153,7 +153,6 @@ public class NavMeshSystem : JobComponentSystem
             updateMesh = false;
         }
 
-        return obstacleJob;
     }
 
     protected override void OnDestroy()
