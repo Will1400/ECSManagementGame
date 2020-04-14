@@ -23,7 +23,7 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorage) },
-            None = new ComponentType[] {typeof(ResourceIsUnderTransportationTag)}
+            None = new ComponentType[] { typeof(ResourceIsUnderTransportationTag) }
         });
 
         StorageAreasQuery = GetEntityQuery(new EntityQueryDesc
@@ -46,7 +46,7 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
 
         Entities.WithAll<EmptyResourceStorageTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceDataElement> resourceDatas, ref ResourceStorage resourceStorage) =>
         {
-            if (storageAreas.Length <= 0 || resourceDatas.Length == 0)
+            if (resourceDatas.Length == 0)
                 return;
 
             for (int i = 0; i < resourcesInStorage.Length; i++)
@@ -79,7 +79,7 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
                     }
                 }
             }
-        }).Run();
+        }).Schedule(Dependency).Complete();
 
         resourcesInStorage.Dispose();
         resourcesInStorageEntities.Dispose();

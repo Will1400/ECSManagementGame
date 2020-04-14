@@ -20,14 +20,21 @@ public class CitizenArrivedAtWork : SystemBase
 
         Entities.WithAll<HasArrivedAtDestinationTag>().ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
-            CommandBuffer.RemoveComponent<GoingToWorkTag>(entity);
-            CommandBuffer.AddComponent<IsWorkingTag>(entity);
+            if (EntityManager.HasComponent<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity))
+            {
+                CommandBuffer.RemoveComponent<GoingToWorkTag>(entity);
+                CommandBuffer.AddComponent<IsWorkingTag>(entity);
 
-            var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
-            workerData.ActiveWorkers++;
-            CommandBuffer.SetComponent(citizenWork.WorkPlaceEntity, workerData);
+                var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
+                workerData.ActiveWorkers++;
+                CommandBuffer.SetComponent(citizenWork.WorkPlaceEntity, workerData);
+                CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entity);
+            }
+            else
+            {
+                CommandBuffer.AddComponent<RemoveFromWorkTag>(entity);
+            }
 
-            CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entity);
         }).WithoutBurst().Run();
     }
 }
