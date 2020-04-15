@@ -56,6 +56,7 @@ public class ConstructionResourceRequirementMetSystem : SystemBase
             if (requirementsMet)
             {
                 workerData.IsWorkable = true;
+                
             }
 
         }).Schedule(Dependency).Complete();
