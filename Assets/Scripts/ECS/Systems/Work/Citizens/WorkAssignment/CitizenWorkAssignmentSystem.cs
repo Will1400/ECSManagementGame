@@ -60,6 +60,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
                         CommandBuffer.SetComponent(idleCitizens[i], new NavAgentRequestingPath { StartPosition = idleCitizensTranslation[i].Value, EndPosition = workerData.WorkPosition });
                         currentWorkers++;
                         CommandBuffer.RemoveComponent<IdleTag>(idleCitizens[i]);
+                        CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(idleCitizens[i]);
 
                         citizenIndex++;
                     }
