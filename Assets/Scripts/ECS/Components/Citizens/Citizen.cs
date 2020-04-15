@@ -8,5 +8,5 @@ using UnityEngine;
 public struct Citizen : IComponentData
 {
     public int Id;
-    public NativeString128 Name;
+    public CitizenPersonalInfo CitizenPersonalData;
 }

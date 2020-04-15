@@ -8,6 +8,7 @@ using UnityEngine.Rendering;
 using System.Linq;
 using Unity.Mathematics;
 using System;
+using Random = UnityEngine.Random;
 
 public class EntityPrefabManager : MonoBehaviour
 {
@@ -49,6 +50,27 @@ public class EntityPrefabManager : MonoBehaviour
         {
             Entity entity = EntityManager.Instantiate(prefab);
             EntityManager.RemoveComponent<Disabled>(entity);
+            return entity;
+        }
+
+        return Entity.Null;
+    }
+
+
+    public Entity SpawnCitizenPrefab()
+    {
+        if (Prefabs.TryGetValue("Citizen", out Entity prefab))
+        {
+            Entity entity = EntityManager.Instantiate(prefab);
+            EntityManager.RemoveComponent<Disabled>(entity);
+            EntityManager.AddComponentData(entity, new Citizen
+            {
+                CitizenPersonalData = new CitizenPersonalInfo
+                {
+                    Age = Random.Range(10, 20),
+                    Gender = (Gender)Random.Range(1, 3)
+                }
+            });
             return entity;
         }
 
