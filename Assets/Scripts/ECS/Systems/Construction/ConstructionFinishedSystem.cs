@@ -16,14 +16,14 @@ public class ConstructionFinishedSystem : SystemBase
     {
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
 
-        Entities.WithAll<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
+        Entities.WithAll<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref ConstructionData construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
         {
             for (int i = 0; i < resourceDatas.Length; i++)
             {
                 var resource = resourceDatas[i].Value;
                 var destroyEntity = CommandBuffer.CreateEntity();
-                CommandBuffer.AddComponent<DestroyResourceInStorage>(destroyEntity);
-                CommandBuffer.SetComponent(destroyEntity, new DestroyResourceInStorage
+                CommandBuffer.AddComponent<DestroyResourceInStorageData>(destroyEntity);
+                CommandBuffer.SetComponent(destroyEntity, new DestroyResourceInStorageData
                 {
                     ResourceData = resource,
                     StorageId = entity.Index
@@ -53,7 +53,7 @@ public class ConstructionFinishedSystem : SystemBase
             CommandBuffer.SetComponent(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });
 
             workerData.ActiveWorkers = -1;
-            CommandBuffer.RemoveComponent<UnderConstruction>(entity);
+            CommandBuffer.RemoveComponent<ConstructionData>(entity);
             CommandBuffer.AddComponent<RemoveWorkPlaceTag>(entity);
         }).WithoutBurst().WithStructuralChanges().Run();
     }

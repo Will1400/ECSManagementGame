@@ -112,7 +112,7 @@ public class EntityPrefabManager : MonoBehaviour
                 }
             }
 
-            EntityManager.AddComponentData(entity, new ResourceStorage { MaxCapacity = -1 });
+            EntityManager.AddComponentData(entity, new ResourceStorageData { MaxCapacity = -1 });
 
             return entity;
         }

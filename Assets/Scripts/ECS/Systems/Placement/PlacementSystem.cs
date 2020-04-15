@@ -38,7 +38,7 @@ public class PlacementSystem : SystemBase
             Cancel();
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 999, 1u << 9).Position;
-            var entity = EntityPrefabManager.Instance.SpawnEntityPrefab("Citizen");
+            var entity = EntityPrefabManager.Instance.SpawnCitizenPrefab();
 
             var position = EntityManager.GetComponentData<Translation>(entity);
             position.Value.x = mouseWorldPosition.x;
@@ -81,7 +81,7 @@ public class PlacementSystem : SystemBase
         EntityManager.AddComponentData(constructionEntity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
         EntityManager.AddComponentData(constructionEntity, new Translation { Value = position });
         EntityManager.AddComponentData(constructionEntity, new WorkPlaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });
-        EntityManager.AddComponentData(constructionEntity, new UnderConstruction { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = prefabName });
+        EntityManager.AddComponentData(constructionEntity, new ConstructionData { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = prefabName });
 
         if (!Input.GetButton("Shift"))
         {

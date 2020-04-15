@@ -42,8 +42,8 @@ public class CitizenResourceDeliverySystem : SystemBase
 
                 var occupation = EntityManager.GetComponentData<GridOccupation>(transportJobData.DestinationEntity);
 
-                CommandBuffer.AddComponent<ResourceInStorage>(transportJobData.ResourceEntity);
-                CommandBuffer.SetComponent(transportJobData.ResourceEntity, new ResourceInStorage
+                CommandBuffer.AddComponent<ResourceInStorageData>(transportJobData.ResourceEntity);
+                CommandBuffer.SetComponent(transportJobData.ResourceEntity, new ResourceInStorageData
                 {
                     StorageEntity = transportJobData.DestinationEntity,
                     ResourceData = EntityManager.GetComponentData<ResourceData>(transportJobData.ResourceEntity),

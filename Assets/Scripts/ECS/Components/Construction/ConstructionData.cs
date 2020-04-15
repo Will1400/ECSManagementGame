@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Collections;
 
 [GenerateAuthoringComponent]
-public struct UnderConstruction : IComponentData
+public struct ConstructionData : IComponentData
 {
     public float totalConstructionTime;
     public float remainingConstructionTime;

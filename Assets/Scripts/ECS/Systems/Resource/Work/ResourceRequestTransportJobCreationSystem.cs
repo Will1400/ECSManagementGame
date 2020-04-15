@@ -18,12 +18,12 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorage), typeof(ResourceIsAvailableTag) },
+            All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorageData), typeof(ResourceIsAvailableTag) },
         });
 
         StorageAreasQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceStorage), typeof(ResourceStorageAreaTag) },
+            All = new ComponentType[] { typeof(ResourceStorageData), typeof(ResourceStorageAreaTag) },
         });
     }
 
@@ -35,12 +35,12 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 
         NativeArray<Entity> storageAreas = StorageAreasQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<Entity> resourceEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
-        NativeArray<ResourceInStorage> resourcesInStorageAreas = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorage>(Allocator.TempJob);
+        NativeArray<ResourceInStorageData> resourcesInStorageAreas = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
 
         // Destroy request if the entity does not exist
-        Entities.ForEach((Entity entity, ref ResourceRequest resourceRequest) =>
+        Entities.ForEach((Entity entity, ref ResourceRequestData resourceRequest) =>
         {
             if (!EntityManager.Exists(resourceRequest.RequestingEntity))
             {
@@ -50,7 +50,7 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
         }).WithoutBurst().Run();
 
         // Try to fulfill requests
-        Entities.ForEach((Entity entity, ref ResourceRequest resourceRequest) =>
+        Entities.ForEach((Entity entity, ref ResourceRequestData resourceRequest) =>
         {
             var transportJob = new ResourceTransportJobData
             {
@@ -80,7 +80,7 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
                         resourceRequest.Amount -= resourcesInStorageAreas[i].ResourceData.Amount;
 
                         resourceEntities[i] = Entity.Null;
-                        resourcesInStorageAreas[i] = new ResourceInStorage { StorageEntity = resource.StorageEntity };
+                        resourcesInStorageAreas[i] = new ResourceInStorageData { StorageEntity = resource.StorageEntity };
 
                     }
                 }

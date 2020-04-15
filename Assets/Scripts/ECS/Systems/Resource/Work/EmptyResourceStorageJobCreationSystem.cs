@@ -17,18 +17,18 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
 
         resourceStoragesToEmptyQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceStorage), typeof(EmptyResourceStorageTag) },
+            All = new ComponentType[] { typeof(ResourceStorageData), typeof(EmptyResourceStorageTag) },
         });
 
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorage) },
+            All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorageData) },
             None = new ComponentType[] { typeof(ResourceIsUnderTransportationTag) }
         });
 
         StorageAreasQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceStorage), typeof(ResourceStorageAreaTag) },
+            All = new ComponentType[] { typeof(ResourceStorageData), typeof(ResourceStorageAreaTag) },
             None = new ComponentType[] { typeof(ResourceStorageFullTag) }
         });
     }
@@ -39,12 +39,12 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
             return;
 
         NativeArray<Entity> resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
-        NativeArray<ResourceInStorage> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorage>(Allocator.TempJob);
+        NativeArray<ResourceInStorageData> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
         NativeArray<Entity> storageAreas = StorageAreasQuery.ToEntityArray(Allocator.TempJob);
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
 
-        Entities.WithAll<EmptyResourceStorageTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceDataElement> resourceDatas, ref ResourceStorage resourceStorage) =>
+        Entities.WithAll<EmptyResourceStorageTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceDataElement> resourceDatas, ref ResourceStorageData resourceStorage) =>
         {
             if (resourceDatas.Length == 0)
                 return;

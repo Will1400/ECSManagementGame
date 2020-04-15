@@ -17,7 +17,7 @@ public class ResourceInStorageAreaPositioningSystem : SystemBase
 
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceInStorage), typeof(Translation) }
+            All = new ComponentType[] { typeof(ResourceInStorageData), typeof(Translation) }
         });
     }
 
@@ -27,7 +27,7 @@ public class ResourceInStorageAreaPositioningSystem : SystemBase
         {
             EntityType = GetArchetypeChunkEntityType(),
             TranslationType = GetArchetypeChunkComponentType<Translation>(),
-            ResourceInStorageType = GetArchetypeChunkComponentType<ResourceInStorage>(),
+            ResourceInStorageType = GetArchetypeChunkComponentType<ResourceInStorageData>(),
         }.Schedule(resourcesInStorageQuery);
         job.Complete();
     }
@@ -38,14 +38,14 @@ public class ResourceInStorageAreaPositioningSystem : SystemBase
         [ReadOnly]
         public ArchetypeChunkEntityType EntityType;
         public ArchetypeChunkComponentType<Translation> TranslationType;
-        public ArchetypeChunkComponentType<ResourceInStorage> ResourceInStorageType;
+        public ArchetypeChunkComponentType<ResourceInStorageData> ResourceInStorageType;
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
             //NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
             NativeArray<Translation> translations = chunk.GetNativeArray(TranslationType);
-            NativeArray<ResourceInStorage> resourceInStorages = chunk.GetNativeArray(ResourceInStorageType);
+            NativeArray<ResourceInStorageData> resourceInStorages = chunk.GetNativeArray(ResourceInStorageType);
 
             for (int i = 0; i < chunk.Count; i++)
             {

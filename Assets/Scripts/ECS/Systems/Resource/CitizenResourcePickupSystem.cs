@@ -33,8 +33,8 @@ public class CitizenResourcePickupSystem : SystemBase
         Entities.WithAll<HasArrivedAtDestinationTag, MovingToPickupResource>().ForEach((Entity entity, int entityInQueryIndex, ref Translation translation, ref ResourceTransportJobData resourceTransportJob) =>
         {
             var removeEntity = CommandBuffer.CreateEntity(entityInQueryIndex);
-            CommandBuffer.AddComponent<RemoveResourceFromStorage>(entityInQueryIndex, removeEntity);
-            CommandBuffer.SetComponent(entityInQueryIndex, removeEntity, new RemoveResourceFromStorage
+            CommandBuffer.AddComponent<RemoveResourceFromStorageData>(entityInQueryIndex, removeEntity);
+            CommandBuffer.SetComponent(entityInQueryIndex, removeEntity, new RemoveResourceFromStorageData
             {
                 ResourceEntity = resourceTransportJob.ResourceEntity,
             });

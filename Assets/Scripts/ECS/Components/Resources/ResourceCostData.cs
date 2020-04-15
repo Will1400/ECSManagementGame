@@ -5,7 +5,7 @@ using System;
 
 [Serializable]
 [GenerateAuthoringComponent]
-public struct ResourceCost : IComponentData
+public struct ResourceCostData : IComponentData
 {
     public ResourceType ResourceType;
     public int Amount;

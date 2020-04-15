@@ -21,7 +21,7 @@ public class ConstructionSystem : SystemBase
         EntityCommandBuffer.Concurrent CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
         float deltaTime = Time.DeltaTime;
 
-        Entities.ForEach((Entity entity, int entityInQueryIndex, ref UnderConstruction construction, ref WorkPlaceWorkerData workerData) =>
+        Entities.ForEach((Entity entity, int entityInQueryIndex, ref ConstructionData construction, ref WorkPlaceWorkerData workerData) =>
         {
             if (workerData.IsWorkable)
             {
@@ -33,6 +33,7 @@ public class ConstructionSystem : SystemBase
                 if (construction.remainingConstructionTime <= 0)
                 {
                     CommandBuffer.AddComponent<ConstructionFinishedTag>(entityInQueryIndex, entity);
+                    workerData.IsWorkable = false;
                 }
             }
         }).Schedule(Dependency).Complete();

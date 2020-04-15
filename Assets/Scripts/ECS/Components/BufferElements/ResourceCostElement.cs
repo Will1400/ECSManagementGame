@@ -3,14 +3,14 @@
 [GenerateAuthoringComponent]
 public struct ResourceCostElement : IBufferElementData
 {
-    public ResourceCost Value;
+    public ResourceCostData Value;
 
-    public static implicit operator ResourceCost(ResourceCostElement e)
+    public static implicit operator ResourceCostData(ResourceCostElement e)
     {
         return e.Value;
     }
 
-    public static implicit operator ResourceCostElement(ResourceCost e)
+    public static implicit operator ResourceCostElement(ResourceCostData e)
     {
         return new ResourceCostElement { Value = e };
     }

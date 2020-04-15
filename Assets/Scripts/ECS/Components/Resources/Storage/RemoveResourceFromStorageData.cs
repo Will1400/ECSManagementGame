@@ -2,7 +2,7 @@
 using System.Collections;
 using Unity.Entities;
 
-public struct RemoveResourceFromStorage : IComponentData
+public struct RemoveResourceFromStorageData : IComponentData
 {
     public Entity ResourceEntity;
     public Entity StorageEntity;

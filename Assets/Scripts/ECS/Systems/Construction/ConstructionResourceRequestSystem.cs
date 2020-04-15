@@ -17,13 +17,13 @@ public class ConstructionResourceRequestSystem : SystemBase
 
         allConstructionSitesQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(UnderConstruction) },
+            All = new ComponentType[] { typeof(ConstructionData) },
             None = new ComponentType[] { typeof(HasRequestedResourcesTag) }
         });
 
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceInStorage) },
+            All = new ComponentType[] { typeof(ResourceInStorageData) },
         });
     }
 
@@ -31,7 +31,7 @@ public class ConstructionResourceRequestSystem : SystemBase
     {
         EntityCommandBuffer.Concurrent CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
 
-        Entities.WithAll<UnderConstruction>().WithNone<HasRequestedResourcesTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceCostElement> resourceCosts, ref Translation translation) =>
+        Entities.WithAll<ConstructionData>().WithNone<HasRequestedResourcesTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceCostElement> resourceCosts, ref Translation translation) =>
         {
             for (int i = 0; i < resourceCosts.Length; i++)
             {
@@ -39,8 +39,8 @@ public class ConstructionResourceRequestSystem : SystemBase
                     continue;
 
                 var requestEntity = CommandBuffer.CreateEntity(entityInQueryIndex);
-                CommandBuffer.AddComponent<ResourceRequest>(entityInQueryIndex, requestEntity);
-                CommandBuffer.SetComponent(entityInQueryIndex, requestEntity, new ResourceRequest
+                CommandBuffer.AddComponent<ResourceRequestData>(entityInQueryIndex, requestEntity);
+                CommandBuffer.SetComponent(entityInQueryIndex, requestEntity, new ResourceRequestData
                 {
                     Amount = resourceCosts[i].Value.Amount,
                     RequestingEntity = entity,

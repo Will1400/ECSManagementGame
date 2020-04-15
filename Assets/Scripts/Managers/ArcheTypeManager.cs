@@ -35,10 +35,10 @@ public class ArcheTypeManager : MonoBehaviour
     void CreateArcheTypes()
     {
         ArcheTypes.Add(PredifinedArchetype.ConstructionSite, entityManager.CreateArchetype(
-            typeof(UnderConstruction),
+            typeof(ConstructionData),
             typeof(WorkPlaceWorkerData),
             typeof(Translation),
-            typeof(ResourceStorage),
+            typeof(ResourceStorageData),
             typeof(ResourceDataElement),
             typeof(GridOccupation)));
     

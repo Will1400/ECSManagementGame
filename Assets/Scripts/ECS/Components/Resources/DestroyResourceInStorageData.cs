@@ -1,6 +1,6 @@
 ﻿using Unity.Entities;
 
-public struct DestroyResourceInStorage : IComponentData
+public struct DestroyResourceInStorageData : IComponentData
 {
     public int StorageId;
     public ResourceData ResourceData;

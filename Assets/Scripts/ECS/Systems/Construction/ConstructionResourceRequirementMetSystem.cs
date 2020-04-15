@@ -24,7 +24,7 @@ public class ConstructionResourceRequirementMetSystem : SystemBase
         }).Schedule(Dependency).Complete();
 
         // Make workplace workable if resource requirement is met
-        Entities.ForEach((Entity entity, DynamicBuffer<ResourceCostElement> resourceCosts, DynamicBuffer<ResourceDataElement> resourceDatas, ref WorkPlaceWorkerData workerData) =>
+        Entities.WithNone<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceCostElement> resourceCosts, DynamicBuffer<ResourceDataElement> resourceDatas, ref WorkPlaceWorkerData workerData) =>
         {
             if (workerData.IsWorkable)
                 return;
@@ -32,7 +32,7 @@ public class ConstructionResourceRequirementMetSystem : SystemBase
             bool requirementsMet = true;
             for (int i = 0; i < resourceCosts.Length; i++)
             {
-                ResourceCost cost = resourceCosts[i];
+                ResourceCostData cost = resourceCosts[i];
 
                 if (cost.Amount == 0)
                     continue;

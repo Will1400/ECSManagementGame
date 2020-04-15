@@ -14,13 +14,13 @@ public class RemoveResourceFromStorageSystem : SystemBase
     protected override void OnUpdate()
     {
         EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
-        Entities.ForEach((Entity entity, ref RemoveResourceFromStorage removeResourceFromStorage) =>
+        Entities.ForEach((Entity entity, ref RemoveResourceFromStorageData removeResourceFromStorage) =>
         {
-            var storageEntity = EntityManager.GetComponentData<ResourceInStorage>(removeResourceFromStorage.ResourceEntity).StorageEntity;
-            var resourceStorage = EntityManager.GetComponentData<ResourceStorage>(storageEntity);
+            var storageEntity = EntityManager.GetComponentData<ResourceInStorageData>(removeResourceFromStorage.ResourceEntity).StorageEntity;
+            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(storageEntity);
             resourceStorage.UsedCapacity--;
 
-            CommandBuffer.RemoveComponent<ResourceInStorage>(removeResourceFromStorage.ResourceEntity);
+            CommandBuffer.RemoveComponent<ResourceInStorageData>(removeResourceFromStorage.ResourceEntity);
 
             CommandBuffer.SetComponent(storageEntity, resourceStorage);
 

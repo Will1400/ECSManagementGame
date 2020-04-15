@@ -3,14 +3,14 @@
 [GenerateAuthoringComponent]
 public struct ResourceRequestElement : IComponentData
 {
-    public ResourceRequest Value;
+    public ResourceRequestData Value;
 
-    public static implicit operator ResourceRequest(ResourceRequestElement e)
+    public static implicit operator ResourceRequestData(ResourceRequestElement e)
     {
         return e.Value;
     }
 
-    public static implicit operator ResourceRequestElement(ResourceRequest e)
+    public static implicit operator ResourceRequestElement(ResourceRequestData e)
     {
         return new ResourceRequestElement { Value = e };
     }

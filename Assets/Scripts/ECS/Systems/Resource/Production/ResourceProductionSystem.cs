@@ -37,7 +37,7 @@ public class ResourceProductionSystem : SystemBase
             EntityType = GetArchetypeChunkEntityType(),
             ResourceProductionDataType = GetArchetypeChunkComponentType<ResourceProductionData>(),
             WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(true),
-            ResourceStorageType = GetArchetypeChunkComponentType<ResourceStorage>(true),
+            ResourceStorageType = GetArchetypeChunkComponentType<ResourceStorageData>(true),
         }.Schedule(producingEntititesQuery);
 
         job.Complete();
@@ -66,7 +66,7 @@ public class ResourceProductionSystem : SystemBase
             //EntityManager.AddComponent<TransportResourceToStorageTag>(resourceEntity);
 
             // Set storage capacity
-            var resourceStorage = EntityManager.GetComponentData<ResourceStorage>(creationInfo.CreatedBy);
+            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(creationInfo.CreatedBy);
             resourceStorage.UsedCapacity++;
             EntityManager.SetComponentData(creationInfo.CreatedBy, resourceStorage);
 
@@ -76,8 +76,8 @@ public class ResourceProductionSystem : SystemBase
             //var resourceIndex = resourceBuffer.Length;
             resourceBuffer.Add(new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount });
 
-            EntityManager.AddComponent<ResourceInStorage>(resourceEntity);
-            EntityManager.SetComponentData(resourceEntity, new ResourceInStorage
+            EntityManager.AddComponent<ResourceInStorageData>(resourceEntity);
+            EntityManager.SetComponentData(resourceEntity, new ResourceInStorageData
             {
                 StorageEntity = creationInfo.CreatedBy,
                 ResourceData = new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount },
@@ -104,7 +104,7 @@ public class ResourceProductionSystem : SystemBase
         [ReadOnly]
         public ArchetypeChunkComponentType<WorkPlaceWorkerData> WorkPlaceWorkerDataType;
         [ReadOnly]
-        public ArchetypeChunkComponentType<ResourceStorage> ResourceStorageType;
+        public ArchetypeChunkComponentType<ResourceStorageData> ResourceStorageType;
 
         public ArchetypeChunkComponentType<ResourceProductionData> ResourceProductionDataType;
 
@@ -114,7 +114,7 @@ public class ResourceProductionSystem : SystemBase
 
             NativeArray<ResourceProductionData> resourceProductionDatas = chunk.GetNativeArray(ResourceProductionDataType);
             NativeArray<WorkPlaceWorkerData> workerDatas = chunk.GetNativeArray(WorkPlaceWorkerDataType);
-            NativeArray<ResourceStorage> resourceStorages = chunk.GetNativeArray(ResourceStorageType);
+            NativeArray<ResourceStorageData> resourceStorages = chunk.GetNativeArray(ResourceStorageType);
 
             for (int i = 0; i < chunk.Count; i++)
             {

@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
-public struct ResourceInStorage : IComponentData
+public struct ResourceInStorageData : IComponentData
 {
     public Entity StorageEntity;
     public ResourceData ResourceData;

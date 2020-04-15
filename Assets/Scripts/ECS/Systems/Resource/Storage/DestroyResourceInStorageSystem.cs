@@ -14,7 +14,7 @@ public class DestroyResourceInStorageSystem : SystemBase
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorage) }
+            All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorageData) }
         });
     }
 
@@ -24,14 +24,14 @@ public class DestroyResourceInStorageSystem : SystemBase
             return;
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
-        NativeArray<ResourceInStorage> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorage>(Allocator.TempJob);
+        NativeArray<ResourceInStorageData> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
         NativeArray<Entity> resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
 
-        Entities.ForEach((Entity entity, int entityInQueryIndex, ref DestroyResourceInStorage resourceToDestroyData) =>
+        Entities.ForEach((Entity entity, int entityInQueryIndex, ref DestroyResourceInStorageData resourceToDestroyData) =>
         {
             for (int i = 0; i < resourcesInStorage.Length; i++)
             {
-                ResourceInStorage resource = resourcesInStorage[i];
+                ResourceInStorageData resource = resourcesInStorage[i];
                 if (resourcesInStorage[i].StorageEntity.Index == resourceToDestroyData.StorageId)
                 {
                     CommandBuffer.DestroyEntity(entityInQueryIndex, resourcesInStorageEntities[i]);

@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 [GenerateAuthoringComponent]
-public struct ResourceStorage : IComponentData
+public struct ResourceStorageData : IComponentData
 {
     public int MaxCapacity;
     public int UsedCapacity;

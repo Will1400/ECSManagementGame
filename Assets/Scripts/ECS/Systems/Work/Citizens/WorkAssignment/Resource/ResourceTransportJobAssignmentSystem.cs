@@ -48,9 +48,9 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
                 transportJobData.DestinationPosition = EntityManager.GetComponentData<Translation>(transportJobData.DestinationEntity).Value;
             }
 
-            if (EntityManager.HasComponent<ResourceStorage>(transportJobData.DestinationEntity))
+            if (EntityManager.HasComponent<ResourceStorageData>(transportJobData.DestinationEntity))
             {
-                var storageData = EntityManager.GetComponentData<ResourceStorage>(transportJobData.DestinationEntity);
+                var storageData = EntityManager.GetComponentData<ResourceStorageData>(transportJobData.DestinationEntity);
 
                 if (storageData.UsedCapacity >= storageData.MaxCapacity && storageData.MaxCapacity != -1)
                 {
