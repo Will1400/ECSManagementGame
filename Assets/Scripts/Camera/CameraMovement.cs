@@ -26,10 +26,10 @@ public class CameraMovement : MonoBehaviour
     {
         float3 input = new float3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
 
-        if (input.Equals( float3.zero))
+        if (input.Equals(float3.zero))
             return;
 
-        transform.Translate(math.normalize(input) * MathHelper.Map(zoomPercent, 0, 1, moveSpeed, moveSpeed * 10) * Time.deltaTime, Space.World);
+        transform.Translate(math.normalize(input) * transform.position.y * Time.deltaTime, Space.World);
     }
 
     void Zoom()
