@@ -63,6 +63,7 @@ public class BuildUIManager : MonoBehaviour
             {
                 GameObject instantiatedBuildOption = Instantiate(buildItemPrefab);
                 instantiatedBuildOption.transform.SetParent(contentHolder, false);
+                instantiatedBuildOption.transform.localScale = new Vector3(1, 1, 1);
 
                 var sprite = Resources.Load<Sprite>($"Sprites/BuildingPreviews/{objectList[j].name}");
                 instantiatedBuildOption.GetComponent<BuildItem>().Initialize(objectList[j].name, sprite ? sprite : defaultSprite);
