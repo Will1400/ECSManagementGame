@@ -87,6 +87,10 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             citizenIndex++;
         }).WithoutBurst().Run();
 
+        // Needs to be played back here to remove IdleTag immediately
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.ShouldPlayback = false;
+
         idleCitizens.Dispose();
     }
 }

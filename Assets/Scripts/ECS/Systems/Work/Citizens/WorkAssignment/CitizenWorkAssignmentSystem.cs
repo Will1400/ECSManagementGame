@@ -72,6 +72,10 @@ public class CitizenWorkAssignmentSystem : SystemBase
             }
         }).Run();
 
+        // Needs to be played back here to remove IdleTag immediately
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.ShouldPlayback = false;
+
         idleCitizens.Dispose();
         idleCitizensTranslation.Dispose();
     }
