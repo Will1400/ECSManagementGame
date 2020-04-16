@@ -139,7 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4bb1162f102c3b4fa01ddc2988ee56d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxCapacity: 0
+  MaxCapacity: 1000
   UsedCapacity: 0
   StoragePosition:
     x: 0
