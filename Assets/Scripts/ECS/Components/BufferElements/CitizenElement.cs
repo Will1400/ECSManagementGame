@@ -1,7 +1,7 @@
 ﻿using Unity.Entities;
 
 [GenerateAuthoringComponent]
-public struct CitizenElement : IComponentData
+public struct CitizenElement : IBufferElementData
 {
     public Citizen Value;
 

@@ -32,6 +32,9 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        if (idleCitizensQuery.CalculateEntityCount() == 0 || transportJobsQuery.CalculateEntityCount() == 0)
+            return;
+
         NativeArray<Entity> idleCitizens = idleCitizensQuery.ToEntityArray(Allocator.Persistent);
         EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
 

@@ -11,13 +11,12 @@ GameObject:
   - component: {fileID: 7638653008570078731}
   - component: {fileID: 2456976529333362162}
   - component: {fileID: 2383782426963973851}
-  - component: {fileID: 2919759342189483465}
   - component: {fileID: -1924725323319534785}
   - component: {fileID: 6512652586641192627}
-  - component: {fileID: 9117858349630149084}
   - component: {fileID: -8444746823183850058}
+  - component: {fileID: 3755188764580656161}
   m_Layer: 0
-  m_Name: ResourceStorageArea
+  m_Name: Storage Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -60,6 +59,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -84,24 +84,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &2919759342189483465
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2897253395712879608}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9329bc92b12abfc4b8fe8fe1c909375c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxCapacity: 1000
-  UsedCapacity: 0
-  StoragePosition:
-    x: 0
-    y: 0
-    z: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &-1924725323319534785
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132,19 +115,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b43fb81233733741b8ec006e0768186, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &9117858349630149084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2897253395712879608}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9686088c460cb046b557af4d27c1e7b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Values: 
 --- !u!114 &-8444746823183850058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,3 +127,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 319d182119693534da172e56a61bed8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3755188764580656161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2897253395712879608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4bb1162f102c3b4fa01ddc2988ee56d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxCapacity: 0
+  UsedCapacity: 0
+  StoragePosition:
+    x: 0
+    y: 0
+    z: 0

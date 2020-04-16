@@ -11,5 +11,5 @@ public struct CitizenPersonalInfo
     public float Age;
     public Gender Gender;
 
-    public DateTime BirthDate;
+    public int BirthDate;
 }
