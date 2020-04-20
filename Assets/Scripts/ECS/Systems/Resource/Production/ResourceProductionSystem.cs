@@ -63,7 +63,6 @@ public class ResourceProductionSystem : SystemBase
             }
 
             EntityManager.SetComponentData(resourceEntity, new Translation { Value = position });
-            //EntityManager.AddComponent<TransportResourceToStorageTag>(resourceEntity);
 
             // Set storage capacity
             var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(creationInfo.CreatedBy);
@@ -73,7 +72,6 @@ public class ResourceProductionSystem : SystemBase
             // Add to storage
 
             var resourceBuffer = EntityManager.GetBuffer<ResourceDataElement>(creationInfo.CreatedBy);
-            //var resourceIndex = resourceBuffer.Length;
             resourceBuffer.Add(new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount });
 
             EntityManager.AddComponent<ResourceInStorageData>(resourceEntity);

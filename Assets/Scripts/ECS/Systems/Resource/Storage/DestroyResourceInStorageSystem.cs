@@ -8,19 +8,26 @@ public class DestroyResourceInStorageSystem : SystemBase
     EndSimulationEntityCommandBufferSystem bufferSystem;
 
     EntityQuery resourcesInStorageQuery;
+    EntityQuery resourcesToDestroyQuery;
 
     protected override void OnCreate()
     {
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
+
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorageData) }
+        });
+
+        resourcesToDestroyQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] { typeof(DestroyResourceInStorageData) }
         });
     }
 
     protected override void OnUpdate()
     {
-        if (resourcesInStorageQuery.CalculateChunkCount() <= 0 || resourcesInStorageQuery.CalculateChunkCount() <= 0)
+        if (resourcesInStorageQuery.CalculateEntityCount() == 0 || resourcesInStorageQuery.CalculateEntityCount() == 0 || resourcesToDestroyQuery.CalculateEntityCount() == 0)
             return;
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
