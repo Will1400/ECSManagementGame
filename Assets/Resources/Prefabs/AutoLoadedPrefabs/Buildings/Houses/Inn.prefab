@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2057154587401318059}
   - component: {fileID: -7314058905610203533}
   - component: {fileID: 5914482868207270733}
+  - component: {fileID: 2799396790720672139}
   m_Layer: 0
   m_Name: Inn
   m_TagString: Untagged
@@ -164,3 +165,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 571414c1dfe1853458518f563ef6bcdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Values: []
+--- !u!65 &2799396790720672139
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4851850016261904117}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 8.01784, y: 14.93595, z: 9.41839}
+  m_Center: {x: 0, y: -0.00012493134, z: 0.27235508}

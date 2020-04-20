@@ -6,8 +6,7 @@ using UnityEngine;
 [Serializable]
 public class TabGroup : MonoBehaviour
 {
-    [SerializeField]
-    private List<TabButton> tabButtons;
+    public List<TabButton> tabButtons;
 
     [SerializeField]
     private Color tabIdle;
@@ -37,7 +36,8 @@ public class TabGroup : MonoBehaviour
                 tabButton.SetColor(tabIdle, tabSecondaryIdle);
             }
 
-            OnTabSelected(tabButtons[0]);
+            if (tabButtons.Count > 0)
+                OnTabSelected(tabButtons[0]);
         }
     }
 
@@ -61,6 +61,14 @@ public class TabGroup : MonoBehaviour
         {
             tabButtons.Add(tabButton);
             tabButton.SetColor(tabIdle, tabSecondaryIdle);
+        }
+    }
+
+    public void Unbscribe(TabButton tabButton)
+    {
+        if (tabButtons.Contains(tabButton))
+        {
+            tabButtons.Remove(tabButton);
         }
     }
 

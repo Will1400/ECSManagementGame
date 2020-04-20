@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Unity.Mathematics;
+using UnityEngine.EventSystems;
 
 public class CameraMovement : MonoBehaviour
 {
@@ -19,7 +20,8 @@ public class CameraMovement : MonoBehaviour
     {
         Move();
 
-        Zoom();
+        if (!EventSystem.current.IsPointerOverGameObject())
+            Zoom();
     }
 
     void Move()

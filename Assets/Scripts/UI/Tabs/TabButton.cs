@@ -70,4 +70,10 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
     {
         OnTabDeselected?.Invoke();
     }
+
+    private void OnDestroy()
+    {
+        if (tabGroup != null)
+            tabGroup.Unbscribe(this);
+    }
 }
