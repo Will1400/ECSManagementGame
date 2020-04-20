@@ -4,12 +4,13 @@ using System.Linq;
 using Unity.Entities;
 using Unity.Transforms;
 
+[UpdateInGroup(typeof(ResourceInteractionGroup))]
 public class CitizenResourcePickupSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
 
-    EntityQuery resourcesToMoveIntoStorageQuery;
-    EntityQuery citizensReadyToPickupQuery;
+    //EntityQuery resourcesToMoveIntoStorageQuery;
+    //EntityQuery citizensReadyToPickupQuery;
 
     protected override void OnCreate()
     {
@@ -20,10 +21,10 @@ public class CitizenResourcePickupSystem : SystemBase
         //    All = new ComponentType[] { typeof(ResourceData), typeof(TransportResourceToStorageTag), typeof(Translation) },
         //});
 
-        citizensReadyToPickupQuery = GetEntityQuery(new EntityQueryDesc
-        {
-            All = new ComponentType[] { typeof(Citizen), typeof(MovingToPickupResource), typeof(HasArrivedAtDestinationTag) }
-        });
+        //citizensReadyToPickupQuery = GetEntityQuery(new EntityQueryDesc
+        //{
+        //    All = new ComponentType[] { typeof(Citizen), typeof(MovingToPickupResource), typeof(HasArrivedAtDestinationTag) }
+        //});
     }
 
     protected override void OnUpdate()

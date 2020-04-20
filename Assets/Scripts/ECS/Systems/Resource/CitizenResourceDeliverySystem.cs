@@ -6,7 +6,7 @@ using Unity.Collections;
 using Unity.Transforms;
 
 [UpdateAfter(typeof(CitizenResourcePickupSystem))]
-[UpdateAfter(typeof(ResourceTransportMovementSystem))]
+[UpdateInGroup(typeof(ResourceInteractionGroup))]
 public class CitizenResourceDeliverySystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

@@ -5,7 +5,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-[UpdateAfter(typeof(CitizenResourcePickupSystem))]
+[UpdateInGroup(typeof(ProductionGroup))]
 public class ResourceProductionSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

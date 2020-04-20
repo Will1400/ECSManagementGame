@@ -7,6 +7,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
+[UpdateInGroup(typeof(MovementGroup))]
 public class NavAgentMovementSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

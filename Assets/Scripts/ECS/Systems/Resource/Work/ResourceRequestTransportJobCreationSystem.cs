@@ -5,6 +5,7 @@ using Unity.Transforms;
 using Unity.Collections;
 using System.Linq;
 
+[UpdateInGroup(typeof(WorkCreationGroup))]
 public class ResourceRequestTransportJobCreationSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

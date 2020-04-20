@@ -5,8 +5,7 @@ using Unity.Collections;
 using Unity.Transforms;
 using Unity.Mathematics;
 
-[UpdateAfter(typeof(CitizenWorkAssignmentSystem))]
-[UpdateAfter(typeof(ResourceTransportJobAssignmentSystem))]
+[UpdateAfter(typeof(WorkAssignmentGroup))]
 public class CitizenReturnHomeWhenIdleSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

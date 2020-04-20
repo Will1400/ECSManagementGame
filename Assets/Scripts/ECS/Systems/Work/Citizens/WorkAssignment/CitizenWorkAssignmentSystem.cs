@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 
+[UpdateInGroup(typeof(WorkAssignmentGroup))]
 public class CitizenWorkAssignmentSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

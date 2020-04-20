@@ -5,6 +5,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
 
+[UpdateInGroup(typeof(WorkAssignmentGroup))]
 public class ResourceTransportJobAssignmentSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
