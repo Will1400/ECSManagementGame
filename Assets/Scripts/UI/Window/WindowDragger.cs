@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,31 +9,34 @@ public class WindowDragger : MonoBehaviour, IDragHandler, IPointerDownHandler
     [SerializeField]
     private RectTransform transformToDrag;
     [SerializeField]
-    private Canvas Canvas;
+    private Canvas canvas;
 
-    // Start is called before the first frame update
-    void Start()
+    public bool setup;
+
+    public void Setup()
     {
         if (transformToDrag == null)
             transformToDrag = transform.parent.GetComponent<RectTransform>();
 
-        if (Canvas == null)
+        if (canvas == null)
         {
             var tempCanvasTransform = transform.parent;
             while (tempCanvasTransform != null)
             {
-                Canvas = tempCanvasTransform.GetComponent<Canvas>();
-                if (Canvas != null)
+                canvas = tempCanvasTransform.GetComponent<Canvas>();
+                if (canvas != null)
                     break;
 
                 tempCanvasTransform = tempCanvasTransform.parent;
             }
         }
+        setup = true;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        transformToDrag.anchoredPosition += eventData.delta / Canvas.scaleFactor;
+        if (setup)
+            transformToDrag.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
     public void OnPointerDown(PointerEventData eventData)

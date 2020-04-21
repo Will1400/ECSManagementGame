@@ -7,6 +7,9 @@ using UnityEngine.EventSystems;
 public class SelectionUISystem : SystemBase
 {
     GameObject buildingInfoPrefab;
+    GameObject canvas;
+
+    GameObject currentOpenWindow;
 
     protected override void OnCreate()
     {
@@ -15,22 +18,33 @@ public class SelectionUISystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (!Input.GetButtonDown("Primary Mouse"))
+        if (canvas == null)
+            canvas = GameObject.Find("Canvas");
+
+        if (!Input.GetButtonDown("Primary Mouse") || EventSystem.current.IsPointerOverGameObject() || GameManager.Instance.CursorState != CursorState.None)
             return;
 
-        bool isOverObject = !EventSystem.current.IsPointerOverGameObject();
-
-
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        var hit =ECSRaycast.Raycast(ray.origin, ray.direction * 9999);
+        var hit = ECSRaycast.Raycast(ray.origin, ray.direction * 9999);
 
         if (hit.Entity != Entity.Null)
         {
             if (EntityManager.HasComponent<GridOccupation>(hit.Entity))
             {
-                var infoPanel =GameObject.Instantiate(buildingInfoPrefab);
-                var controller = infoPanel.GetComponent<SelectionInfoWindowController>();
+                if (currentOpenWindow != null)
+                {
+                    currentOpenWindow.GetComponent<SelectionInfoWindowController>().CloseWindow();
+                }
+
+                GameObject infoPanel = GameObject.Instantiate(buildingInfoPrefab);
+                infoPanel.transform.SetParent(canvas.transform);
+                infoPanel.transform.localScale = Vector3.one;
+                infoPanel.transform.position = Input.mousePosition;
+
+                SelectionInfoWindowController controller = infoPanel.GetComponent<SelectionInfoWindowController>();
                 controller.Initialize(hit.Entity);
+
+                currentOpenWindow = infoPanel;
             }
             else
             {

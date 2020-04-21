@@ -29,10 +29,16 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
             OnTabDeselected = new UnityEvent();
     }
 
-    void Start()
+    void OnEnable()
     {
         if (tabGroup != null)
             tabGroup.Subscribe(this);
+    }
+
+    void OnDisable()
+    {
+        if (tabGroup != null)
+            tabGroup.Unbscribe(this);
     }
 
     public void SetTabGroup(TabGroup tabGroup)
@@ -69,11 +75,5 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
     public void Deselect()
     {
         OnTabDeselected?.Invoke();
-    }
-
-    private void OnDestroy()
-    {
-        if (tabGroup != null)
-            tabGroup.Unbscribe(this);
     }
 }
