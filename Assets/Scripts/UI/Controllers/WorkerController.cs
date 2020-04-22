@@ -24,14 +24,14 @@ public class WorkerController : MonoBehaviour
 
     void UpdateText()
     {
-        var data = EntityManager.GetComponentData<WorkPlaceWorkerData>(entity);
+        var data = EntityManager.GetComponentData<WorkplaceWorkerData>(entity);
 
         workerCountText.text = $"{data.CurrentWorkers} of {data.MaxWorkers}";
     }
 
     public void IncreaseMaxWorkerLimit()
     {
-        var data = EntityManager.GetComponentData<WorkPlaceWorkerData>(entity);
+        var data = EntityManager.GetComponentData<WorkplaceWorkerData>(entity);
         data.MaxWorkers++;
         EntityManager.SetComponentData(entity, data);
 
@@ -40,7 +40,7 @@ public class WorkerController : MonoBehaviour
 
     public void DecreaseMaxWorkerLimit()
     {
-        var data = EntityManager.GetComponentData<WorkPlaceWorkerData>(entity);
+        var data = EntityManager.GetComponentData<WorkplaceWorkerData>(entity);
         data.MaxWorkers--;
 
         if (data.MaxWorkers < 0)

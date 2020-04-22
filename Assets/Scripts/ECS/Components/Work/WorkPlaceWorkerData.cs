@@ -4,7 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 [GenerateAuthoringComponent]
-public struct WorkPlaceWorkerData : IComponentData
+public struct WorkplaceWorkerData : IComponentData
 {
     public bool IsWorkable;
     public int MaxWorkers;

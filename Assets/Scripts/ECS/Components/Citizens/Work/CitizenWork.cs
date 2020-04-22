@@ -7,6 +7,6 @@ using Unity.Mathematics;
 public struct CitizenWork : IComponentData
 {
     public bool IsWorking;
-    public Entity WorkPlaceEntity;
+    public Entity WorkplaceEntity;
     public float3 WorkPosition;
 }

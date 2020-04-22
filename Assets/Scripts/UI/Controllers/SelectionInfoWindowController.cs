@@ -38,7 +38,7 @@ public class SelectionInfoWindowController : MonoBehaviour
 
         titleText.text = EntityManager.GetName(entity);
 
-        if (EntityManager.HasComponent<WorkPlaceWorkerData>(entity))
+        if (EntityManager.HasComponent<WorkplaceWorkerData>(entity))
         {
             workerControlPanel.SetActive(true);
             workerControlPanel.GetComponent<WorkerController>().Initialize(entity);

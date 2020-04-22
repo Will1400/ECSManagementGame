@@ -40,7 +40,6 @@ public class SelectionUISystem : SystemBase
                 infoPanel.transform.SetParent(windowHolder.transform);
                 infoPanel.transform.localScale = Vector3.one;
                 Vector3 offset = new Vector3(0, -(infoPanel.GetComponent<RectTransform>().rect.height / 4));
-                Debug.Log(offset);
                 infoPanel.transform.position = Input.mousePosition + offset;
 
                 SelectionInfoWindowController controller = infoPanel.GetComponent<SelectionInfoWindowController>();

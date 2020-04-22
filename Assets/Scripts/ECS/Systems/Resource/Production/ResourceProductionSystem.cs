@@ -19,7 +19,7 @@ public class ResourceProductionSystem : SystemBase
 
         producingEntititesQuery = GetEntityQuery(new EntityQueryDesc()
         {
-            All = new ComponentType[] { typeof(ResourceProductionData), typeof(WorkPlaceWorkerData) }
+            All = new ComponentType[] { typeof(ResourceProductionData), typeof(WorkplaceWorkerData) }
         });
 
         resourcesToCreate = new NativeQueue<ResourceCreationInfo>(Allocator.Persistent);
@@ -36,7 +36,7 @@ public class ResourceProductionSystem : SystemBase
             ResourcesToCreate = resourcesToCreate.AsParallelWriter(),
             EntityType = GetArchetypeChunkEntityType(),
             ResourceProductionDataType = GetArchetypeChunkComponentType<ResourceProductionData>(),
-            WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(true),
+            WorkplaceWorkerDataType = GetArchetypeChunkComponentType<WorkplaceWorkerData>(true),
             ResourceStorageType = GetArchetypeChunkComponentType<ResourceStorageData>(true),
         }.Schedule(producingEntititesQuery);
 
@@ -100,7 +100,7 @@ public class ResourceProductionSystem : SystemBase
         [ReadOnly]
         public ArchetypeChunkEntityType EntityType;
         [ReadOnly]
-        public ArchetypeChunkComponentType<WorkPlaceWorkerData> WorkPlaceWorkerDataType;
+        public ArchetypeChunkComponentType<WorkplaceWorkerData> WorkplaceWorkerDataType;
         [ReadOnly]
         public ArchetypeChunkComponentType<ResourceStorageData> ResourceStorageType;
 
@@ -111,13 +111,13 @@ public class ResourceProductionSystem : SystemBase
             NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
             NativeArray<ResourceProductionData> resourceProductionDatas = chunk.GetNativeArray(ResourceProductionDataType);
-            NativeArray<WorkPlaceWorkerData> workerDatas = chunk.GetNativeArray(WorkPlaceWorkerDataType);
+            NativeArray<WorkplaceWorkerData> workerDatas = chunk.GetNativeArray(WorkplaceWorkerDataType);
             NativeArray<ResourceStorageData> resourceStorages = chunk.GetNativeArray(ResourceStorageType);
 
             for (int i = 0; i < chunk.Count; i++)
             {
                 ResourceProductionData productionData = resourceProductionDatas[i];
-                WorkPlaceWorkerData workerData = workerDatas[i];
+                WorkplaceWorkerData workerData = workerDatas[i];
 
                 if (resourceStorages[i].UsedCapacity >= resourceStorages[i].MaxCapacity)
                     continue;

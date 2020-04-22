@@ -15,7 +15,7 @@ public class ConstructionResourceRequirementMetSystem : SystemBase
     {
         var CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
 
-        Entities.WithAll<HasNoResourceCost>().ForEach((Entity entity, int entityInQueryIndex, ref WorkPlaceWorkerData workerData) =>
+        Entities.WithAll<HasNoResourceCost>().ForEach((Entity entity, int entityInQueryIndex, ref WorkplaceWorkerData workerData) =>
         {
             workerData.IsWorkable = true;
 
@@ -24,7 +24,7 @@ public class ConstructionResourceRequirementMetSystem : SystemBase
         }).Schedule(Dependency).Complete();
 
         // Make workplace workable if resource requirement is met
-        Entities.WithNone<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceCostElement> resourceCosts, DynamicBuffer<ResourceDataElement> resourceDatas, ref WorkPlaceWorkerData workerData) =>
+        Entities.WithNone<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceCostElement> resourceCosts, DynamicBuffer<ResourceDataElement> resourceDatas, ref WorkplaceWorkerData workerData) =>
         {
             if (workerData.IsWorkable)
                 return;

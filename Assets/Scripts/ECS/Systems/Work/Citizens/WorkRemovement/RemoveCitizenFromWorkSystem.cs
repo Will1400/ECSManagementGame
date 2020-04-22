@@ -17,15 +17,15 @@ public class RemoveCitizenFromWorkSystem : SystemBase
 
         Entities.WithAll<RemoveFromWorkTag>().ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
-            if (citizenWork.WorkPlaceEntity != Entity.Null && EntityManager.Exists(citizenWork.WorkPlaceEntity) & EntityManager.HasComponent<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity))
+            if (citizenWork.WorkplaceEntity != Entity.Null && EntityManager.Exists(citizenWork.WorkplaceEntity) & EntityManager.HasComponent<WorkplaceWorkerData>(citizenWork.WorkplaceEntity))
             {
-                var index = citizenWork.WorkPlaceEntity.Index;
-                var workerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(citizenWork.WorkPlaceEntity);
+                var index = citizenWork.WorkplaceEntity.Index;
+                var workerData = EntityManager.GetComponentData<WorkplaceWorkerData>(citizenWork.WorkplaceEntity);
 
                 workerData.ActiveWorkers--;
                 workerData.CurrentWorkers--;
 
-                CommandBuffer.SetComponent(citizenWork.WorkPlaceEntity, workerData);
+                CommandBuffer.SetComponent(citizenWork.WorkplaceEntity, workerData);
             }
 
             CommandBuffer.RemoveComponent<IsWorkingTag>(entity);

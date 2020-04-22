@@ -21,7 +21,7 @@ public class ConstructionSystem : SystemBase
         EntityCommandBuffer.Concurrent CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
         float deltaTime = Time.DeltaTime;
 
-        Entities.ForEach((Entity entity, int entityInQueryIndex, ref ConstructionData construction, ref WorkPlaceWorkerData workerData) =>
+        Entities.ForEach((Entity entity, int entityInQueryIndex, ref ConstructionData construction, ref WorkplaceWorkerData workerData) =>
         {
             if (workerData.IsWorkable)
             {

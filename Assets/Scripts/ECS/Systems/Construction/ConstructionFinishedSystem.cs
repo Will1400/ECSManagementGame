@@ -16,7 +16,7 @@ public class ConstructionFinishedSystem : SystemBase
     {
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
 
-        Entities.WithAll<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref ConstructionData construction, ref WorkPlaceWorkerData workerData, ref Translation translation) =>
+        Entities.WithAll<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref ConstructionData construction, ref WorkplaceWorkerData workerData, ref Translation translation) =>
         {
             for (int i = 0; i < resourceDatas.Length; i++)
             {
@@ -40,9 +40,9 @@ public class ConstructionFinishedSystem : SystemBase
 
             translation.Value.y = EntityManager.GetComponentData<Translation>(finishedEntity).Value.y;
 
-            if (EntityManager.HasComponent<WorkPlaceWorkerData>(finishedEntity))
+            if (EntityManager.HasComponent<WorkplaceWorkerData>(finishedEntity))
             {
-                WorkPlaceWorkerData newWorkerData = EntityManager.GetComponentData<WorkPlaceWorkerData>(finishedEntity);
+                WorkplaceWorkerData newWorkerData = EntityManager.GetComponentData<WorkplaceWorkerData>(finishedEntity);
                 newWorkerData.WorkPosition = workerData.WorkPosition;
                 CommandBuffer.SetComponent(finishedEntity, newWorkerData);
             }
@@ -54,7 +54,7 @@ public class ConstructionFinishedSystem : SystemBase
 
             workerData.ActiveWorkers = -1;
             CommandBuffer.RemoveComponent<ConstructionData>(entity);
-            CommandBuffer.AddComponent<RemoveWorkPlaceTag>(entity);
+            CommandBuffer.AddComponent<RemoveWorkplaceTag>(entity);
         }).WithoutBurst().WithStructuralChanges().Run();
     }
 }

@@ -2,6 +2,6 @@
 using System.Collections;
 using Unity.Entities;
 
-public struct RemoveWorkPlaceTag : IComponentData
+public struct RemoveWorkplaceTag : IComponentData
 {
 }

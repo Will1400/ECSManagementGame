@@ -25,8 +25,8 @@ public class CitizenWorkAssignmentSystem : SystemBase
 
         needsWorkersQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(WorkPlaceWorkerData) },
-            None = new ComponentType[] { typeof(RemoveWorkPlaceTag) }
+            All = new ComponentType[] { typeof(WorkplaceWorkerData) },
+            None = new ComponentType[] { typeof(RemoveWorkplaceTag) }
         });
     }
 
@@ -41,7 +41,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
         EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
 
         int citizenIndex = 0;
-        Entities.WithNone<RemoveWorkPlaceTag>().ForEach((Entity workPlace, ref WorkPlaceWorkerData workerData) =>
+        Entities.WithNone<RemoveWorkplaceTag>().ForEach((Entity workPlace, ref WorkplaceWorkerData workerData) =>
         {
             if (idleCitizens.Length == 0)
                 return;
@@ -57,7 +57,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
                         CommandBuffer.AddComponent<CitizenWork>(idleCitizens[i]);
                         CommandBuffer.AddComponent<NavAgentRequestingPath>(idleCitizens[i]);
 
-                        CommandBuffer.SetComponent(idleCitizens[i], new CitizenWork { WorkPlaceEntity = workPlace, WorkPosition = workerData.WorkPosition });
+                        CommandBuffer.SetComponent(idleCitizens[i], new CitizenWork { WorkplaceEntity = workPlace, WorkPosition = workerData.WorkPosition });
                         CommandBuffer.SetComponent(idleCitizens[i], new NavAgentRequestingPath { StartPosition = idleCitizensTranslation[i].Value, EndPosition = workerData.WorkPosition });
                         currentWorkers++;
                         CommandBuffer.RemoveComponent<IdleTag>(idleCitizens[i]);

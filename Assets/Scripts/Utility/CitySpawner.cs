@@ -39,7 +39,7 @@ public class CitySpawner : MonoBehaviour
 
             EntityManager.AddComponentData(entity, new GridOccupation { Start = new int2(occupation.x, occupation.y), End = new int2(occupation.z, occupation.w) });
             EntityManager.AddComponentData(entity, new Translation { Value = position });
-            EntityManager.AddComponentData(entity, new WorkPlaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });
+            EntityManager.AddComponentData(entity, new WorkplaceWorkerData { MaxWorkers = 4, WorkPosition = position + new float3(0, 0, -(position.z - occupation.y + 1)) });
         }
 
         constructionSites.Dispose();

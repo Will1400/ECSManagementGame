@@ -8,9 +8,9 @@ using Unity.Collections;
 using Unity.Entities;
 
 [UpdateBefore(typeof(RemoveCitizenFromWorkSystem))]
-public class RemoveWorkPlaceSystem : SystemBase
+public class RemoveWorkplaceSystem : SystemBase
 {
-    EntityQuery workPlacesToRemoveQuery;
+    EntityQuery workplaceToRemoveQuery;
     EntityQuery workingCitizensQuery;
     EndSimulationEntityCommandBufferSystem bufferSystem;
 
@@ -19,9 +19,9 @@ public class RemoveWorkPlaceSystem : SystemBase
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
 
 
-        workPlacesToRemoveQuery = GetEntityQuery(new EntityQueryDesc
+        workplaceToRemoveQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(RemoveWorkPlaceTag) }
+            All = new ComponentType[] { typeof(RemoveWorkplaceTag) }
         });
         workingCitizensQuery = GetEntityQuery(new EntityQueryDesc
         {
@@ -32,20 +32,20 @@ public class RemoveWorkPlaceSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (workPlacesToRemoveQuery.CalculateChunkCount() <= 0)
+        if (workplaceToRemoveQuery.CalculateChunkCount() <= 0)
             return;
 
         NativeArray<Entity> workingCitizens = workingCitizensQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<CitizenWork> workingCitizensWorkerData = workingCitizensQuery.ToComponentDataArray<CitizenWork>(Allocator.TempJob);
 
-        var job = new RemoveWorkPlaceJob
+        var job = new RemoveWorkplaceJob
         {
             EntityType = GetArchetypeChunkEntityType(),
-            WorkPlaceWorkerDataType = GetArchetypeChunkComponentType<WorkPlaceWorkerData>(),
+            WorkplaceWorkerDataType = GetArchetypeChunkComponentType<WorkplaceWorkerData>(),
             WorkingCitizens = workingCitizens,
             WorkingCitizensWorkerData = workingCitizensWorkerData,
             CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
-        }.Schedule(workPlacesToRemoveQuery);
+        }.Schedule(workplaceToRemoveQuery);
         job.Complete();
 
         workingCitizens.Dispose();
@@ -53,11 +53,11 @@ public class RemoveWorkPlaceSystem : SystemBase
     }
 
     [BurstCompile]
-    struct RemoveWorkPlaceJob : IJobChunk
+    struct RemoveWorkplaceJob : IJobChunk
     {
         [ReadOnly]
         public ArchetypeChunkEntityType EntityType;
-        public ArchetypeChunkComponentType<WorkPlaceWorkerData> WorkPlaceWorkerDataType;
+        public ArchetypeChunkComponentType<WorkplaceWorkerData> WorkplaceWorkerDataType;
 
         [ReadOnly]
         public NativeArray<Entity> WorkingCitizens;
@@ -69,26 +69,26 @@ public class RemoveWorkPlaceSystem : SystemBase
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
             var entities = chunk.GetNativeArray(EntityType);
-            var workPlaceWorkerDatas = chunk.GetNativeArray(WorkPlaceWorkerDataType);
+            var workplaceWorkerDatas = chunk.GetNativeArray(WorkplaceWorkerDataType);
 
             for (int i = 0; i < chunk.Count; i++)
             {
-                WorkPlaceWorkerData workPlaceWorkerData = workPlaceWorkerDatas[i];
+                WorkplaceWorkerData workplaceWorkerData = workplaceWorkerDatas[i];
 
                 for (int j = 0; j < WorkingCitizensWorkerData.Length; j++)
                 {
-                    if (workPlaceWorkerData.CurrentWorkers <= 0)
+                    if (workplaceWorkerData.CurrentWorkers <= 0)
                         break;
 
                     var workerData = WorkingCitizensWorkerData[j];
-                    if (workerData.WorkPlaceEntity.Index == entities[i].Index)
+                    if (workerData.WorkplaceEntity.Index == entities[i].Index)
                     {
                         CommandBuffer.AddComponent<RemoveFromWorkTag>(chunkIndex, WorkingCitizens[j]);
-                        workPlaceWorkerData.CurrentWorkers--;
+                        workplaceWorkerData.CurrentWorkers--;
                     }
                 }
 
-                if (workPlaceWorkerData.CurrentWorkers <= 0)
+                if (workplaceWorkerData.CurrentWorkers <= 0)
                     CommandBuffer.DestroyEntity(chunkIndex, entities[i]);
             }
         }

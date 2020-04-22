@@ -15,7 +15,7 @@ public class TooltipController : MonoBehaviour
         else
             Destroy(gameObject);
 
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 
     [SerializeField]
