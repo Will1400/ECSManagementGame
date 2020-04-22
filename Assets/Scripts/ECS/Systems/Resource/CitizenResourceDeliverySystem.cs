@@ -64,5 +64,8 @@ public class CitizenResourceDeliverySystem : SystemBase
             CommandBuffer.AddComponent<IdleTag>(citizen);
 
         }).WithoutBurst().Run();
+
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.ShouldPlayback = false;
     }
 }

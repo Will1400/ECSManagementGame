@@ -47,12 +47,17 @@ public class TabGroup : MonoBehaviour
         if (targetIndex < 0)
             targetIndex = tabButtons.Count - 1;
         OnTabSelected(tabButtons[targetIndex % tabButtons.Count]);
+
+        if (!selectedTab.gameObject.activeSelf)
+            SelectLeft();
     }
 
     public void SelectRight()
     {
         OnTabSelected(tabButtons[(tabButtons.IndexOf(selectedTab) + 1) % tabButtons.Count]);
 
+        if (!selectedTab.gameObject.activeSelf)
+            SelectRight();
     }
 
     public void Subscribe(TabButton tabButton)

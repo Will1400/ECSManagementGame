@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Entities;
 using UnityEngine;
@@ -40,6 +41,7 @@ public class SelectionInfoWindowController : MonoBehaviour
         foreach (Transform item in contextPanelHolder.transform)
         {
             availablePanels.Add(item.name.Replace("Panel", string.Empty), item.gameObject);
+            item.gameObject.SetActive(false);
         }
 
         // Check entity for components that has a panel
@@ -67,17 +69,28 @@ public class SelectionInfoWindowController : MonoBehaviour
                 item.gameObject.SetActive(true);
             }
         }
+
+        // Activate first panel
+
+        if (applicablePanels.Count > 0)
+        {
+            SwitchToPanel(applicablePanels.First().Key);
+            tabGroup.OnTabSelected(tabGroup.tabButtons[0]);
+        }
     }
 
     public void SwitchToPanel(string panelName)
     {
         if (applicablePanels.TryGetValue(panelName, out GameObject panel))
         {
-            panel.SetActive(true);
-            var filler = panel.GetComponent<PanelFiller>();
-            if (filler != null)
+            if (!panel.activeSelf)
             {
-                filler.Fill(selectedEntity);
+                panel.SetActive(true);
+                var filler = panel.GetComponent<PanelFiller>();
+                if (filler != null)
+                {
+                    filler.Fill(selectedEntity);
+                }
             }
         }
     }

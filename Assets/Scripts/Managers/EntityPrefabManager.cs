@@ -20,6 +20,8 @@ public class EntityPrefabManager : MonoBehaviour
 
     EntityManager EntityManager;
 
+    BlobAssetStore assetStore;
+
     private void Awake()
     {
         if (Instance is null)
@@ -30,17 +32,16 @@ public class EntityPrefabManager : MonoBehaviour
     {
         EntityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        using (BlobAssetStore assetStore = new BlobAssetStore())
-        {
-            var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, assetStore);
-            GameObject[] gameObjectPrefabs = Resources.LoadAll<GameObject>("Prefabs/");
+        assetStore = new BlobAssetStore();
+        var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, assetStore);
+        GameObject[] gameObjectPrefabs = Resources.LoadAll<GameObject>("Prefabs/");
 
-            foreach (var item in gameObjectPrefabs)
-            {
-                var entity = GameObjectConversionUtility.ConvertGameObjectHierarchy(item, settings);
-                EntityManager.AddComponent<Disabled>(entity);
-                Prefabs.Add(item.name, entity);
-            }
+        foreach (var item in gameObjectPrefabs)
+        {
+            var entity = GameObjectConversionUtility.ConvertGameObjectHierarchy(item, settings);
+            EntityManager.AddComponent<Disabled>(entity);
+            Prefabs.Add(item.name, entity);
+            EntityManager.SetName(entity, item.name);
         }
     }
 
@@ -56,6 +57,15 @@ public class EntityPrefabManager : MonoBehaviour
         return Entity.Null;
     }
 
+    public Entity GetEntityPrefab(string name)
+    {
+        if (Prefabs.TryGetValue(name, out Entity prefab))
+        {
+            return prefab;
+        }
+
+        return Entity.Null;
+    }
 
     public Entity SpawnCitizenPrefab()
     {
@@ -71,18 +81,6 @@ public class EntityPrefabManager : MonoBehaviour
                     Gender = (Gender)Random.Range(1, 3)
                 }
             });
-            return entity;
-        }
-
-        return Entity.Null;
-    }
-
-
-    public Entity GetEntityPrefab(string name)
-    {
-        if (Prefabs.TryGetValue(name, out Entity prefab))
-        {
-            Entity entity = EntityManager.Instantiate(prefab);
             return entity;
         }
 
@@ -119,7 +117,6 @@ public class EntityPrefabManager : MonoBehaviour
 
         return Entity.Null;
     }
-
 
     public Entity SpawnBeingPlacedEntityPrefab(string name)
     {

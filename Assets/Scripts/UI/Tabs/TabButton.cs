@@ -35,12 +35,6 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
             tabGroup.Subscribe(this);
     }
 
-    void OnDisable()
-    {
-        if (tabGroup != null)
-            tabGroup.Unbscribe(this);
-    }
-
     public void SetTabGroup(TabGroup tabGroup)
     {
         this.tabGroup = tabGroup;
@@ -75,5 +69,11 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
     public void Deselect()
     {
         OnTabDeselected?.Invoke();
+    }
+
+    private void OnDestroy()
+    {
+        if (tabGroup != null)
+            tabGroup.Unbscribe(this);
     }
 }
