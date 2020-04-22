@@ -13,6 +13,8 @@ public class SelectionInfoWindowController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI titleText;
     [SerializeField]
+    private GameObject workerControlPanel;
+    [SerializeField]
     private WindowDragger windowDragger;
     [SerializeField]
     private GameObject contextPanelHolder;
@@ -29,11 +31,22 @@ public class SelectionInfoWindowController : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
         selectedEntity = entity;
 
         windowDragger.Setup();
 
         titleText.text = EntityManager.GetName(entity);
+
+        if (EntityManager.HasComponent<WorkPlaceWorkerData>(entity))
+        {
+            workerControlPanel.SetActive(true);
+            workerControlPanel.GetComponent<WorkerController>().Initialize(entity);
+        }
+        else
+        {
+            workerControlPanel.SetActive(false);
+        }
 
         Dictionary<string, GameObject> availablePanels = new Dictionary<string, GameObject>();
 
@@ -50,7 +63,6 @@ public class SelectionInfoWindowController : MonoBehaviour
         {
             applicablePanels.Add("Occupants", panel);
         }
-
         if (EntityManager.HasComponent<ResourceProductionData>(entity) && availablePanels.TryGetValue("Production", out panel))
         {
             applicablePanels.Add("Production", panel);
@@ -61,13 +73,9 @@ public class SelectionInfoWindowController : MonoBehaviour
         foreach (Transform item in tabGroup.transform)
         {
             if (!applicablePanels.TryGetValue(item.name, out panel))
-            {
                 item.gameObject.SetActive(false);
-            }
             else
-            {
                 item.gameObject.SetActive(true);
-            }
         }
 
         // Activate first panel

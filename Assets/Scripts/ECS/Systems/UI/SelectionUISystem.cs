@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 public class SelectionUISystem : SystemBase
 {
     GameObject buildingInfoPrefab;
-    GameObject canvas;
+    GameObject windowHolder;
 
     GameObject currentOpenWindow;
 
@@ -18,8 +18,8 @@ public class SelectionUISystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (canvas == null)
-            canvas = GameObject.Find("Canvas");
+        if (windowHolder == null)
+            windowHolder = GameObject.Find("Canvas").transform.Find("Windows").gameObject;
 
         if (!Input.GetButtonDown("Primary Mouse") || EventSystem.current.IsPointerOverGameObject() || GameManager.Instance.CursorState != CursorState.None)
             return;
@@ -37,7 +37,7 @@ public class SelectionUISystem : SystemBase
                 }
 
                 GameObject infoPanel = GameObject.Instantiate(buildingInfoPrefab);
-                infoPanel.transform.SetParent(canvas.transform);
+                infoPanel.transform.SetParent(windowHolder.transform);
                 infoPanel.transform.localScale = Vector3.one;
                 Vector3 offset = new Vector3(0, -(infoPanel.GetComponent<RectTransform>().rect.height / 4));
                 Debug.Log(offset);
