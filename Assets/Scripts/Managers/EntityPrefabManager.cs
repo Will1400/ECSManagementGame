@@ -73,12 +73,15 @@ public class EntityPrefabManager : MonoBehaviour
         {
             Entity entity = EntityManager.Instantiate(prefab);
             EntityManager.RemoveComponent<Disabled>(entity);
+
+            var gender = (Gender)Random.Range(1, 3);
             EntityManager.AddComponentData(entity, new Citizen
             {
                 CitizenPersonalData = new CitizenPersonalInfo
                 {
-                    Age = Random.Range(10, 20),
-                    Gender = (Gender)Random.Range(1, 3)
+                    Name = NameHelper.GetName(gender),
+                    Age = Random.Range(10, 40),
+                    Gender = gender
                 }
             });
             return entity;
