@@ -11,7 +11,7 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
     EndSimulationEntityCommandBufferSystem bufferSystem;
 
     EntityQuery resourcesInStorageQuery;
-    EntityQuery StorageAreasQuery;
+    EntityQuery resourceRequestsQuery;
 
     protected override void OnCreate()
     {
@@ -22,19 +22,18 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
             All = new ComponentType[] { typeof(ResourceData), typeof(ResourceInStorageData), typeof(ResourceIsAvailableTag) },
         });
 
-        StorageAreasQuery = GetEntityQuery(new EntityQueryDesc
+        resourceRequestsQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(ResourceStorageData), typeof(ResourceStorageAreaTag) },
+            All = new ComponentType[] { typeof(ResourceRequestData) },
         });
     }
 
     protected override void OnUpdate()
     {
 
-        if (resourcesInStorageQuery.CalculateChunkCount() == 0)
+        if (resourcesInStorageQuery.CalculateChunkCount() == 0 || resourceRequestsQuery.CalculateEntityCount() == 0)
             return;
 
-        NativeArray<Entity> storageAreas = StorageAreasQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<Entity> resourceEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<ResourceInStorageData> resourcesInStorageAreas = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
 
@@ -82,7 +81,6 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 
                         resourceEntities[i] = Entity.Null;
                         resourcesInStorageAreas[i] = new ResourceInStorageData { StorageEntity = resource.StorageEntity };
-
                     }
                 }
             }
@@ -94,7 +92,6 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 
         }).Run();
 
-        storageAreas.Dispose();
         resourcesInStorageAreas.Dispose();
         resourceEntities.Dispose();
     }

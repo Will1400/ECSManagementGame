@@ -28,6 +28,19 @@ public class RemoveExcessWorkersSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        bool isWorkerCountValid = true;
+        Entities.ForEach((Entity entity, ref WorkplaceWorkerData workerData) =>
+        {
+            if (workerData.CurrentWorkers > workerData.MaxWorkers)
+            {
+                isWorkerCountValid = false;
+                return;
+            }
+        }).Run();
+
+        if (isWorkerCountValid)
+            return;
+
         var buffer = bufferSystem.CreateCommandBuffer();
         var CommandBuffer = buffer.ToConcurrent();
 
