@@ -21,6 +21,8 @@ public class SelectionInfoWindowController : MonoBehaviour
     [SerializeField]
     private TabGroup tabGroup;
 
+    GameObject currentPanel;
+
     private Dictionary<string, GameObject> applicablePanels = new Dictionary<string, GameObject>();
 
     public void Initialize(Entity entity)
@@ -58,24 +60,21 @@ public class SelectionInfoWindowController : MonoBehaviour
         }
 
         // Check entity for components that has a panel
-
-        if (EntityManager.HasComponent<CitizenElement>(entity) && availablePanels.TryGetValue("Occupants", out GameObject panel))
-        {
-            applicablePanels.Add("Occupants", panel);
-        }
-        if (EntityManager.HasComponent<ResourceProductionData>(entity) && availablePanels.TryGetValue("Production", out panel))
-        {
-            applicablePanels.Add("Production", panel);
-        }
+        AddApplicablePanels(availablePanels);
 
         // Setup Applicable panels
 
         foreach (Transform item in tabGroup.transform)
         {
-            if (!applicablePanels.TryGetValue(item.name, out panel))
+            if (!applicablePanels.TryGetValue(item.name, out _))
+            {
                 item.gameObject.SetActive(false);
+                tabGroup.Unbscribe(item.GetComponent<TabButton>());
+            }
             else
+            {
                 item.gameObject.SetActive(true);
+            }
         }
 
         // Activate first panel
@@ -87,19 +86,51 @@ public class SelectionInfoWindowController : MonoBehaviour
         }
     }
 
+    void AddApplicablePanels(Dictionary<string, GameObject> availablePanels)
+    {
+
+        if (EntityManager.HasComponent<CitizenElement>(selectedEntity) && availablePanels.TryGetValue("Occupants", out GameObject panel))
+        {
+            applicablePanels.Add("Occupants", panel);
+        }
+        if (EntityManager.HasComponent<ResourceProductionData>(selectedEntity) && availablePanels.TryGetValue("Production", out panel))
+        {
+            applicablePanels.Add("Production", panel);
+        }
+        if (EntityManager.HasComponent<ResourceDataElement>(selectedEntity) && availablePanels.TryGetValue("Inventory", out panel))
+        {
+            applicablePanels.Add("Inventory", panel);
+        }
+    }
+
     public void SwitchToPanel(string panelName)
     {
         if (applicablePanels.TryGetValue(panelName, out GameObject panel))
         {
-            if (!panel.activeSelf)
+            if (panel != currentPanel)
             {
+                if (currentPanel != null)
+                    currentPanel.SetActive(false);
+
                 panel.SetActive(true);
-                var filler = panel.GetComponent<PanelFiller>();
+                var filler = panel.GetComponent<PanelFillerBase>();
                 if (filler != null)
                 {
                     filler.Fill(selectedEntity);
                 }
+
+                currentPanel = panel;
             }
+
+            //if (!panel.activeSelf)
+            //{
+            //    panel.SetActive(true);
+            //    var filler = panel.GetComponent<PanelFillerBase>();
+            //    if (filler != null)
+            //    {
+            //        filler.Fill(selectedEntity);
+            //    }
+            //}
         }
     }
 

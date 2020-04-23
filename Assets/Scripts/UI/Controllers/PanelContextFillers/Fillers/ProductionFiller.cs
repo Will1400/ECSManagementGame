@@ -4,7 +4,7 @@ using Unity.Entities;
 using TMPro;
 using System;
 
-public class ProductionFiller : PanelFiller
+public class ProductionFiller : PanelFillerBase
 {
     [SerializeField]
     private TextMeshProUGUI resourceTypeText;

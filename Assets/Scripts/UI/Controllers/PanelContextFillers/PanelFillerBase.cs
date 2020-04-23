@@ -2,7 +2,7 @@
 using System.Collections;
 using Unity.Entities;
 
-public abstract class PanelFiller : MonoBehaviour
+public abstract class PanelFillerBase : MonoBehaviour
 {
     protected EntityManager EntityManager;
     protected Entity entity;

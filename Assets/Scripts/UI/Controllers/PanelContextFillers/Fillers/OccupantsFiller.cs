@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using System.Collections.Generic;
 
-public class OccupantsFiller : PanelFiller
+public class OccupantsFiller : PanelFillerBase
 {
     [SerializeField]
     private GameObject occupantPrefab;
