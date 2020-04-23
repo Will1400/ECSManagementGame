@@ -21,14 +21,8 @@ public class NameHelper : MonoBehaviour
             path = @"Assets\Resources\Text\Names\FemaleNames.csv";
 
         }
-        Stopwatch watch = new Stopwatch();
-        watch.Start();
 
         var name = File.ReadLines(path).Skip(Random.Range(0, 1000)).First().Split(',').First();
-        
-        watch.Stop();
-        Debug.Log(watch.Elapsed);
-
         return name;
     }
 }

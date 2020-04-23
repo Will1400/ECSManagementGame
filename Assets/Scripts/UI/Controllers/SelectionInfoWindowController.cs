@@ -15,6 +15,8 @@ public class SelectionInfoWindowController : MonoBehaviour
     [SerializeField]
     private GameObject workerControlPanel;
     [SerializeField]
+    private GameObject citizenPanel;
+    [SerializeField]
     private WindowDragger windowDragger;
     [SerializeField]
     private GameObject contextPanelHolder;
@@ -50,6 +52,15 @@ public class SelectionInfoWindowController : MonoBehaviour
             workerControlPanel.SetActive(false);
         }
 
+        if (EntityManager.HasComponent<Citizen>(entity))
+        {
+            citizenPanel.SetActive(true);
+        }
+        else
+        {
+            citizenPanel.SetActive(false);
+        }
+
         Dictionary<string, GameObject> availablePanels = new Dictionary<string, GameObject>();
 
         // Load all panels
@@ -59,7 +70,6 @@ public class SelectionInfoWindowController : MonoBehaviour
             item.gameObject.SetActive(false);
         }
 
-        // Check entity for components that has a panel
         AddApplicablePanels(availablePanels);
 
         // Setup Applicable panels
@@ -88,8 +98,11 @@ public class SelectionInfoWindowController : MonoBehaviour
 
     void AddApplicablePanels(Dictionary<string, GameObject> availablePanels)
     {
-
-        if (EntityManager.HasComponent<CitizenElement>(selectedEntity) && availablePanels.TryGetValue("Occupants", out GameObject panel))
+        if (EntityManager.HasComponent<Citizen>(selectedEntity) && availablePanels.TryGetValue("CitizenDetails", out GameObject panel))
+        {
+            applicablePanels.Add("CitizenDetails", panel);
+        }
+        if (EntityManager.HasComponent<CitizenElement>(selectedEntity) && availablePanels.TryGetValue("Occupants", out panel))
         {
             applicablePanels.Add("Occupants", panel);
         }
@@ -121,16 +134,6 @@ public class SelectionInfoWindowController : MonoBehaviour
 
                 currentPanel = panel;
             }
-
-            //if (!panel.activeSelf)
-            //{
-            //    panel.SetActive(true);
-            //    var filler = panel.GetComponent<PanelFillerBase>();
-            //    if (filler != null)
-            //    {
-            //        filler.Fill(selectedEntity);
-            //    }
-            //}
         }
     }
 

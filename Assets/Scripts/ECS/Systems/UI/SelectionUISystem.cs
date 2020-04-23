@@ -13,7 +13,7 @@ public class SelectionUISystem : SystemBase
 
     protected override void OnCreate()
     {
-        buildingInfoPrefab = Resources.Load<GameObject>("Prefabs/OtherPrefabs/UI/BuildingInfoPanel");
+        buildingInfoPrefab = Resources.Load<GameObject>("Prefabs/OtherPrefabs/UI/SelectionInfoPanel");
     }
 
     protected override void OnUpdate()
@@ -29,7 +29,7 @@ public class SelectionUISystem : SystemBase
 
         if (hit.Entity != Entity.Null)
         {
-            if (EntityManager.HasComponent<GridOccupation>(hit.Entity))
+            if (EntityManager.HasComponent<GridOccupation>(hit.Entity) || EntityManager.HasComponent<Citizen>(hit.Entity))
             {
                 if (currentOpenWindow != null)
                 {
@@ -46,10 +46,6 @@ public class SelectionUISystem : SystemBase
                 controller.Initialize(hit.Entity);
 
                 currentOpenWindow = infoPanel;
-            }
-            else
-            {
-
             }
         }
     }
