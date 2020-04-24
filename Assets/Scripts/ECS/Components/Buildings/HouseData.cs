@@ -7,4 +7,6 @@ public struct HouseData : IComponentData
 {
     public int MaxResidents;
     public int CurrentResidents;
+
+    public Entity FamilyEntity;
 }

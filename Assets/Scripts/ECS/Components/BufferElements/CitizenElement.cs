@@ -3,14 +3,14 @@
 [GenerateAuthoringComponent]
 public struct CitizenElement : IBufferElementData
 {
-    public Citizen Value;
+    public Entity Value;
 
-    public static implicit operator Citizen(CitizenElement e)
+    public static implicit operator Entity(CitizenElement e)
     {
         return e.Value;
     }
 
-    public static implicit operator CitizenElement(Citizen e)
+    public static implicit operator CitizenElement(Entity e)
     {
         return new CitizenElement { Value = e };
     }

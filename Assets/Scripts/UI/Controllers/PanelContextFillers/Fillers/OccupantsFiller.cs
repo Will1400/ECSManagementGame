@@ -42,13 +42,12 @@ public class OccupantsFiller : PanelFillerBase
                 itemObject.transform.localScale = Vector3.one;
             }
 
-            //_ = contentHolder.childCount;
             int i = 0;
             foreach (Transform item in contentHolder)
             {
                 if (i < buffer.Length)
                 {
-                    Citizen citizen = buffer[i].Value;
+                    Citizen citizen = EntityManager.GetComponentData<Citizen>(buffer[i].Value);
 
                     var itemController = item.GetComponent<OccupantItem>();
                     itemController.Initialize(citizen);
@@ -60,8 +59,6 @@ public class OccupantsFiller : PanelFillerBase
 
                 i++;
             }
-            //_ = contentHolder.childCount;
-
         }
     }
 }
