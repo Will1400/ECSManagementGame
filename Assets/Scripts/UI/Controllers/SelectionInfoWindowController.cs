@@ -40,7 +40,8 @@ public class SelectionInfoWindowController : MonoBehaviour
 
         windowDragger.Setup();
 
-        titleText.text = EntityManager.GetName(entity);
+        if (EntityManager.HasComponent<DisplayData>(entity))
+            titleText.text = EntityManager.GetComponentData<DisplayData>(entity).Name.ToString();
 
         if (EntityManager.HasComponent<WorkplaceWorkerData>(entity))
         {

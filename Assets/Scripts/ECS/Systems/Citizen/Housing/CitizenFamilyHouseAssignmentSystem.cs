@@ -46,7 +46,6 @@ public class CitizenFamilyHouseAssignmentSystem : SystemBase
 
         Entities.ForEach((Entity entity, DynamicBuffer<CitizenElement> citizenElements, ref HouseData houseData, ref Translation translation) =>
         {
-            //int familyIndex = 0;
             if (houseData.FamilyEntity == Entity.Null)
             {
                 for (int i = 0; i < familyDatas.Length; i++)
@@ -85,12 +84,11 @@ public class CitizenFamilyHouseAssignmentSystem : SystemBase
                     }
 
                     family.HasHome = true;
+                    familyDatas[i] = family;
                     CommandBuffer.SetComponent(familyEntites[i], family);
-
-                    //familyIndex++;
                 }
             }
-        }).WithoutBurst().Run();
+        }).Run();
 
         CommandBuffer.Playback(EntityManager);
         CommandBuffer.ShouldPlayback = false;

@@ -39,9 +39,13 @@ public class EntityPrefabManager : MonoBehaviour
         foreach (var item in gameObjectPrefabs)
         {
             var entity = GameObjectConversionUtility.ConvertGameObjectHierarchy(item, settings);
+
             EntityManager.AddComponent<Disabled>(entity);
+
+            EntityManager.AddComponent<DisplayData>(entity);
+            EntityManager.SetComponentData(entity, new DisplayData { Name = item.name });
+
             Prefabs.Add(item.name, entity);
-            EntityManager.SetName(entity, item.name);
         }
     }
 
