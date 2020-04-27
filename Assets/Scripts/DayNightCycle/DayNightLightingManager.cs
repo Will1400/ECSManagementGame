@@ -24,7 +24,7 @@ public class DayNightLightingManager : MonoBehaviour
 
         if (Application.isPlaying)
         {
-            timeOfDay += Time.deltaTime / 3;
+            timeOfDay += Time.deltaTime / 4;
             timeOfDay %= 24;
             UpdateLighting(timeOfDay / 24);
         }
