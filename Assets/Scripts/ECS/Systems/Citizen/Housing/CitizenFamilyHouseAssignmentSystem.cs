@@ -61,26 +61,15 @@ public class CitizenFamilyHouseAssignmentSystem : SystemBase
 
                     if (family.Husband != Entity.Null)
                     {
-                        CommandBuffer.AddComponent<CitizenHousingData>(family.Husband);
-                        CommandBuffer.SetComponent(family.Husband, new CitizenHousingData
-                        {
-                            HouseEntity = entity,
-                            HousePosition = translation.Value
-                        });
-                        citizenElements.Add(new CitizenElement { Value = family.Husband });
-                        houseData.CurrentResidents++;
+                        var houseAssignmentEntity = CommandBuffer.CreateEntity();
+                        CommandBuffer.AddComponent<AddCitizenToHouseData>(houseAssignmentEntity);
+                        CommandBuffer.SetComponent(houseAssignmentEntity, new AddCitizenToHouseData { CitizenEntity = family.Husband, HouseEntity = entity });
                     }
-
-                    if (familyDatas[i].Wife != Entity.Null)
+                    if (family.Wife != Entity.Null)
                     {
-                        CommandBuffer.AddComponent<CitizenHousingData>(family.Wife);
-                        CommandBuffer.SetComponent(family.Wife, new CitizenHousingData
-                        {
-                            HouseEntity = entity,
-                            HousePosition = translation.Value
-                        });
-                        citizenElements.Add(new CitizenElement { Value = family.Wife });
-                        houseData.CurrentResidents++;
+                        var houseAssignmentEntity = CommandBuffer.CreateEntity();
+                        CommandBuffer.AddComponent<AddCitizenToHouseData>(houseAssignmentEntity);
+                        CommandBuffer.SetComponent(houseAssignmentEntity, new AddCitizenToHouseData { CitizenEntity = family.Wife, HouseEntity = entity });
                     }
 
                     family.HasHome = true;
