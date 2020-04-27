@@ -4,7 +4,6 @@ using Unity.Entities;
 using Unity.Collections;
 using Unity.Burst;
 
-[UpdateAfter(typeof(CitizenFamilyCompletionSystem))]
 public class CitizenFamilyCreationSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
@@ -68,7 +67,10 @@ public class CitizenFamilyCreationSystem : SystemBase
                 CommandBuffer.SetComponent(entity, family);
 
                 CommandBuffer.AddComponent<CitizenFamily>(family.Husband);
+                CommandBuffer.SetComponent<CitizenFamily>(family.Husband, new CitizenFamily { FamilyEntity = entity });
+
                 CommandBuffer.AddComponent<CitizenFamily>(family.Wife);
+                CommandBuffer.SetComponent<CitizenFamily>(family.Wife, new CitizenFamily { FamilyEntity = entity });
             }
         }
 
