@@ -23,6 +23,7 @@ public class SelectionInfoWindowController : MonoBehaviour
     [SerializeField]
     private TabGroup tabGroup;
 
+    bool isPinned;
     GameObject currentPanel;
 
     private Dictionary<string, GameObject> applicablePanels = new Dictionary<string, GameObject>();
@@ -136,6 +137,22 @@ public class SelectionInfoWindowController : MonoBehaviour
                 currentPanel = panel;
             }
         }
+    }
+
+    public void TogglePin()
+    {
+        var windowSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<SelectionUISystem>();
+
+        isPinned = !isPinned;
+        if (isPinned)
+        {
+            windowSystem.PinWindow(gameObject);
+        }
+        else
+        {
+            windowSystem.UnpinWindow(gameObject);
+        }
+
     }
 
     public void CloseWindow()

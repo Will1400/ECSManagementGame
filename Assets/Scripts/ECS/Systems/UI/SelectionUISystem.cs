@@ -16,6 +16,20 @@ public class SelectionUISystem : SystemBase
         buildingInfoPrefab = Resources.Load<GameObject>("Prefabs/OtherPrefabs/UI/SelectionInfoPanel");
     }
 
+    public void PinWindow(GameObject window)
+    {
+        if (currentOpenWindow == window)
+            currentOpenWindow = null;
+    }
+
+    public void UnpinWindow(GameObject window)
+    {
+        if (currentOpenWindow != null)
+        {
+            window.GetComponent<SelectionInfoWindowController>().CloseWindow();
+        }
+    }
+
     protected override void OnUpdate()
     {
         if (windowHolder == null)
