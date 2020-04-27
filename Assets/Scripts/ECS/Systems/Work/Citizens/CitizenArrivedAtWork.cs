@@ -22,7 +22,6 @@ public class CitizenArrivedAtWork : SystemBase
         {
             if (EntityManager.HasComponent<WorkplaceWorkerData>(citizenWork.WorkplaceEntity))
             {
-                CommandBuffer.RemoveComponent<GoingToWorkTag>(entity);
                 CommandBuffer.AddComponent<IsWorkingTag>(entity);
 
                 var workerData = EntityManager.GetComponentData<WorkplaceWorkerData>(citizenWork.WorkplaceEntity);

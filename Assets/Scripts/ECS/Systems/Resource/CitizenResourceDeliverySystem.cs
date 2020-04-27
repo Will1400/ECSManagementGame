@@ -11,16 +11,9 @@ public class CitizenResourceDeliverySystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
 
-    EntityQuery citizensReadyForDeliveryQuery;
-
     protected override void OnCreate()
     {
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
-        citizensReadyForDeliveryQuery = GetEntityQuery(new EntityQueryDesc
-        {
-            All = new ComponentType[] { typeof(Citizen), typeof(HasArrivedAtDestinationTag), typeof(ResourceTransportJobData) }
-        });
     }
 
     protected override void OnUpdate()
@@ -53,7 +46,6 @@ public class CitizenResourceDeliverySystem : SystemBase
             }
 
             CommandBuffer.SetComponent(transportJobData.ResourceEntity, new Rotation { Value = quaternion.identity });
-
             
             CommandBuffer.RemoveComponent<ResourceTransportJobData>(citizen);
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(citizen);

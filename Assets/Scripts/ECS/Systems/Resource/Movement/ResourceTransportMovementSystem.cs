@@ -53,8 +53,6 @@ public class ResourceTransportMovementSystem : SystemBase
 
             for (int i = 0; i < chunk.Count; i++)
             {
-
-
                 var resourceEntity = transportJobDatas[i].ResourceEntity;
 
                 float3 forward = math.forward(rotations[i].Value);

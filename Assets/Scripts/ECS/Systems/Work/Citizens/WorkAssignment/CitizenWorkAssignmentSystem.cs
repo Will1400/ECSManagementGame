@@ -53,7 +53,6 @@ public class CitizenWorkAssignmentSystem : SystemBase
                 {
                     if (currentWorkers < workerData.MaxWorkers)
                     {
-                        CommandBuffer.AddComponent<GoingToWorkTag>(idleCitizens[i]);
                         CommandBuffer.AddComponent<CitizenWork>(idleCitizens[i]);
                         CommandBuffer.AddComponent<NavAgentRequestingPath>(idleCitizens[i]);
 

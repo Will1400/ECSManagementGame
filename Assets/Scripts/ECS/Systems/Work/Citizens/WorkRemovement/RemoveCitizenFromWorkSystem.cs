@@ -32,9 +32,6 @@ public class RemoveCitizenFromWorkSystem : SystemBase
             CommandBuffer.RemoveComponent<RemoveFromWorkTag>(entity);
             CommandBuffer.RemoveComponent<CitizenWork>(entity);
 
-            if (EntityManager.HasComponent<GoingToWorkTag>(entity))
-                CommandBuffer.RemoveComponent<GoingToWorkTag>(entity);
-
             CommandBuffer.AddComponent<IdleTag>(entity);
         }).WithoutBurst().Run();
     }
