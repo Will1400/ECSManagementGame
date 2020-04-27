@@ -21,7 +21,7 @@ public class CitizenPregnancyFinishedSystem : SystemBase
         {
             if (pregnancyData.TimeRemaining <= 0)
             {
-                var child = EntityPrefabManager.Instance.SpawnCitizenPrefabWithCommandBuffer(CommandBuffer);
+                var child = EntityPrefabManager.Instance.SpawnCitizenPrefab(CommandBuffer);
 
                 CommandBuffer.SetComponent(child, translation);
 

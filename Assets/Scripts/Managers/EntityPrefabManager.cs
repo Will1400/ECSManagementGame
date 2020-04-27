@@ -61,6 +61,18 @@ public class EntityPrefabManager : MonoBehaviour
         return Entity.Null;
     }
 
+    public Entity SpawnEntityPrefab(EntityCommandBuffer commandBuffer, string name)
+    {
+        if (Prefabs.TryGetValue(name, out Entity prefab))
+        {
+            Entity entity = commandBuffer.Instantiate(prefab);
+            commandBuffer.RemoveComponent<Disabled>(entity);
+            return entity;
+        }
+
+        return Entity.Null;
+    }
+
     public Entity GetEntityPrefab(string name)
     {
         if (Prefabs.TryGetValue(name, out Entity prefab))
@@ -71,15 +83,15 @@ public class EntityPrefabManager : MonoBehaviour
         return Entity.Null;
     }
 
-    public Entity SpawnCitizenPrefabWithCommandBuffer(EntityCommandBuffer CommandBuffer)
+    public Entity SpawnCitizenPrefab(EntityCommandBuffer commandBuffer)
     {
         if (Prefabs.TryGetValue("Citizen", out Entity prefab))
         {
-            Entity entity = CommandBuffer.Instantiate(prefab);
-            CommandBuffer.RemoveComponent<Disabled>(entity);
+            Entity entity = commandBuffer.Instantiate(prefab);
+            commandBuffer.RemoveComponent<Disabled>(entity);
 
             var gender = (Gender)Random.Range(1, 3);
-            CommandBuffer.SetComponent(entity, new Citizen
+            commandBuffer.SetComponent(entity, new Citizen
             {
                 CitizenPersonalData = new CitizenPersonalInfo
                 {

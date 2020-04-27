@@ -30,7 +30,7 @@ public class ConstructionFinishedSystem : SystemBase
                 });
             }
 
-            Entity finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(construction.finishedPrefabName.ToString());
+            Entity finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(CommandBuffer, construction.finishedPrefabName.ToString());
 
             if (finishedEntity == Entity.Null)
             {
@@ -55,6 +55,6 @@ public class ConstructionFinishedSystem : SystemBase
             workerData.ActiveWorkers = -1;
             CommandBuffer.RemoveComponent<ConstructionData>(entity);
             CommandBuffer.AddComponent<RemoveWorkplaceTag>(entity);
-        }).WithoutBurst().WithStructuralChanges().Run();
+        }).WithoutBurst().Run();
     }
 }
