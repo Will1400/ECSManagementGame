@@ -71,6 +71,28 @@ public class EntityPrefabManager : MonoBehaviour
         return Entity.Null;
     }
 
+    public Entity SpawnCitizenPrefabWithCommandBuffer(EntityCommandBuffer CommandBuffer)
+    {
+        if (Prefabs.TryGetValue("Citizen", out Entity prefab))
+        {
+            Entity entity = CommandBuffer.Instantiate(prefab);
+            CommandBuffer.RemoveComponent<Disabled>(entity);
+
+            var gender = (Gender)Random.Range(1, 3);
+            CommandBuffer.SetComponent(entity, new Citizen
+            {
+                CitizenPersonalData = new CitizenPersonalInfo
+                {
+                    Name = NameHelper.GetName(gender),
+                    Age = Random.Range(10, 40),
+                    Gender = gender
+                }
+            });
+            return entity;
+        }
+        return Entity.Null;
+    }
+
     public Entity SpawnCitizenPrefab()
     {
         if (Prefabs.TryGetValue("Citizen", out Entity prefab))
@@ -90,7 +112,6 @@ public class EntityPrefabManager : MonoBehaviour
             });
             return entity;
         }
-
         return Entity.Null;
     }
 

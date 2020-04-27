@@ -22,6 +22,9 @@ public class AddCitizenToHouseSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        if (addCitizenTohouseQuery.CalculateEntityCount() == 0)
+            return;
+
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
 
         var entities = addCitizenTohouseQuery.ToEntityArray(Allocator.TempJob);

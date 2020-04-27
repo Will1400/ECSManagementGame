@@ -17,23 +17,21 @@ public class CitizenPregnancyFinishedSystem : SystemBase
     {
         var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
-
         Entities.ForEach((Entity entity, ref CitizenPregnancyData pregnancyData, ref Translation translation, ref CitizenFamily citizenFamily) =>
         {
             if (pregnancyData.TimeRemaining <= 0)
             {
-                var child = EntityPrefabManager.Instance.SpawnCitizenPrefab();
+                var child = EntityPrefabManager.Instance.SpawnCitizenPrefabWithCommandBuffer(CommandBuffer);
 
-                EntityManager.SetComponentData(child, translation);
-
-                var familyData = EntityManager.GetComponentData<FamilyData>(citizenFamily.FamilyEntity);
+                CommandBuffer.SetComponent(child, translation);
 
                 // Add to family
-                EntityManager.AddComponent<CitizenFamily>(child);
-                EntityManager.SetComponentData(child, new CitizenFamily { FamilyEntity = citizenFamily.FamilyEntity });
+                CommandBuffer.AddComponent<CitizenFamily>(child);
+                CommandBuffer.SetComponent(child, new CitizenFamily { FamilyEntity = citizenFamily.FamilyEntity });
 
+                var familyData = EntityManager.GetComponentData<FamilyData>(citizenFamily.FamilyEntity);
                 familyData.ChildCount++;
-                EntityManager.SetComponentData(citizenFamily.FamilyEntity, familyData);
+                CommandBuffer.SetComponent(citizenFamily.FamilyEntity, familyData);
 
                 // Add to house
                 var houseAssignmentEntity = CommandBuffer.CreateEntity();
@@ -42,8 +40,7 @@ public class CitizenPregnancyFinishedSystem : SystemBase
 
                 CommandBuffer.RemoveComponent<CitizenPregnancyData>(entity);
             }
-        }).WithStructuralChanges().WithoutBurst().Run();
-
+        }).WithoutBurst().Run();
 
         CommandBuffer.Playback(EntityManager);
         CommandBuffer.Dispose();
