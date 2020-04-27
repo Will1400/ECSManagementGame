@@ -21,7 +21,7 @@ public class CitySpawner : MonoBehaviour
         if (entityPrefab == Entity.Null)
             return;
 
-        EntityManager.AddComponentData(entityPrefab, new ConstructionData { totalConstructionTime = 4, remainingConstructionTime = 4, finishedPrefabName = PrefabName });
+        EntityManager.AddComponentData(entityPrefab, new ConstructionData { TotalConstructionTime = 4, RemainingConstructionTime = 4, FinishedPrefabName = PrefabName });
 
         NativeArray<Entity> constructionSites = EntityManager.Instantiate(entityPrefab, count, Allocator.Temp);
         int columnCount = (int)math.round(math.sqrt(count));

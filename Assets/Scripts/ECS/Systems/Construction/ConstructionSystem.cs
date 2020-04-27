@@ -27,10 +27,10 @@ public class ConstructionSystem : SystemBase
             {
                 if (workerData.ActiveWorkers >= 0)
                 {
-                    construction.remainingConstructionTime -= deltaTime * (workerData.ActiveWorkers / .5f);
+                    construction.RemainingConstructionTime -= deltaTime * (workerData.ActiveWorkers / .5f);
                 }
 
-                if (construction.remainingConstructionTime <= 0)
+                if (construction.RemainingConstructionTime <= 0)
                 {
                     CommandBuffer.AddComponent<ConstructionFinishedTag>(entityInQueryIndex, entity);
                     workerData.IsWorkable = false;

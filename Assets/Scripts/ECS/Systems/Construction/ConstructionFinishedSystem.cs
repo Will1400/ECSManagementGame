@@ -30,7 +30,8 @@ public class ConstructionFinishedSystem : SystemBase
                 });
             }
 
-            Entity finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(CommandBuffer, construction.finishedPrefabName.ToString());
+            Entity finishedEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(CommandBuffer, construction.FinishedPrefabName.ToString());
+            Entity prefabEntity = EntityPrefabManager.Instance.GetEntityPrefab(construction.FinishedPrefabName.ToString());
 
             if (finishedEntity == Entity.Null)
             {
@@ -38,16 +39,16 @@ public class ConstructionFinishedSystem : SystemBase
                 return;
             }
 
-            translation.Value.y = EntityManager.GetComponentData<Translation>(finishedEntity).Value.y;
+            translation.Value.y = EntityManager.GetComponentData<Translation>(prefabEntity).Value.y;
+            CommandBuffer.SetComponent(finishedEntity, new Translation { Value = translation.Value });
 
-            if (EntityManager.HasComponent<WorkplaceWorkerData>(finishedEntity))
+            if (EntityManager.HasComponent<WorkplaceWorkerData>(prefabEntity))
             {
-                WorkplaceWorkerData newWorkerData = EntityManager.GetComponentData<WorkplaceWorkerData>(finishedEntity);
+                WorkplaceWorkerData newWorkerData = EntityManager.GetComponentData<WorkplaceWorkerData>(prefabEntity);
                 newWorkerData.WorkPosition = workerData.WorkPosition;
                 CommandBuffer.SetComponent(finishedEntity, newWorkerData);
             }
 
-            CommandBuffer.SetComponent(finishedEntity, new Translation { Value = translation.Value });
 
             var occupation = EntityManager.GetComponentData<GridOccupation>(entity);
             CommandBuffer.SetComponent(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });

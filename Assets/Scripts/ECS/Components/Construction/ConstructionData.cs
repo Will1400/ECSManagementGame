@@ -6,7 +6,7 @@ using Unity.Collections;
 [GenerateAuthoringComponent]
 public struct ConstructionData : IComponentData
 {
-    public float totalConstructionTime;
-    public float remainingConstructionTime;
-    public NativeString128 finishedPrefabName;
+    public float TotalConstructionTime;
+    public float RemainingConstructionTime;
+    public NativeString128 FinishedPrefabName;
 }
