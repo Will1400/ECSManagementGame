@@ -67,10 +67,10 @@ public class CitizenFamilyCreationSystem : SystemBase
                 CommandBuffer.SetComponent(entity, family);
 
                 CommandBuffer.AddComponent<CitizenFamily>(family.Husband);
-                CommandBuffer.SetComponent<CitizenFamily>(family.Husband, new CitizenFamily { FamilyEntity = entity });
+                CommandBuffer.SetComponent(family.Husband, new CitizenFamily { FamilyEntity = entity });
 
                 CommandBuffer.AddComponent<CitizenFamily>(family.Wife);
-                CommandBuffer.SetComponent<CitizenFamily>(family.Wife, new CitizenFamily { FamilyEntity = entity });
+                CommandBuffer.SetComponent(family.Wife, new CitizenFamily { FamilyEntity = entity });
             }
         }
 

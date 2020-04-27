@@ -22,6 +22,11 @@ public class CameraMovement : MonoBehaviour
 
         if (!EventSystem.current.IsPointerOverGameObject())
             Zoom();
+
+        transform.position = new Vector3(
+            math.clamp(transform.position.x, 0, GridCacheSystem.Instance.GridSize.x), 
+            transform.position.y,
+            math.clamp(transform.position.z, -(transform.position.y / 2), GridCacheSystem.Instance.GridSize.y));
     }
 
     void Move()
@@ -32,6 +37,7 @@ public class CameraMovement : MonoBehaviour
             return;
 
         transform.Translate(math.normalize(input) * transform.position.y * Time.deltaTime, Space.World);
+
     }
 
     void Zoom()

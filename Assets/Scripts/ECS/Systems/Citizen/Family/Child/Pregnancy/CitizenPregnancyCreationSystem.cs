@@ -21,7 +21,7 @@ public class CitizenPregnancyCreationSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (Random.Range(0, 20) != 0)
+        if (Random.Range(0, 100) != 0)
             return;
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
@@ -36,7 +36,7 @@ public class CitizenPregnancyCreationSystem : SystemBase
                 if (familyEntites.Contains(citizenFamily.FamilyEntity))
                 {
                     var familyIndex = familyEntites.IndexOf<Entity>(citizenFamily.FamilyEntity);
-                    if (familyDatas[familyIndex].HasHome)
+                    if (familyDatas[familyIndex].HasHome && Random.Range(0, 10 * familyDatas[familyIndex].ChildCount) == 0)
                     {
                         CommandBuffer.AddComponent<CitizenPregnancyData>(entity);
                         CommandBuffer.SetComponent(entity, new CitizenPregnancyData
