@@ -6,6 +6,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Burst;
 
+[UpdateInGroup(typeof(MovementGroup))]
 public class ResourceTransportMovementSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

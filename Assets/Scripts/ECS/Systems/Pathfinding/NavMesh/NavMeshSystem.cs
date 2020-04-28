@@ -68,8 +68,11 @@ public class NavMeshSystem : SystemBase
         {
             if (obstacleData.Size.Equals(float3.zero))
             {
-                Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
-                obstacleData.Size = mesh.bounds.size;
+                if (EntityManager.HasComponent<RenderMesh>(entity))
+                {
+                    Mesh mesh = EntityManager.GetSharedComponentData<RenderMesh>(entity).mesh;
+                    obstacleData.Size = mesh.bounds.size;
+                }
             }
 
             commandBuffer.AddComponent<NavMeshSourceHasSizeTag>(entity);

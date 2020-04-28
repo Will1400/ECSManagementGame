@@ -66,7 +66,6 @@ public class RemoveExcessWorkersSystem : SystemBase
                 }
             }
         }).Schedule(Dependency).Complete();
-        //}).Run();
 
         buffer.Playback(EntityManager);
         buffer.ShouldPlayback = false;
