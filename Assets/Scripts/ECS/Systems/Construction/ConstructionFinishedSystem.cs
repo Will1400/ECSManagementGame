@@ -49,7 +49,6 @@ public class ConstructionFinishedSystem : SystemBase
                 CommandBuffer.SetComponent(finishedEntity, newWorkerData);
             }
 
-
             var occupation = EntityManager.GetComponentData<GridOccupation>(entity);
             CommandBuffer.SetComponent(finishedEntity, new GridOccupation { Start = occupation.Start, End = occupation.End });
 

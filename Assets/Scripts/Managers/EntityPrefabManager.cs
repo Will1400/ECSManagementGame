@@ -127,11 +127,17 @@ public class EntityPrefabManager : MonoBehaviour
         return Entity.Null;
     }
 
-    public Entity SpawnConstructionEntityPrefab(string name)
+    public Entity SpawnConstructionEntityPrefab(string finishedPrefabName)
     {
-        if (Prefabs.TryGetValue(name, out Entity prefab))
+        if (Prefabs.TryGetValue(finishedPrefabName, out Entity prefab))
         {
-            Entity entity = EntityManager.CreateEntity(ArcheTypeManager.Instance.GetArcheType(PredifinedArchetype.ConstructionSite));
+            Entity entity = EntityManager.CreateEntity(
+                typeof(ConstructionData),
+                typeof(WorkplaceWorkerData),
+                typeof(Translation),
+                typeof(ResourceStorageData),
+                typeof(ResourceDataElement),
+                typeof(GridOccupation));
 
             if (EntityManager.HasComponent<HasNoResourceCost>(prefab))
             {
