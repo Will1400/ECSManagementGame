@@ -39,6 +39,19 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
         if (resourcesInStorageQuery.CalculateChunkCount() == 0 || StorageAreasQuery.CalculateChunkCount() == 0 || resourceStoragesToEmptyQuery.CalculateChunkCount() == 0)
             return;
 
+        bool isResourceStorageEmpty = true;
+        Entities.WithAll<EmptyResourceStorageTag>().ForEach((Entity entity, ref ResourceStorageData resourceStorage) =>
+        {
+            if (resourceStorage.UsedCapacity > 0)
+            {
+                isResourceStorageEmpty = false;
+                return;
+            }
+        }).Run();
+
+        if (isResourceStorageEmpty)
+            return;
+
         NativeArray<Entity> resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<ResourceInStorageData> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
         NativeArray<Entity> storageAreas = StorageAreasQuery.ToEntityArray(Allocator.TempJob);
