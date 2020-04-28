@@ -43,6 +43,8 @@ public class SelectionInfoWindowController : MonoBehaviour
 
         if (EntityManager.HasComponent<DisplayData>(entity))
             titleText.text = EntityManager.GetComponentData<DisplayData>(entity).Name.ToString();
+        else
+            titleText.text = "";
 
         if (EntityManager.HasComponent<WorkplaceWorkerData>(entity))
         {
