@@ -50,38 +50,28 @@ public class ResourceProductionSystem : SystemBase
 
             var position = EntityManager.GetComponentData<Translation>(resourceEntity).Value;
 
-            if (EntityManager.HasComponent<GridOccupation>(creationInfo.CreatedBy))
+            if (EntityManager.HasComponent<GridOccupation>(creationInfo.StorageEntity))
             {
-                var occupation = EntityManager.GetComponentData<GridOccupation>(creationInfo.CreatedBy);
+                var occupation = EntityManager.GetComponentData<GridOccupation>(creationInfo.StorageEntity);
 
                 position.x = occupation.Start.x + ((occupation.End.x - occupation.Start.x) / 2);
                 position.z = occupation.Start.y - 1;
             }
             else
             {
-                position.xz = EntityManager.GetComponentData<Translation>(creationInfo.CreatedBy).Value.xz;
+                position.xz = EntityManager.GetComponentData<Translation>(creationInfo.StorageEntity).Value.xz;
             }
 
             EntityManager.SetComponentData(resourceEntity, new Translation { Value = position });
 
-            // Set storage capacity
-            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(creationInfo.CreatedBy);
-            resourceStorage.UsedCapacity++;
-            EntityManager.SetComponentData(creationInfo.CreatedBy, resourceStorage);
+           
 
             // Add to storage
+            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(creationInfo.StorageEntity);
+            resourceStorage.UsedCapacity++;
+            EntityManager.SetComponentData(creationInfo.StorageEntity, resourceStorage);
 
-            var resourceBuffer = EntityManager.GetBuffer<ResourceDataElement>(creationInfo.CreatedBy);
-            resourceBuffer.Add(new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount });
-
-            EntityManager.AddComponent<ResourceInStorageData>(resourceEntity);
-            EntityManager.SetComponentData(resourceEntity, new ResourceInStorageData
-            {
-                StorageEntity = creationInfo.CreatedBy,
-                ResourceData = new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount },
-                StorageAreaStartPosition = position,
-                StorageAreaEndPosition = position + new float3(1, 1, 1),
-            });
+         
         }
     }
 
@@ -135,7 +125,7 @@ public class ResourceProductionSystem : SystemBase
                         ResourceType = productionData.ResourceType,
                         Amount = productionData.AmountPerProduction,
                         Position = float3.zero,
-                        CreatedBy = entities[i]
+                        StorageEntity = entities[i]
                     });
 
                     productionData.ProductionTimeRemaining = productionData.ProductionTime;
@@ -150,6 +140,6 @@ public class ResourceProductionSystem : SystemBase
         public float3 Position;
         public ResourceType ResourceType;
         public int Amount;
-        public Entity CreatedBy;
+        public Entity StorageEntity;
     }
 }

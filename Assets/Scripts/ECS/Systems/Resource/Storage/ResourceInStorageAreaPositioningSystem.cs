@@ -6,7 +6,7 @@ using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Burst;
 
-[UpdateInGroup(typeof(MovementGroup))]
+[UpdateInGroup(typeof(VisualGroup))]
 public class ResourceInStorageAreaPositioningSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

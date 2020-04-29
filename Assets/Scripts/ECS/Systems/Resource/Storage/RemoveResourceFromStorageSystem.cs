@@ -26,5 +26,8 @@ public class RemoveResourceFromStorageSystem : SystemBase
 
             CommandBuffer.DestroyEntity(entity);
         }).WithoutBurst().Run();
+
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.ShouldPlayback = false;
     }
 }

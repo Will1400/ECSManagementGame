@@ -39,7 +39,7 @@ public class DestroyResourceInStorageSystem : SystemBase
             for (int i = 0; i < resourcesInStorage.Length; i++)
             {
                 ResourceInStorageData resource = resourcesInStorage[i];
-                if (resourcesInStorage[i].StorageEntity.Index == resourceToDestroyData.StorageId)
+                if (resourcesInStorage[i].StorageEntity == resourceToDestroyData.StorageEntity)
                 {
                     CommandBuffer.DestroyEntity(entityInQueryIndex, resourcesInStorageEntities[i]);
                 }

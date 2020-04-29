@@ -30,7 +30,6 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 
     protected override void OnUpdate()
     {
-
         if (resourcesInStorageQuery.CalculateChunkCount() == 0 || resourceRequestsQuery.CalculateEntityCount() == 0)
             return;
 
@@ -63,12 +62,14 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
                 if (resourceRequest.Amount <= 0)
                     break;
 
+                // Check if resource matches the requested type
                 if (resourcesInStorageAreas[i].ResourceData.ResourceType == resourceRequest.ResourceType && resourceEntities[i] != Entity.Null)
                 {
                     var resource = resourcesInStorageAreas[i];
 
                     if (resource.ResourceData.Amount <= resourceRequest.Amount)
                     {
+                        // Found resource to use for request
                         transportJob.ResourceEntity = resourceEntities[i];
 
                         var jobEntity = CommandBuffer.CreateEntity();
@@ -87,6 +88,7 @@ public class ResourceRequestTransportJobCreationSystem : SystemBase
 
             if (resourceRequest.Amount <= 0)
             {
+                // Request fulfilled
                 CommandBuffer.DestroyEntity(entity);
             }
 

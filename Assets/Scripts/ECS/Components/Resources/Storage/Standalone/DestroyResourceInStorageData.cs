@@ -2,6 +2,6 @@
 
 public struct DestroyResourceInStorageData : IComponentData
 {
-    public int StorageId;
+    public Entity StorageEntity;
     public ResourceData ResourceData;
 }

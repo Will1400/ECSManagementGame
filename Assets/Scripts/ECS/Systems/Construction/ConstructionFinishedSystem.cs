@@ -26,7 +26,7 @@ public class ConstructionFinishedSystem : SystemBase
                 CommandBuffer.SetComponent(destroyEntity, new DestroyResourceInStorageData
                 {
                     ResourceData = resource,
-                    StorageId = entity.Index
+                    StorageEntity = entity
                 });
             }
 
