@@ -36,7 +36,7 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
         if (idleCitizensQuery.CalculateEntityCount() == 0 || transportJobsQuery.CalculateEntityCount() == 0)
             return;
 
-        NativeArray<Entity> idleCitizens = idleCitizensQuery.ToEntityArray(Allocator.Persistent);
+        NativeArray<Entity> idleCitizens = idleCitizensQuery.ToEntityArray(Allocator.TempJob);
         EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
 
         int citizenIndex = 0;
