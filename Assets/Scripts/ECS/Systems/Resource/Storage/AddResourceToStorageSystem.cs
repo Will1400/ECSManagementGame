@@ -2,8 +2,8 @@
 using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
+using Unity.Mathematics;
 
-[UpdateBefore(typeof(RemoveResourceFromStorageSystem))]
 public class AddResourceToStorageSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
@@ -22,10 +22,16 @@ public class AddResourceToStorageSystem : SystemBase
             ResourceData resourceData = EntityManager.GetComponentData<ResourceData>(addResourceToStorage.ResourceEntity);
             var position = EntityManager.GetComponentData<Translation>(addResourceToStorage.StorageEntity).Value;
 
-            // Add to storage
+            // Set storage capacity
+            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(addResourceToStorage.StorageEntity);
+            resourceStorage.UsedCapacity++;
+            CommandBuffer.SetComponent(addResourceToStorage.StorageEntity, resourceStorage);
 
+            // Add to storage
             var resourceBuffer = EntityManager.GetBuffer<ResourceDataElement>(addResourceToStorage.StorageEntity);
+            Debug.Log("Buffer length before adding: " + resourceBuffer.Length);
             resourceBuffer.Add(new ResourceDataElement { Value = resourceData });
+            Debug.Log("Buffer length after adding: " + resourceBuffer.Length);
 
             CommandBuffer.AddComponent<ResourceInStorageData>(addResourceToStorage.ResourceEntity);
             CommandBuffer.SetComponent(addResourceToStorage.ResourceEntity, new ResourceInStorageData
@@ -33,13 +39,8 @@ public class AddResourceToStorageSystem : SystemBase
                 StorageEntity = addResourceToStorage.StorageEntity,
                 ResourceData = resourceData,
                 StorageAreaStartPosition = position,
-                StorageAreaEndPosition = position,
+                StorageAreaEndPosition = position + new float3(1, 1, 1),
             });
-
-            // Set storage capacity
-            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(addResourceToStorage.StorageEntity);
-            resourceStorage.UsedCapacity++;
-            CommandBuffer.SetComponent(addResourceToStorage.StorageEntity, resourceStorage);
 
             CommandBuffer.DestroyEntity(entity);
         }).WithoutBurst().Run();

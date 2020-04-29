@@ -64,14 +64,11 @@ public class ResourceProductionSystem : SystemBase
 
             EntityManager.SetComponentData(resourceEntity, new Translation { Value = position });
 
-           
 
-            // Add to storage
-            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(creationInfo.StorageEntity);
-            resourceStorage.UsedCapacity++;
-            EntityManager.SetComponentData(creationInfo.StorageEntity, resourceStorage);
 
-         
+            var entity =EntityManager.CreateEntity();
+            EntityManager.AddComponent<AddResourceToStorageData>(entity);
+            EntityManager.SetComponentData(entity, new AddResourceToStorageData { ResourceEntity = resourceEntity, StorageEntity = creationInfo.StorageEntity });
         }
     }
 
