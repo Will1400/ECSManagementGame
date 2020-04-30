@@ -16,6 +16,8 @@ public class DayNightLightingManager : MonoBehaviour
 
     [SerializeField, Range(0, 24)]
     private float timeOfDay;
+    [SerializeField]
+    private float timeSpeedMultiplier = .1f;
 
     private void Update()
     {
@@ -24,7 +26,7 @@ public class DayNightLightingManager : MonoBehaviour
 
         if (Application.isPlaying)
         {
-            timeOfDay += Time.deltaTime / 4;
+            timeOfDay += Time.deltaTime / 10 * timeSpeedMultiplier;
             timeOfDay %= 24;
             UpdateLighting(timeOfDay / 24);
         }

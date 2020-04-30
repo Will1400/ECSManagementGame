@@ -13,6 +13,10 @@ GameObject:
   - component: {fileID: 5895433128048104878}
   - component: {fileID: 6352307192343700617}
   - component: {fileID: 7124093080015578320}
+  - component: {fileID: -8252949149245495542}
+  - component: {fileID: 8901141735681777739}
+  - component: {fileID: 8721637366092209461}
+  - component: {fileID: 9060722155670074420}
   m_Layer: 0
   m_Name: Bush_3
   m_TagString: Untagged
@@ -28,7 +32,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5872709029723509694}
   m_LocalRotation: {x: 0.000000021855694, y: 0, z: -0, w: 1}
-  m_LocalPosition: {x: 49.80016, y: 0.5, z: 36.56212}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -111,6 +115,75 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Area: 1
   Size:
+    x: 0
+    y: 0
+    z: 0
+--- !u!114 &-8252949149245495542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5872709029723509694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3050cd223fb9f0b4c8757a3b79f0d4d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FoodType: 0
+  AmountPerProduction: 1
+  ProductionTime: 10
+  ProductionTimeRemaining: 1
+  SpawnPointOffset:
+    x: 0.022
+    y: 1.88
+    z: -0.28
+--- !u!114 &8901141735681777739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5872709029723509694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6c50805896c4f64a8b19c59e96e67cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Values: []
+--- !u!114 &8721637366092209461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5872709029723509694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 954c5e4dcdca9d64c8e2fe85a3f7d66b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Start:
+    x: 0
+    y: 0
+  End:
+    x: 0
+    y: 0
+--- !u!114 &9060722155670074420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5872709029723509694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4bb1162f102c3b4fa01ddc2988ee56d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxCapacity: 8
+  UsedCapacity: 0
+  StoragePosition:
     x: 0
     y: 0
     z: 0
