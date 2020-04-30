@@ -23,7 +23,7 @@ public class CitizenResourceDeliverySystem : SystemBase
         {
             if (EntityManager.Exists(transportJobData.DestinationEntity))
             {
-                if (!EntityManager.HasComponent<ResourceStorageAreaTag>(transportJobData.DestinationEntity))
+                if (EntityManager.HasComponent<ResourceDataElement>(transportJobData.DestinationEntity))
                 {
                     var resourceBuffer = EntityManager.GetBuffer<ResourceDataElement>(transportJobData.DestinationEntity);
                     resourceBuffer.Add(EntityManager.GetComponentData<ResourceData>(transportJobData.ResourceEntity));

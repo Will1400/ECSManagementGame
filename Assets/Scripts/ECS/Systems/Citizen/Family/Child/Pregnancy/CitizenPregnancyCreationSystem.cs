@@ -33,18 +33,21 @@ public class CitizenPregnancyCreationSystem : SystemBase
         {
             if (citizen.CitizenPersonalData.Gender == Gender.Female)
             {
-                if (familyEntites.Contains(citizenFamily.FamilyEntity))
+                for (int i = 0; i < familyEntites.Length; i++)
                 {
-                    var familyIndex = familyEntites.IndexOf<Entity>(citizenFamily.FamilyEntity);
-                    if (familyDatas[familyIndex].HasHome && Random.Range(0, 10 * familyDatas[familyIndex].ChildCount) == 0)
+                    if (familyEntites[i] == citizenFamily.FamilyEntity)
                     {
-                        CommandBuffer.AddComponent<CitizenPregnancyData>(entity);
-                        CommandBuffer.SetComponent(entity, new CitizenPregnancyData
+                        if (familyDatas[i].HasHome && Random.Range(0, 10 * familyDatas[i].ChildCount) == 0)
                         {
-                            TimeRemaining = 60,
-                            Mother = entity,
-                            Father = familyDatas[familyIndex].Husband
-                        });
+                            CommandBuffer.AddComponent<CitizenPregnancyData>(entity);
+                            CommandBuffer.SetComponent(entity, new CitizenPregnancyData
+                            {
+                                TimeRemaining = 60,
+                                Mother = entity,
+                                Father = familyDatas[i].Husband
+                            });
+                        }
+                        break;
                     }
                 }
             }

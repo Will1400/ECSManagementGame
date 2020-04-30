@@ -5,7 +5,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-public class CitizenFoodDepletionSystem : SystemBase
+public class FoodDepletionSystem : SystemBase
 {
     protected override void OnUpdate()
     {
@@ -13,7 +13,7 @@ public class CitizenFoodDepletionSystem : SystemBase
 
         Entities.ForEach((Entity entity, ref CitizenFoodData foodData) =>
         {
-            foodData.CurrentFoodLevel -= deltatime / 4 * foodData.DepletionMultiplier;
+            foodData.CurrentFoodLevel -= deltatime / 10 * foodData.DepletionMultiplier;
         }).Schedule();
     }
 }

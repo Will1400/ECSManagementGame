@@ -29,9 +29,7 @@ public class AddResourceToStorageSystem : SystemBase
 
             // Add to storage
             var resourceBuffer = EntityManager.GetBuffer<ResourceDataElement>(addResourceToStorage.StorageEntity);
-            Debug.Log("Buffer length before adding: " + resourceBuffer.Length);
             resourceBuffer.Add(new ResourceDataElement { Value = resourceData });
-            Debug.Log("Buffer length after adding: " + resourceBuffer.Length);
 
             CommandBuffer.AddComponent<ResourceInStorageData>(addResourceToStorage.ResourceEntity);
             CommandBuffer.SetComponent(addResourceToStorage.ResourceEntity, new ResourceInStorageData

@@ -1,17 +1,17 @@
-﻿using Unity.Burst;
-using Unity.Collections;
+﻿using UnityEngine;
+using System.Collections;
 using Unity.Entities;
-using Unity.Jobs;
+using Unity.Collections;
 using Unity.Mathematics;
 using Unity.Transforms;
 
 [UpdateInGroup(typeof(ProductionGroup))]
-public class ResourceProductionSystem : SystemBase
+public class FoodProductionSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery producingEntititesQuery;
 
-    NativeQueue<ResourceCreationInfo> resourcesToCreate;
+    NativeQueue<CreationInfo> resourcesToCreate;
 
     protected override void OnCreate()
     {
@@ -19,10 +19,10 @@ public class ResourceProductionSystem : SystemBase
 
         producingEntititesQuery = GetEntityQuery(new EntityQueryDesc()
         {
-            All = new ComponentType[] { typeof(ResourceProductionData), typeof(WorkplaceWorkerData) }
+            All = new ComponentType[] { typeof(FoodProductionData) }
         });
 
-        resourcesToCreate = new NativeQueue<ResourceCreationInfo>(Allocator.Persistent);
+        resourcesToCreate = new NativeQueue<CreationInfo>(Allocator.Persistent);
     }
 
     protected override void OnUpdate()
@@ -35,23 +35,20 @@ public class ResourceProductionSystem : SystemBase
             DeltaTime = Time.DeltaTime,
             ResourcesToCreate = resourcesToCreate.AsParallelWriter(),
             EntityType = GetArchetypeChunkEntityType(),
-            ResourceProductionDataType = GetArchetypeChunkComponentType<ResourceProductionData>(),
+            FoodProductionDataType = GetArchetypeChunkComponentType<FoodProductionData>(),
             WorkplaceWorkerDataType = GetArchetypeChunkComponentType<WorkplaceWorkerData>(true),
             ResourceStorageType = GetArchetypeChunkComponentType<ResourceStorageData>(true),
         }.Schedule(producingEntititesQuery);
 
         job.Complete();
 
-        while (resourcesToCreate.TryDequeue(out ResourceCreationInfo creationInfo))
+        while (resourcesToCreate.TryDequeue(out CreationInfo creationInfo))
         {
-            Entity resourceEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(creationInfo.ResourceType.ToString());
+            Entity foodEntity = EntityPrefabManager.Instance.SpawnEntityPrefab(creationInfo.ResourceType.ToString());
 
-            EntityManager.SetComponentData(resourceEntity, new ResourceData { ResourceType = creationInfo.ResourceType, Amount = creationInfo.Amount });
+            EntityManager.SetComponentData(foodEntity, new ResourceData { ResourceType = ResourceType.Food, Amount = creationInfo.Amount });
 
-            var position = EntityManager.GetComponentData<Translation>(resourceEntity).Value;
-
-            if (math.all(creationInfo.PositionOffset != float3.zero))
-                position += creationInfo.PositionOffset;
+            var position = EntityManager.GetComponentData<Translation>(foodEntity).Value;
 
             if (math.all(creationInfo.PositionOffset == float3.zero) && EntityManager.HasComponent<GridOccupation>(creationInfo.StorageEntity))
             {
@@ -65,11 +62,14 @@ public class ResourceProductionSystem : SystemBase
                 position.xz = EntityManager.GetComponentData<Translation>(creationInfo.StorageEntity).Value.xz;
             }
 
-            EntityManager.SetComponentData(resourceEntity, new Translation { Value = position });
+            if (math.all(creationInfo.PositionOffset != float3.zero))
+                position += creationInfo.PositionOffset;
 
-            var entity =EntityManager.CreateEntity();
+            EntityManager.SetComponentData(foodEntity, new Translation { Value = position });
+
+            var entity = EntityManager.CreateEntity();
             EntityManager.AddComponent<AddResourceToStorageData>(entity);
-            EntityManager.SetComponentData(entity, new AddResourceToStorageData { ResourceEntity = resourceEntity, StorageEntity = creationInfo.StorageEntity });
+            EntityManager.SetComponentData(entity, new AddResourceToStorageData { ResourceEntity = foodEntity, StorageEntity = creationInfo.StorageEntity });
         }
     }
 
@@ -80,7 +80,7 @@ public class ResourceProductionSystem : SystemBase
 
     struct ProductionJob : IJobChunk
     {
-        public NativeQueue<ResourceCreationInfo>.ParallelWriter ResourcesToCreate;
+        public NativeQueue<CreationInfo>.ParallelWriter ResourcesToCreate;
 
         [ReadOnly]
         public float DeltaTime;
@@ -92,51 +92,65 @@ public class ResourceProductionSystem : SystemBase
         [ReadOnly]
         public ArchetypeChunkComponentType<ResourceStorageData> ResourceStorageType;
 
-        public ArchetypeChunkComponentType<ResourceProductionData> ResourceProductionDataType;
+        public ArchetypeChunkComponentType<FoodProductionData> FoodProductionDataType;
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
             NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
 
-            NativeArray<ResourceProductionData> resourceProductionDatas = chunk.GetNativeArray(ResourceProductionDataType);
-            NativeArray<WorkplaceWorkerData> workerDatas = chunk.GetNativeArray(WorkplaceWorkerDataType);
+            NativeArray<FoodProductionData> productionDatas = chunk.GetNativeArray(FoodProductionDataType);
             NativeArray<ResourceStorageData> resourceStorages = chunk.GetNativeArray(ResourceStorageType);
+
+            bool usesWorkers = false;
+
+            if (chunk.Has<WorkplaceWorkerData>(WorkplaceWorkerDataType))
+            {
+                NativeArray<WorkplaceWorkerData> workerDatas = chunk.GetNativeArray(WorkplaceWorkerDataType);
+                usesWorkers = true;
+
+                for (int i = 0; i < chunk.Count; i++)
+                {
+                    FoodProductionData productionData = productionDatas[i];
+
+                    productionData.ProductionTimeRemaining -= DeltaTime * (workerDatas[i].ActiveWorkers / .5f);
+                    productionDatas[i] = productionData;
+                }
+            }
 
             for (int i = 0; i < chunk.Count; i++)
             {
-                ResourceProductionData productionData = resourceProductionDatas[i];
-                WorkplaceWorkerData workerData = workerDatas[i];
-
                 if (resourceStorages[i].UsedCapacity >= resourceStorages[i].MaxCapacity)
                     continue;
 
-                if (workerData.ActiveWorkers >= 0)
+                FoodProductionData productionData = productionDatas[i];
+
+                if (!usesWorkers)
                 {
-                    productionData.ProductionTimeRemaining -= DeltaTime * (workerData.ActiveWorkers / .5f);
-                    resourceProductionDatas[i] = productionData;
+                    productionData.ProductionTimeRemaining -= DeltaTime;
+                    productionDatas[i] = productionData;
                 }
 
-                if (productionData.ProductionTimeRemaining <= 0)
+                if (productionDatas[i].ProductionTimeRemaining <= 0)
                 {
-                    ResourcesToCreate.Enqueue(new ResourceCreationInfo
+                    ResourcesToCreate.Enqueue(new CreationInfo
                     {
-                        ResourceType = productionData.ResourceType,
+                        ResourceType = productionData.FoodType,
                         Amount = productionData.AmountPerProduction,
                         PositionOffset = productionData.SpawnPointOffset,
                         StorageEntity = entities[i]
                     });
 
                     productionData.ProductionTimeRemaining = productionData.ProductionTime;
-                    resourceProductionDatas[i] = productionData;
+                    productionDatas[i] = productionData;
                 }
             }
         }
     }
 
-    struct ResourceCreationInfo
+    struct CreationInfo
     {
         public float3 PositionOffset;
-        public ResourceType ResourceType;
+        public FoodType ResourceType;
         public int Amount;
         public Entity StorageEntity;
     }

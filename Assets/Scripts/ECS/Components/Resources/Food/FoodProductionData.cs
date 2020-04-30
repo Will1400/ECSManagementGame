@@ -1,12 +1,10 @@
-﻿using UnityEngine;
-using System.Collections;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Mathematics;
 
 [GenerateAuthoringComponent]
-public struct ResourceProductionData : IComponentData
+public struct FoodProductionData : IComponentData
 {
-    public ResourceType ResourceType;
+    public FoodType FoodType;
     public int AmountPerProduction;
 
     public float ProductionTime;

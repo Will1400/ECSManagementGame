@@ -48,7 +48,6 @@ public class UIStatUpdatingSystem : SystemBase
         }
     }
 
-
     EntityQuery citizensQuery;
     EntityQuery resourcesQuery;
 
