@@ -16,13 +16,27 @@ public class RemoveResourceFromStorageSystem : SystemBase
         EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
         Entities.ForEach((Entity entity, ref RemoveResourceFromStorageData removeResourceFromStorage) =>
         {
-            var storageEntity = EntityManager.GetComponentData<ResourceInStorageData>(removeResourceFromStorage.ResourceEntity).StorageEntity;
-            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(storageEntity);
+            ResourceInStorageData resourceInStorageData = EntityManager.GetComponentData<ResourceInStorageData>(removeResourceFromStorage.ResourceEntity);
+            var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(resourceInStorageData.StorageEntity);
             resourceStorage.UsedCapacity--;
+
+            if (EntityManager.HasComponent<ResourceDataElement>(resourceInStorageData.StorageEntity))
+            {
+                var buffer = EntityManager.GetBuffer<ResourceDataElement>(resourceInStorageData.StorageEntity);
+
+                for (int j = 0; j < buffer.Length; j++)
+                {
+                    if (buffer[j].Value == resourceInStorageData.ResourceData)
+                    {
+                        buffer.RemoveAt(j);
+                        break;
+                    }
+                }
+            }
 
             CommandBuffer.RemoveComponent<ResourceInStorageData>(removeResourceFromStorage.ResourceEntity);
 
-            CommandBuffer.SetComponent(storageEntity, resourceStorage);
+            CommandBuffer.SetComponent(resourceInStorageData.StorageEntity, resourceStorage);
 
             CommandBuffer.DestroyEntity(entity);
         }).WithoutBurst().Run();

@@ -30,25 +30,43 @@ public class DestroyResourceInStorageSystem : SystemBase
         if (resourcesInStorageQuery.CalculateEntityCount() == 0 || resourcesInStorageQuery.CalculateEntityCount() == 0 || resourcesToDestroyQuery.CalculateEntityCount() == 0)
             return;
 
-        var CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent();
-        NativeArray<ResourceInStorageData> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
+        var CommandBuffer = bufferSystem.CreateCommandBuffer();
         NativeArray<Entity> resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
+        NativeArray<ResourceInStorageData> resourcesInStorageDatas = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
 
-        Entities.ForEach((Entity entity, int entityInQueryIndex, ref DestroyResourceInStorageData resourceToDestroyData) =>
+        Entities.ForEach((Entity entity, ref DestroyResourceInStorageData resourceToDestroyData) =>
         {
-            for (int i = 0; i < resourcesInStorage.Length; i++)
+            for (int i = 0; i < resourcesInStorageDatas.Length; i++)
             {
-                ResourceInStorageData resource = resourcesInStorage[i];
-                if (resourcesInStorage[i].StorageEntity == resourceToDestroyData.StorageEntity)
+                ResourceInStorageData resource = resourcesInStorageDatas[i];
+                if (resourcesInStorageDatas[i].StorageEntity == resourceToDestroyData.StorageEntity)
                 {
-                    CommandBuffer.DestroyEntity(entityInQueryIndex, resourcesInStorageEntities[i]);
+                    var storageEntity = EntityManager.GetComponentData<ResourceInStorageData>(resourcesInStorageEntities[i]).StorageEntity;
+                    var resourceStorage = EntityManager.GetComponentData<ResourceStorageData>(storageEntity);
+                    resourceStorage.UsedCapacity--;
+
+                    if (EntityManager.HasComponent<ResourceDataElement>(resourceToDestroyData.StorageEntity))
+                    {
+                        var buffer = EntityManager.GetBuffer<ResourceDataElement>(resourceToDestroyData.StorageEntity);
+
+                        for (int j = 0; j < buffer.Length; j++)
+                        {
+                            if (buffer[j].Value == resourcesInStorageDatas[i].ResourceData)
+                            {
+                                buffer.RemoveAt(j);
+                                break;
+                            }
+                        }
+                    }
+
+                    CommandBuffer.DestroyEntity(resourcesInStorageEntities[i]);
                 }
             }
-            CommandBuffer.DestroyEntity(entityInQueryIndex, entity);
+            CommandBuffer.DestroyEntity(entity);
 
-        }).Schedule(Dependency).Complete();
+        }).WithoutBurst().Run();
 
-        resourcesInStorage.Dispose();
         resourcesInStorageEntities.Dispose();
+        resourcesInStorageDatas.Dispose();
     }
 }
