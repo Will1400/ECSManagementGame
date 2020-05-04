@@ -51,7 +51,7 @@ public class FindFoodForHungryEntitiesSystem : SystemBase
             };
             job.Schedule().Complete();
 
-            if (job.ClosestFoodIndex == -1 || foodEntities[job.ClosestFoodIndex] == Entity.Null)
+            if (job.ClosestFoodIndex == -1 || foodEntities[job.ClosestFoodIndex] == Entity.Null || !EntityManager.Exists(foodEntities[job.ClosestFoodIndex]))
             {
                 continue;
             }

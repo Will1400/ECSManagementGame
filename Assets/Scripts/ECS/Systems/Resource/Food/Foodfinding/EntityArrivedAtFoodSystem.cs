@@ -19,14 +19,22 @@ public class EntityArrivedAtFoodSystem : SystemBase
 
         Entities.WithAll<HasArrivedAtDestinationTag>().ForEach((Entity entity, ref MovingToEatFoodData movingToEatFoodData) =>
         {
-            var consumptionEntity = CommandBuffer.CreateEntity();
-            CommandBuffer.AddComponent<ConsumeFoodData>(consumptionEntity);
-            CommandBuffer.SetComponent(consumptionEntity, new ConsumeFoodData
+            if (EntityManager.Exists(movingToEatFoodData.FoodEntity))
             {
-                ConsumerEntity = entity,
-                FoodEntity = movingToEatFoodData.FoodEntity,
-                FoodData = EntityManager.GetComponentData<FoodData>(movingToEatFoodData.FoodEntity)
-            });
+                var consumptionEntity = CommandBuffer.CreateEntity();
+                CommandBuffer.AddComponent<ConsumeFoodData>(consumptionEntity);
+                CommandBuffer.SetComponent(consumptionEntity, new ConsumeFoodData
+                {
+                    ConsumerEntity = entity,
+                    FoodEntity = movingToEatFoodData.FoodEntity,
+                    FoodData = EntityManager.GetComponentData<FoodData>(movingToEatFoodData.FoodEntity)
+                });
+            }
+            else
+            {
+                CommandBuffer.RemoveComponent<MovingToEatFoodData>(entity);
+                CommandBuffer.AddComponent<IdleTag>(entity);
+            }
 
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(entity);
         }).WithoutBurst().Run();
