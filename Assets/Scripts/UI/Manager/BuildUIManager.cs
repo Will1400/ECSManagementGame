@@ -47,7 +47,7 @@ public class BuildUIManager : MonoBehaviour
         buildItemContexts = new Dictionary<string, List<GameObject>>();
 
         PrefabContexts.Add("Houses", Resources.LoadAll<GameObject>("Prefabs/AutoLoadedPrefabs/Buildings/Houses/").ToList());
-        PrefabContexts.Add("ResourceGatherers", Resources.LoadAll<GameObject>("Prefabs/AutoLoadedPrefabs/Buildings/ResourceGatherers/").ToList());
+        PrefabContexts.Add("Production", Resources.LoadAll<GameObject>("Prefabs/AutoLoadedPrefabs/Buildings/Production/").ToList());
         PrefabContexts.Add("Storage", Resources.LoadAll<GameObject>("Prefabs/AutoLoadedPrefabs/Buildings/Storage/").ToList());
         PrefabContexts.Add("All", Resources.LoadAll<GameObject>("Prefabs/AutoLoadedPrefabs/").ToList());
 
