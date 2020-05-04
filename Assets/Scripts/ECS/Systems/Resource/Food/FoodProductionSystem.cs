@@ -67,6 +67,10 @@ public class FoodProductionSystem : SystemBase
 
             EntityManager.SetComponentData(foodEntity, new Translation { Value = position });
 
+            if (creationInfo.MakeFoodAvailable)
+                EntityManager.AddComponent<ResourceIsAvailableTag>(foodEntity);
+
+            // Add to storage
             var entity = EntityManager.CreateEntity();
             EntityManager.AddComponent<AddResourceToStorageData>(entity);
             EntityManager.SetComponentData(entity, new AddResourceToStorageData { ResourceEntity = foodEntity, StorageEntity = creationInfo.StorageEntity });
@@ -137,7 +141,8 @@ public class FoodProductionSystem : SystemBase
                         ResourceType = productionData.FoodType,
                         Amount = productionData.AmountPerProduction,
                         PositionOffset = productionData.SpawnPointOffset,
-                        StorageEntity = entities[i]
+                        StorageEntity = entities[i],
+                        MakeFoodAvailable = productionData.IsProducedFoodAvailable
                     });
 
                     productionData.ProductionTimeRemaining = productionData.ProductionTime;
@@ -153,5 +158,6 @@ public class FoodProductionSystem : SystemBase
         public FoodType ResourceType;
         public int Amount;
         public Entity StorageEntity;
+        public bool MakeFoodAvailable;
     }
 }

@@ -4,7 +4,8 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Collections;
 
-public class FoodConsumtionSystem : SystemBase
+[UpdateAfter(typeof(EntityArrivedAtFoodSystem))]
+public class FoodConsumptionSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery consumptionDataQuery;
@@ -26,7 +27,6 @@ public class FoodConsumtionSystem : SystemBase
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
 
-        var consumptionEntities = consumptionDataQuery.ToEntityArray(Allocator.TempJob);
         var consumptionData = consumptionDataQuery.ToComponentDataArray<ConsumeFoodData>(Allocator.TempJob);
 
         Entities.ForEach((Entity entity, ref CitizenFoodData citizenFoodData, ref MovingToEatFoodData movingToEatFoodData) =>
@@ -36,8 +36,8 @@ public class FoodConsumtionSystem : SystemBase
                 if (consumptionData[i].FoodEntity == movingToEatFoodData.FoodEntity)
                 {
                     citizenFoodData.CurrentFoodLevel += consumptionData[i].FoodData.HungerReplenished;
-                    CommandBuffer.DestroyEntity(consumptionEntities[i]);
 
+                    // Reset citizen
                     CommandBuffer.RemoveComponent<MovingToEatFoodData>(entity);
                     CommandBuffer.AddComponent<IdleTag>(entity);
                 }
@@ -47,7 +47,6 @@ public class FoodConsumtionSystem : SystemBase
         CommandBuffer.Playback(EntityManager);
         CommandBuffer.ShouldPlayback = false;
 
-        consumptionEntities.Dispose();
         consumptionData.Dispose();
     }
 }

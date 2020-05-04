@@ -19,7 +19,7 @@ public class FindFoodForHungryEntitiesSystem : SystemBase
 
         foodQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(FoodData), typeof(Translation) }
+            All = new ComponentType[] { typeof(FoodData), typeof(Translation), typeof(ResourceIsAvailableTag) }
         });
 
         hungryEntitiesQuery = GetEntityQuery(new EntityQueryDesc
@@ -35,7 +35,6 @@ public class FindFoodForHungryEntitiesSystem : SystemBase
             return;
 
         var foodEntities = foodQuery.ToEntityArray(Allocator.TempJob);
-        var foodDatas = foodQuery.ToComponentDataArray<FoodData>(Allocator.TempJob);
         var foodTranslations = foodQuery.ToComponentDataArray<Translation>(Allocator.TempJob);
 
         var hungryEntities = hungryEntitiesQuery.ToEntityArray(Allocator.TempJob);
@@ -51,9 +50,8 @@ public class FindFoodForHungryEntitiesSystem : SystemBase
                 HungryEntityPosition = hungryEntitiesTranslations[i].Value
             };
             job.Schedule().Complete();
-            //job.Run();
 
-            if (job.ClosestFoodIndex == -1)
+            if (job.ClosestFoodIndex == -1 || foodEntities[job.ClosestFoodIndex] == Entity.Null)
             {
                 continue;
             }
@@ -69,13 +67,18 @@ public class FindFoodForHungryEntitiesSystem : SystemBase
                 StartPosition = job.HungryEntityPosition,
                 EndPosition = foodTranslations[job.ClosestFoodIndex].Value
             });
+
+            CommandBuffer.RemoveComponent<ResourceIsAvailableTag>(foodEntities[job.ClosestFoodIndex]);
+
+            // Used to make sure only 1 entity gets assigned to eat the specific food
+            foodTranslations[job.ClosestFoodIndex] = new Translation { };
+            foodEntities[job.ClosestFoodIndex] = Entity.Null;
         }
 
         CommandBuffer.Playback(EntityManager);
         CommandBuffer.Dispose();
 
         foodEntities.Dispose();
-        foodDatas.Dispose();
         foodTranslations.Dispose();
 
         hungryEntities.Dispose();
@@ -97,6 +100,9 @@ public class FindFoodForHungryEntitiesSystem : SystemBase
 
             for (int i = 0; i < FoodTranslations.Length; i++)
             {
+                if (math.all(FoodTranslations[i].Value == float3.zero))
+                    continue;
+
                 float distance = math.distance(HungryEntityPosition, FoodTranslations[i].Value);
 
                 if (distance < shortestDistance)

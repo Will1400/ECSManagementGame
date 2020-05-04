@@ -2,25 +2,20 @@
 using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
+using Unity.Collections;
 
 public class EntityArrivedAtFoodSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
-    EntityQuery entitiesArrivedAtFoodQuery;
 
     protected override void OnCreate()
     {
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
-        entitiesArrivedAtFoodQuery = GetEntityQuery(new EntityQueryDesc
-        {
-            All = new ComponentType[] { typeof(MovingToEatFoodData), typeof(CitizenFoodData), typeof(Translation), typeof(HasArrivedAtDestinationTag) },
-        });
     }
 
     protected override void OnUpdate()
     {
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         Entities.WithAll<HasArrivedAtDestinationTag>().ForEach((Entity entity, ref MovingToEatFoodData movingToEatFoodData) =>
         {
@@ -37,6 +32,6 @@ public class EntityArrivedAtFoodSystem : SystemBase
         }).WithoutBurst().Run();
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
     }
 }

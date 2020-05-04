@@ -132,6 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FoodType: 0
   AmountPerProduction: 1
+  IsProducedFoodAvailable: 1
   ProductionTime: 10
   ProductionTimeRemaining: 1
   SpawnPointOffset:
