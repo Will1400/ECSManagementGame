@@ -9,7 +9,9 @@ public class BuildUIManager : MonoBehaviour
 {
     public static BuildUIManager Instance;
 
-    // Prefabs loaded
+    public bool IsActive => buildPanel.activeSelf;
+
+    // The loaded prefabs 
     Dictionary<string, List<GameObject>> PrefabContexts;
 
     // UI elements

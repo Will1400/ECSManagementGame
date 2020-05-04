@@ -14,4 +14,9 @@ public class GameManager : MonoBehaviour
         else
             Destroy(gameObject);
     }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
 }
