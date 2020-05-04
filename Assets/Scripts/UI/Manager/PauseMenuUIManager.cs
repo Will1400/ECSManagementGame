@@ -24,7 +24,8 @@ public class PauseMenuUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Instance.CursorState == CursorState.None && !BuildUIManager.Instance.IsActive)
+        if (Input.GetKeyDown(KeyCode.Escape) && !BuildUIManager.Instance.IsActive &&
+            (GameManager.Instance.CursorState == CursorState.None || GameManager.Instance.CursorState == CursorState.Menu))
         {
             ToggleWindow();
         }
@@ -33,12 +34,14 @@ public class PauseMenuUIManager : MonoBehaviour
 
     public void CloseWindow()
     {
+        GameManager.Instance.CursorState = CursorState.None;
         pauseMenuPanel.SetActive(false);
         menuPanel.transform.DOScale(.1f, .2f);
     }
 
     public void OpenWindow()
     {
+        GameManager.Instance.CursorState = CursorState.Menu;
         pauseMenuPanel.SetActive(true);
         menuPanel.transform.DOScale(1, .2f);
     }

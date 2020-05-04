@@ -5,5 +5,5 @@ public enum CursorState
 {
     None,
     Building,
-
+    Menu
 }
