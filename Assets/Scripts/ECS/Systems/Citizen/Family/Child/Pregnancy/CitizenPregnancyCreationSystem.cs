@@ -21,7 +21,7 @@ public class CitizenPregnancyCreationSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        if (Random.Range(0, 100) != 0)
+        if (Random.Range(0, 200) != 0)
             return;
 
         var CommandBuffer = bufferSystem.CreateCommandBuffer();
@@ -37,7 +37,7 @@ public class CitizenPregnancyCreationSystem : SystemBase
                 {
                     if (familyEntites[i] == citizenFamily.FamilyEntity)
                     {
-                        if (familyDatas[i].HasHome && Random.Range(0, 10 * familyDatas[i].ChildCount) == 0)
+                        if (familyDatas[i].HasHome)
                         {
                             CommandBuffer.AddComponent<CitizenPregnancyData>(entity);
                             CommandBuffer.SetComponent(entity, new CitizenPregnancyData
@@ -51,7 +51,7 @@ public class CitizenPregnancyCreationSystem : SystemBase
                     }
                 }
             }
-        }).Run();
+        }).Schedule(Dependency).Complete();
 
         familyEntites.Dispose();
         familyDatas.Dispose();
