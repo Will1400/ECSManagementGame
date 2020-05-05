@@ -34,10 +34,19 @@ public class EntityPrefabManager : MonoBehaviour
 
         assetStore = new BlobAssetStore();
         GameObject[] gameObjectPrefabs = Resources.LoadAll<GameObject>("Prefabs/");
+        //var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, assetStore);
 
         foreach (var item in gameObjectPrefabs)
         {
             ConvertGameObjectToEntity(item);
+            //var entity = GameObjectConversionUtility.ConvertGameObjectHierarchy(item, settings);
+
+            //EntityManager.AddComponent<Disabled>(entity);
+
+            //EntityManager.AddComponent<DisplayData>(entity);
+            //EntityManager.SetComponentData(entity, new DisplayData { Name = item.name });
+
+            //Prefabs.Add(item.name, entity);
         }
     }
 
@@ -94,7 +103,7 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnCitizenPrefab(EntityCommandBuffer commandBuffer)
     {
-        var prefab = GetEntityPrefab(name);
+        var prefab = GetEntityPrefab("Citizen");
         if (prefab != Entity.Null)
         {
             Entity entity = commandBuffer.Instantiate(prefab);
@@ -117,7 +126,7 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnCitizenPrefab()
     {
-        var prefab = GetEntityPrefab(name);
+        var prefab = GetEntityPrefab("Citizen");
         if (prefab != Entity.Null)
         {
             Entity entity = EntityManager.Instantiate(prefab);
@@ -140,7 +149,7 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnConstructionEntityPrefab(string finishedPrefabName)
     {
-        var prefab = GetEntityPrefab(name);
+        var prefab = GetEntityPrefab(finishedPrefabName);
         if (prefab != Entity.Null)
         {
             Entity entity = EntityManager.CreateEntity(
