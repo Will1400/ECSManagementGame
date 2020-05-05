@@ -81,7 +81,7 @@ public class BuildUIManager : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.CursorState != CursorState.None)
+        if (GameManager.Instance.CursorState == CursorState.Menu)
             return;
 
         if (Input.GetButtonDown("Build"))

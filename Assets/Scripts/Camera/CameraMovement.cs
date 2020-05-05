@@ -18,7 +18,7 @@ public class CameraMovement : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.Instance.CursorState != CursorState.None)
+        if (GameManager.Instance.CursorState == CursorState.Menu)
             return;
 
         Move();

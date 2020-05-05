@@ -33,20 +33,28 @@ public class EntityPrefabManager : MonoBehaviour
         EntityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         assetStore = new BlobAssetStore();
-        var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, assetStore);
         GameObject[] gameObjectPrefabs = Resources.LoadAll<GameObject>("Prefabs/");
 
         foreach (var item in gameObjectPrefabs)
         {
-            var entity = GameObjectConversionUtility.ConvertGameObjectHierarchy(item, settings);
-
-            EntityManager.AddComponent<Disabled>(entity);
-
-            EntityManager.AddComponent<DisplayData>(entity);
-            EntityManager.SetComponentData(entity, new DisplayData { Name = item.name });
-
-            Prefabs.Add(item.name, entity);
+            ConvertGameObjectToEntity(item);
         }
+    }
+
+    Entity ConvertGameObjectToEntity(GameObject gameObject)
+    {
+        var settings = GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, assetStore);
+
+        var entity = GameObjectConversionUtility.ConvertGameObjectHierarchy(gameObject, settings);
+
+        EntityManager.AddComponent<Disabled>(entity);
+
+        EntityManager.AddComponent<DisplayData>(entity);
+        EntityManager.SetComponentData(entity, new DisplayData { Name = gameObject.name });
+
+        Prefabs.Add(gameObject.name, entity);
+
+        return entity;
     }
 
     public Entity SpawnEntityPrefab(string name)
@@ -63,7 +71,8 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnEntityPrefab(EntityCommandBuffer commandBuffer, string name)
     {
-        if (Prefabs.TryGetValue(name, out Entity prefab))
+        var prefab = GetEntityPrefab(name);
+        if (prefab != Entity.Null)
         {
             Entity entity = commandBuffer.Instantiate(prefab);
             commandBuffer.RemoveComponent<Disabled>(entity);
@@ -85,7 +94,8 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnCitizenPrefab(EntityCommandBuffer commandBuffer)
     {
-        if (Prefabs.TryGetValue("Citizen", out Entity prefab))
+        var prefab = GetEntityPrefab(name);
+        if (prefab != Entity.Null)
         {
             Entity entity = commandBuffer.Instantiate(prefab);
             commandBuffer.RemoveComponent<Disabled>(entity);
@@ -107,7 +117,8 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnCitizenPrefab()
     {
-        if (Prefabs.TryGetValue("Citizen", out Entity prefab))
+        var prefab = GetEntityPrefab(name);
+        if (prefab != Entity.Null)
         {
             Entity entity = EntityManager.Instantiate(prefab);
             EntityManager.RemoveComponent<Disabled>(entity);
@@ -129,7 +140,8 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnConstructionEntityPrefab(string finishedPrefabName)
     {
-        if (Prefabs.TryGetValue(finishedPrefabName, out Entity prefab))
+        var prefab = GetEntityPrefab(name);
+        if (prefab != Entity.Null)
         {
             Entity entity = EntityManager.CreateEntity(
                 typeof(ConstructionData),
@@ -166,7 +178,8 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnBeingPlacedEntityPrefab(string name)
     {
-        if (Prefabs.TryGetValue(name, out Entity prefab))
+        var prefab = GetEntityPrefab(name);
+        if (prefab != Entity.Null)
         {
             Entity entity = SpawnVisualOnlyPrefab(name);
 
@@ -202,7 +215,8 @@ public class EntityPrefabManager : MonoBehaviour
 
     public Entity SpawnVisualOnlyPrefab(string name)
     {
-        if (Prefabs.TryGetValue(name, out Entity prefab))
+        var prefab = GetEntityPrefab(name);
+        if (prefab != Entity.Null)
         {
             var entity = EntityManager.CreateEntity(
                 ComponentType.ReadOnly<Translation>(),
