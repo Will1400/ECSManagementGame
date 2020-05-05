@@ -81,6 +81,9 @@ public class BuildUIManager : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance.CursorState != CursorState.None)
+            return;
+
         if (Input.GetButtonDown("Build"))
             TogglePanel();
         if (Input.GetKeyDown(KeyCode.Escape))

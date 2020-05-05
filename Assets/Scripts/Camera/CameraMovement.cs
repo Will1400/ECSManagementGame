@@ -18,6 +18,9 @@ public class CameraMovement : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance.CursorState != CursorState.None)
+            return;
+
         Move();
 
         if (!EventSystem.current.IsPointerOverGameObject())
