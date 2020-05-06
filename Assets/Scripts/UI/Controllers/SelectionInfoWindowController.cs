@@ -143,7 +143,7 @@ public class SelectionInfoWindowController : MonoBehaviour
 
     public void TogglePin()
     {
-        var windowSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<SelectionUISystem>();
+        var windowSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<SelectionWindowUISystem>();
 
         isPinned = !isPinned;
         if (isPinned)

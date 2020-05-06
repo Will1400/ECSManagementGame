@@ -4,7 +4,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class SelectionUISystem : SystemBase
+public class SelectionWindowUISystem : SystemBase
 {
     GameObject buildingInfoPrefab;
     GameObject windowHolder;

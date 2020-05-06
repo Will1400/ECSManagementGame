@@ -56,5 +56,8 @@ public class ConstructionFinishedSystem : SystemBase
             CommandBuffer.RemoveComponent<ConstructionData>(entity);
             CommandBuffer.AddComponent<RemoveWorkplaceTag>(entity);
         }).WithoutBurst().Run();
+
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.ShouldPlayback = false;
     }
 }

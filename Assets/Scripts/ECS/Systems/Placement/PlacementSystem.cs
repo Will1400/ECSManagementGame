@@ -26,6 +26,9 @@ public class PlacementSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        if (GameManager.Instance.CursorState == CursorState.Menu)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             if (currentEntity == Entity.Null)
