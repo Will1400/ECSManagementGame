@@ -17,7 +17,9 @@ public class PlacementPositionSystem : SystemBase
         float3 mouseWorldPosition = ECSRaycast.Raycast(ray.origin, ray.direction * 9999, 1u << 9).Position;
         mouseWorldPosition = math.round(mouseWorldPosition);
 
-        Entities.WithAll<BeingPlacedTag>().WithNone<IsInCache>().ForEach((ref Translation translation, ref GridOccupation gridOccupation, ref WorldRenderBounds renderBounds) =>
+        bool rotate = Input.GetButtonDown("Rotate");
+
+        Entities.WithAll<BeingPlacedTag>().WithNone<IsInCache>().ForEach((ref Translation translation,ref Rotation rotation, ref GridOccupation gridOccupation, ref WorldRenderBounds renderBounds) =>
         {
             AABB bounds = renderBounds.Value;
             var result = GridHelper.CalculateGridOccupationFromBounds(bounds);
@@ -29,6 +31,12 @@ public class PlacementPositionSystem : SystemBase
             heightAdjustedPosition.y = translation.Value.y;
 
             translation.Value = heightAdjustedPosition;
+
+            if (rotate)
+            {
+                //rotation.Value += quaternion.RotateY(90);
+            }
+
         }).Schedule(Dependency).Complete();
     }
 }

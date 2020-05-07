@@ -58,7 +58,7 @@ public class ResourceProductionSystem : SystemBase
                 var occupation = EntityManager.GetComponentData<GridOccupation>(creationInfo.StorageEntity);
 
                 position.x = occupation.Start.x + ((occupation.End.x - occupation.Start.x) / 2);
-                position.z = occupation.Start.y - 1;
+                position.z = occupation.Start.y - 2;
             }
             else
             {
