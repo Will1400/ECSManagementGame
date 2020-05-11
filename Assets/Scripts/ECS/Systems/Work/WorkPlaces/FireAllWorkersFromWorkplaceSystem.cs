@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Collections;
 using Unity.Burst;
 
+[UpdateBefore(typeof(RemoveCitizenFromWorkSystem))]
 public class FireAllWorkersFromWorkplaceSystem : SystemBase
 {
     EntityQuery workplacesToFireQuery;
@@ -14,14 +15,13 @@ public class FireAllWorkersFromWorkplaceSystem : SystemBase
     {
         bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
 
-
         workplacesToFireQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(FireAllWorkersTag), typeof(WorkplaceWorkerData) }
         });
         workingCitizensQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(CitizenWork) },
+            All = new ComponentType[] { typeof(Citizen), typeof(CitizenWork) },
             None = new ComponentType[] { typeof(RemoveFromWorkTag) }
         });
     }
@@ -34,18 +34,23 @@ public class FireAllWorkersFromWorkplaceSystem : SystemBase
         NativeArray<Entity> workingCitizens = workingCitizensQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<CitizenWork> workingCitizensWorkerData = workingCitizensQuery.ToComponentDataArray<CitizenWork>(Allocator.TempJob);
 
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
+
         var job = new RemoveWorkplaceJob
         {
             EntityType = GetArchetypeChunkEntityType(),
             WorkplaceWorkerDataType = GetArchetypeChunkComponentType<WorkplaceWorkerData>(),
             WorkingCitizens = workingCitizens,
             WorkingCitizensWorkerData = workingCitizensWorkerData,
-            CommandBuffer = bufferSystem.CreateCommandBuffer().ToConcurrent()
+            CommandBuffer = CommandBuffer.ToConcurrent()
         }.Schedule(workplacesToFireQuery);
         job.Complete();
 
         workingCitizens.Dispose();
         workingCitizensWorkerData.Dispose();
+
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.Dispose();
     }
 
     [BurstCompile]
@@ -77,15 +82,14 @@ public class FireAllWorkersFromWorkplaceSystem : SystemBase
                         break;
 
                     var workerData = WorkingCitizensWorkerData[j];
-                    if (workerData.WorkplaceEntity.Index == entities[i].Index)
+                    if (workerData.WorkplaceEntity == entities[i])
                     {
                         CommandBuffer.AddComponent<RemoveFromWorkTag>(chunkIndex, WorkingCitizens[j]);
                         workplaceWorkerData.CurrentWorkers--;
                     }
                 }
 
-                if (workplaceWorkerData.CurrentWorkers <= 0)
-                    CommandBuffer.RemoveComponent<FireAllWorkersTag>(chunkIndex, entities[i]);
+                CommandBuffer.RemoveComponent<FireAllWorkersTag>(chunkIndex, entities[i]);
             }
         }
     }

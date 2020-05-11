@@ -15,6 +15,7 @@ public class DisableProductionPlaceOnFullStorage : SystemBase
             if (resourceStorage.UsedCapacity >= resourceStorage.MaxCapacity)
             {
                 workerData.IsWorkable = false;
+
                 if (workerData.ActiveWorkers > 0)
                     CommandBuffer.AddComponent<FireAllWorkersTag>(entity);
             }

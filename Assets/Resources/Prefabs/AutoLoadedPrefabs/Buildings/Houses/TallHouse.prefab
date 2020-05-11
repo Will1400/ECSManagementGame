@@ -121,7 +121,7 @@ MonoBehaviour:
   - ResourceType: 2
     Amount: 10
   - ResourceType: 1
-    Amount: 0
+    Amount: 10
 --- !u!114 &6358543582134592528
 MonoBehaviour:
   m_ObjectHideFlags: 0

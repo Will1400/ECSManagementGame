@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Unity.Entities;
+using Unity.Collections;
 
+[UpdateAfter(typeof(CitizenArrivedAtWork))]
 public class RemoveCitizenFromWorkSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;
@@ -13,7 +15,7 @@ public class RemoveCitizenFromWorkSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         Entities.WithAll<RemoveFromWorkTag>().ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
@@ -22,10 +24,12 @@ public class RemoveCitizenFromWorkSystem : SystemBase
                 var index = citizenWork.WorkplaceEntity.Index;
                 var workerData = EntityManager.GetComponentData<WorkplaceWorkerData>(citizenWork.WorkplaceEntity);
 
-                workerData.ActiveWorkers--;
+                if (citizenWork.IsWorking)
+                    workerData.ActiveWorkers--;
+
                 workerData.CurrentWorkers--;
 
-                CommandBuffer.SetComponent(citizenWork.WorkplaceEntity, workerData);
+                EntityManager.SetComponentData(citizenWork.WorkplaceEntity, workerData);
             }
 
             CommandBuffer.RemoveComponent<IsWorkingTag>(entity);
@@ -34,5 +38,8 @@ public class RemoveCitizenFromWorkSystem : SystemBase
 
             CommandBuffer.AddComponent<IdleTag>(entity);
         }).WithoutBurst().Run();
+
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.Dispose();
     }
 }

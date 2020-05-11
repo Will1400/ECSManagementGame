@@ -16,13 +16,15 @@ public class CitizenArrivedAtWork : SystemBase
 
     protected override void OnUpdate()
     {
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         Entities.WithAll<HasArrivedAtDestinationTag>().ForEach((Entity entity, ref CitizenWork citizenWork) =>
         {
             if (EntityManager.HasComponent<WorkplaceWorkerData>(citizenWork.WorkplaceEntity))
             {
                 CommandBuffer.AddComponent<IsWorkingTag>(entity);
+
+                citizenWork.IsWorking = true;
 
                 var workerData = EntityManager.GetComponentData<WorkplaceWorkerData>(citizenWork.WorkplaceEntity);
                 workerData.ActiveWorkers++;
@@ -35,5 +37,8 @@ public class CitizenArrivedAtWork : SystemBase
             }
 
         }).WithoutBurst().Run();
+
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.Dispose();
     }
 }
