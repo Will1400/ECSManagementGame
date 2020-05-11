@@ -5,20 +5,10 @@ using Unity.Collections;
 
 public class RemoveExcessWorkersSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    EntityQuery workplaceQuery;
     EntityQuery workingCitizensQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
-
-        workplaceQuery = GetEntityQuery(new EntityQueryDesc
-        {
-            All = new ComponentType[] { typeof(WorkplaceWorkerData) }
-        });
         workingCitizensQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(CitizenWork) },
@@ -28,6 +18,7 @@ public class RemoveExcessWorkersSystem : SystemBase
 
     protected override void OnUpdate()
     {
+        // Used to only run when there is excess workers
         bool isWorkerCountValid = true;
         Entities.ForEach((Entity entity, ref WorkplaceWorkerData workerData) =>
         {
@@ -41,7 +32,7 @@ public class RemoveExcessWorkersSystem : SystemBase
         if (isWorkerCountValid)
             return;
 
-        var buffer = bufferSystem.CreateCommandBuffer();
+        var buffer = new EntityCommandBuffer(Allocator.TempJob);
         var CommandBuffer = buffer.ToConcurrent();
 
         NativeArray<Entity> citizens = workingCitizensQuery.ToEntityArray(Allocator.TempJob);
@@ -59,6 +50,7 @@ public class RemoveExcessWorkersSystem : SystemBase
                     if (citizenWorks[i].WorkplaceEntity == entity)
                     {
                         CommandBuffer.AddComponent<RemoveFromWorkTag>(entityInQueryIndex, citizens[i]);
+                        // Reset citizenWork, since the worker gets removed from the workplace here instead
                         CommandBuffer.SetComponent(entityInQueryIndex, citizens[i], new CitizenWork { });
                         workerData.ActiveWorkers--;
                         workerData.CurrentWorkers--;
@@ -68,7 +60,7 @@ public class RemoveExcessWorkersSystem : SystemBase
         }).Schedule(Dependency).Complete();
 
         buffer.Playback(EntityManager);
-        buffer.ShouldPlayback = false;
+        buffer.Dispose();
 
         citizens.Dispose();
         citizenWorks.Dispose();

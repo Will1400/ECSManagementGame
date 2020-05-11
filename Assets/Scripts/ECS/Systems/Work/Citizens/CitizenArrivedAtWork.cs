@@ -7,13 +7,6 @@ using Unity.Collections;
 
 public class CitizenArrivedAtWork : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    protected override void OnCreate()
-    {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-    }
-
     protected override void OnUpdate()
     {
         var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
@@ -26,6 +19,7 @@ public class CitizenArrivedAtWork : SystemBase
 
                 citizenWork.IsWorking = true;
 
+                // Add worker to workplace
                 var workerData = EntityManager.GetComponentData<WorkplaceWorkerData>(citizenWork.WorkplaceEntity);
                 workerData.ActiveWorkers++;
                 CommandBuffer.SetComponent(citizenWork.WorkplaceEntity, workerData);

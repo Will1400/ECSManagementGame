@@ -10,7 +10,7 @@ public class DisableProductionPlaceOnFullStorage : SystemBase
     {
         var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
-        Entities.ForEach((Entity entity, ref ResourceProductionData productionData, ref ResourceStorageData resourceStorage, ref WorkplaceWorkerData workerData) =>
+        Entities.WithAny<ResourceProductionData, FoodProductionData>().ForEach((Entity entity, ref ResourceStorageData resourceStorage, ref WorkplaceWorkerData workerData) =>
         {
             if (resourceStorage.UsedCapacity >= resourceStorage.MaxCapacity)
             {

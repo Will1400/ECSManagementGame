@@ -6,13 +6,6 @@ using Unity.Collections;
 [UpdateAfter(typeof(CitizenArrivedAtWork))]
 public class RemoveCitizenFromWorkSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    protected override void OnCreate()
-    {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-    }
-
     protected override void OnUpdate()
     {
         var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);

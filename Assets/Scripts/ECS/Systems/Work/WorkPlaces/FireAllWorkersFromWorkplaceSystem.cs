@@ -9,12 +9,9 @@ public class FireAllWorkersFromWorkplaceSystem : SystemBase
 {
     EntityQuery workplacesToFireQuery;
     EntityQuery workingCitizensQuery;
-    EndSimulationEntityCommandBufferSystem bufferSystem;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         workplacesToFireQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(FireAllWorkersTag), typeof(WorkplaceWorkerData) }
@@ -74,18 +71,15 @@ public class FireAllWorkersFromWorkplaceSystem : SystemBase
 
             for (int i = 0; i < chunk.Count; i++)
             {
-                WorkplaceWorkerData workplaceWorkerData = workplaceWorkerDatas[i];
-
                 for (int j = 0; j < WorkingCitizensWorkerData.Length; j++)
                 {
-                    if (workplaceWorkerData.CurrentWorkers <= 0)
+                    if (workplaceWorkerDatas[i].CurrentWorkers <= 0)
                         break;
 
                     var workerData = WorkingCitizensWorkerData[j];
                     if (workerData.WorkplaceEntity == entities[i])
                     {
                         CommandBuffer.AddComponent<RemoveFromWorkTag>(chunkIndex, WorkingCitizens[j]);
-                        workplaceWorkerData.CurrentWorkers--;
                     }
                 }
 
