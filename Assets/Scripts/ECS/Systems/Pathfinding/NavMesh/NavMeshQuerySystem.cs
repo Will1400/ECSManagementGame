@@ -17,7 +17,7 @@ public enum PathfindingFailedReason
     FailedToResolve,
 }
 
-[UpdateBefore(typeof(NavMeshSystem))]
+[UpdateInGroup(typeof(PathFindingGroup))]
 public class NavMeshQuerySystem : SystemBase
 {
 

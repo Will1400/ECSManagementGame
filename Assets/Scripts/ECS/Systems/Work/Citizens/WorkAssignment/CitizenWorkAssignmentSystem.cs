@@ -65,6 +65,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
 
                 citizenEntititiesHandle.Complete();
 
+                // Assign citizens to job
                 foreach (var item in nearestCitizenIndexes.Distinct())
                 {
                     int citizenIndex = item.EntityIndex;
@@ -144,8 +145,9 @@ public class CitizenWorkAssignmentSystem : SystemBase
                             break;
                         }
                     }
-                    distanceToBeat = ClosestCitizenIndexes[0].Distance;
 
+                    // Set distanceToBeat to the highest distance
+                    distanceToBeat = ClosestCitizenIndexes[0].Distance;
                     for (int d = 0; d < ClosestCitizenIndexes.Length; d++)
                     {
                         if (distanceToBeat < ClosestCitizenIndexes[d].Distance)

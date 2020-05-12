@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Collections;
 
+[UpdateInGroup(typeof(ResourceStorageInteractionGroup))]
 public class DestroyResourceInStorageSystem : SystemBase
 {
     EndSimulationEntityCommandBufferSystem bufferSystem;

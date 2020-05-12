@@ -12,7 +12,7 @@ using Unity.Jobs;
 using System.Linq;
 using UnityEngine.Experimental.AI;
 
-[UpdateAfter(typeof(PlacementSystem))]
+[UpdateInGroup(typeof(PathFindingGroup))]
 public class NavMeshSystem : SystemBase
 {
     private Bounds bounds;

@@ -5,6 +5,7 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
 
+[UpdateAfter(typeof(MovementGroup))]
 public class CitizenArrivedAtWork : SystemBase
 {
     protected override void OnUpdate()

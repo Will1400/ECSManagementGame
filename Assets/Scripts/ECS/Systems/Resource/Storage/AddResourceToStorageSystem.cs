@@ -3,19 +3,14 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
+using Unity.Collections;
 
+[UpdateInGroup(typeof(ResourceStorageInteractionGroup))]
 public class AddResourceToStorageSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    protected override void OnCreate()
-    {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-    }
-
     protected override void OnUpdate()
     {
-        EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
+        EntityCommandBuffer CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         Entities.ForEach((Entity entity, ref AddResourceToStorageData addResourceToStorage) =>
         {
@@ -44,6 +39,6 @@ public class AddResourceToStorageSystem : SystemBase
         }).WithoutBurst().Run();
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
     }
 }

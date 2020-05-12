@@ -6,6 +6,7 @@ using System;
 using Unity.Collections;
 using Unity.Burst;
 
+[UpdateInGroup(typeof(UIGroup))]
 public class UIStatUpdatingSystem : SystemBase
 {
     public static UIStatUpdatingSystem Instance;

@@ -3,6 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Collections;
 
+[UpdateInGroup(typeof(WorkRemovementGroup))]
 public class RemoveExcessWorkersSystem : SystemBase
 {
     EntityQuery workingCitizensQuery;

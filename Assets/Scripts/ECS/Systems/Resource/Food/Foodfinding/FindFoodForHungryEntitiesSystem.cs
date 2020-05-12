@@ -9,14 +9,11 @@ using Unity.Mathematics;
 
 public class FindFoodForHungryEntitiesSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery foodQuery;
     EntityQuery hungryEntitiesQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         foodQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(FoodData), typeof(Translation), typeof(ResourceIsAvailableTag) }

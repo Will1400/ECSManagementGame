@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.Entities;
 using Unity.Collections;
 
-[UpdateAfter(typeof(CitizenArrivedAtWork))]
+[UpdateInGroup(typeof(WorkRemovementGroup))]
 public class RemoveCitizenFromWorkSystem : SystemBase
 {
     protected override void OnUpdate()

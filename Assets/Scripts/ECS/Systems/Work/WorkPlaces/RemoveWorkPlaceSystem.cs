@@ -8,6 +8,7 @@ using Unity.Collections;
 using Unity.Entities;
 
 [UpdateBefore(typeof(RemoveCitizenFromWorkSystem))]
+[UpdateInGroup(typeof(WorkRemovementGroup))]
 public class RemoveWorkplaceSystem : SystemBase
 {
     EntityQuery workplaceToRemoveQuery;

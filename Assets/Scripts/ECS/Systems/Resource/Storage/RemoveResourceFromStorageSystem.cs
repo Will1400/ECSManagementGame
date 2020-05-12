@@ -1,19 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Unity.Entities;
+using Unity.Collections;
 
+[UpdateInGroup(typeof(ResourceStorageInteractionGroup))]
 public class RemoveResourceFromStorageSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    protected override void OnCreate()
-    {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-    }
-
     protected override void OnUpdate()
     {
-        EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
+        EntityCommandBuffer CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
         Entities.ForEach((Entity entity, ref RemoveResourceFromStorageData removeResourceFromStorage) =>
         {
             ResourceInStorageData resourceInStorageData = EntityManager.GetComponentData<ResourceInStorageData>(removeResourceFromStorage.ResourceEntity);
@@ -42,6 +37,6 @@ public class RemoveResourceFromStorageSystem : SystemBase
         }).WithoutBurst().Run();
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
     }
 }

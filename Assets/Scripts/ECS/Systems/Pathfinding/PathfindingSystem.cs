@@ -11,7 +11,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-[UpdateAfter(typeof(NavMeshSystem))]
+[UpdateInGroup(typeof(PathFindingGroup))]
 public class PathfindingSystem : SystemBase
 {
     NativeHashMap<int, Entity> queuedEntities;

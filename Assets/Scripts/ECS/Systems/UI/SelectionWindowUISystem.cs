@@ -4,6 +4,7 @@ using Unity.Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+[UpdateInGroup(typeof(UIGroup))]
 public class SelectionWindowUISystem : SystemBase
 {
     GameObject buildingInfoPrefab;

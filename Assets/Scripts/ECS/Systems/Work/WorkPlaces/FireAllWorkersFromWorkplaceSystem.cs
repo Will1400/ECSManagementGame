@@ -5,6 +5,7 @@ using Unity.Collections;
 using Unity.Burst;
 
 [UpdateBefore(typeof(RemoveCitizenFromWorkSystem))]
+[UpdateInGroup(typeof(WorkRemovementGroup))]
 public class FireAllWorkersFromWorkplaceSystem : SystemBase
 {
     EntityQuery workplacesToFireQuery;

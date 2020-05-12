@@ -8,15 +8,12 @@ using Unity.Transforms;
 [UpdateInGroup(typeof(ProductionGroup))]
 public class FoodProductionSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery producingEntititesQuery;
 
     NativeQueue<CreationInfo> resourcesToCreate;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         producingEntititesQuery = GetEntityQuery(new EntityQueryDesc()
         {
             All = new ComponentType[] { typeof(FoodProductionData) }

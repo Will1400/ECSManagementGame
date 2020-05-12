@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Collections;
 
 [UpdateBefore(typeof(FireAllWorkersFromWorkplaceSystem))]
+[UpdateInGroup(typeof(WorkRemovementGroup))]
 public class DisableProductionPlaceOnFullStorage : SystemBase
 {
     protected override void OnUpdate()
