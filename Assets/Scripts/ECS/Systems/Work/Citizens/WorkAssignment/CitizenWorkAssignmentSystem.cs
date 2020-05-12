@@ -122,12 +122,9 @@ public class CitizenWorkAssignmentSystem : SystemBase
         {
             float distanceToBeat = Mathf.Infinity;
 
-            if (CitizenTranslations.Length < NeededCitizens)
+            for (int i = 0; i < ClosestCitizenIndexes.Length; i++)
             {
-                for (int i = 0; i < NeededCitizens - CitizenTranslations.Length; i++)
-                {
-                    ClosestCitizenIndexes[i] = new EntityDistanceInfo { EntityIndex = -1 };
-                }
+                ClosestCitizenIndexes[i] = new EntityDistanceInfo { EntityIndex = -1, Distance = Mathf.Infinity };
             }
 
             for (int i = 0; i < CitizenTranslations.Length; i++)
@@ -146,10 +143,14 @@ public class CitizenWorkAssignmentSystem : SystemBase
                             ClosestCitizenIndexes[j] = new EntityDistanceInfo { EntityIndex = i, Distance = distance };
                             break;
                         }
+                    }
+                    distanceToBeat = ClosestCitizenIndexes[0].Distance;
 
-                        if (distanceToBeat < ClosestCitizenIndexes[j].Distance)
+                    for (int d = 0; d < ClosestCitizenIndexes.Length; d++)
+                    {
+                        if (distanceToBeat < ClosestCitizenIndexes[d].Distance)
                         {
-                            distanceToBeat = ClosestCitizenIndexes[j].Distance;
+                            distanceToBeat = ClosestCitizenIndexes[d].Distance;
                         }
                     }
                 }
