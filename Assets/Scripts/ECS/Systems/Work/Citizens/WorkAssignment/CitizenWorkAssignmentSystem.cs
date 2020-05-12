@@ -65,9 +65,9 @@ public class CitizenWorkAssignmentSystem : SystemBase
 
                 citizenEntititiesHandle.Complete();
 
-                for (int c = 0; c < nearestCitizenIndexes.Length; c++)
+                foreach (var item in nearestCitizenIndexes.Distinct())
                 {
-                    int citizenIndex = nearestCitizenIndexes[c].EntityIndex;
+                    int citizenIndex = item.EntityIndex;
 
                     if (citizenIndex == -1)
                         continue;
