@@ -13,6 +13,7 @@ public class ConstructionSmokeVisualSystem : SystemBase
     VisualEffectAsset effectAsset;
 
     EntityQuery constructionSiteQuery;
+    // Used to make the system always run
     EntityQuery defaultQuery;
 
     protected override void OnCreate()
@@ -32,7 +33,16 @@ public class ConstructionSmokeVisualSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        for (int e = 0; e < constructionSiteQuery.CalculateEntityCount() - effectBuffer.Count; e++)
+        int neededEffects = 0;
+        Entities.ForEach((Entity entity, ref ConstructionData constructionData, ref WorkplaceWorkerData workerData, ref GridOccupation gridOccupation, ref Translation translation) =>
+        {
+            if (workerData.ActiveWorkers > 0)
+            {
+                neededEffects++;
+            }
+        }).Run();
+
+        for (int e = 0; e < neededEffects - effectBuffer.Count; e++)
         {
             var smokeObject = new GameObject("ConstructionSmoke");
 
@@ -46,7 +56,7 @@ public class ConstructionSmokeVisualSystem : SystemBase
         int i = 0;
         Entities.ForEach((Entity entity, ref ConstructionData constructionData, ref WorkplaceWorkerData workerData, ref GridOccupation gridOccupation, ref Translation translation) =>
         {
-            if (workerData.ActiveWorkers > 0)
+            if (workerData.ActiveWorkers > 0 && i < effectBuffer.Count)
             {
                 if (effectBuffer[i].gameObject.transform.position == Vector3.zero)
                 {
@@ -65,7 +75,7 @@ public class ConstructionSmokeVisualSystem : SystemBase
         }
 
 
-        for (int e = 0; i < effectBuffer.Count - constructionSiteQuery.CalculateEntityCount(); e++)
+        for (int e = 0; e < effectBuffer.Count - neededEffects; e++)
         {
             GameObject.Destroy(effectBuffer[e].gameObject);
             effectBuffer.RemoveAt(e);
