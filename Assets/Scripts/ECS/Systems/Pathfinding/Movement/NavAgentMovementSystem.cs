@@ -76,6 +76,7 @@ public class NavAgentMovementSystem : SystemBase
                 var rotation = rotations[i];
                 var agent = navAgents[i];
 
+                // Reached destiantion
                 if (agent.CurrentWaypointIndex >= buffer.Length && buffer.Length > 0)
                 {
                     agent.Status = AgentStatus.Idle;
@@ -90,6 +91,8 @@ public class NavAgentMovementSystem : SystemBase
 
                 if (math.distance(translation.Value, destination) > .4f)
                 {
+                    // Move towards current waypoint
+
                     float3 direction = math.normalize(destination - translation.Value);
                     direction.y = 0;
                     rotation.Value = quaternion.LookRotation(direction, new float3(0, 1, 0));
@@ -100,6 +103,7 @@ public class NavAgentMovementSystem : SystemBase
                 }
                 else
                 {
+                    // Set the next waypoint
                     agent.CurrentWaypointIndex++;
                     navAgents[i] = agent;
                 }

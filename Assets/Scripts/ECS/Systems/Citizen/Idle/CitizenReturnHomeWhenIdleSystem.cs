@@ -8,14 +8,10 @@ using Unity.Mathematics;
 [UpdateAfter(typeof(WorkAssignmentGroup))]
 public class CitizenReturnHomeWhenIdleSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
     EntityQuery idleCitizensWithHousingQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         idleCitizensWithHousingQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(Citizen), typeof(IdleTag), typeof(CitizenHousingData) },
@@ -25,7 +21,7 @@ public class CitizenReturnHomeWhenIdleSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        var buffer = bufferSystem.CreateCommandBuffer();
+        var buffer = new EntityCommandBuffer(Allocator.TempJob);
 
         var job = new HomeJob
         {
@@ -38,7 +34,7 @@ public class CitizenReturnHomeWhenIdleSystem : SystemBase
         job.Complete();
 
         buffer.Playback(EntityManager);
-        buffer.ShouldPlayback = false;
+        buffer.Dispose();
     }
 
     struct HomeJob : IJobChunk

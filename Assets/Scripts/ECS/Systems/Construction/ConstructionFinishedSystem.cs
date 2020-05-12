@@ -2,19 +2,13 @@
 using System.Collections;
 using Unity.Entities;
 using Unity.Transforms;
+using Unity.Collections;
 
 public class ConstructionFinishedSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    protected override void OnCreate()
-    {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-    }
-
     protected override void OnUpdate()
     {
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         Entities.WithAll<ConstructionFinishedTag>().ForEach((Entity entity, DynamicBuffer<ResourceDataElement> resourceDatas, ref ConstructionData construction, ref WorkplaceWorkerData workerData, ref Translation translation) =>
         {
@@ -58,6 +52,6 @@ public class ConstructionFinishedSystem : SystemBase
         }).WithoutBurst().Run();
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
     }
 }

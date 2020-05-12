@@ -9,16 +9,9 @@ using Unity.Transforms;
 [UpdateInGroup(typeof(ResourceInteractionGroup))]
 public class CitizenResourceDeliverySystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    protected override void OnCreate()
-    {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-    }
-
     protected override void OnUpdate()
     {
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
         Entities.WithAll<Citizen, HasArrivedAtDestinationTag>().WithNone<MovingToPickupResource>().ForEach((Entity citizen, ref ResourceTransportJobData transportJobData) =>
         {
             if (EntityManager.Exists(transportJobData.DestinationEntity))
@@ -58,6 +51,6 @@ public class CitizenResourceDeliverySystem : SystemBase
         }).WithoutBurst().Run();
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
     }
 }

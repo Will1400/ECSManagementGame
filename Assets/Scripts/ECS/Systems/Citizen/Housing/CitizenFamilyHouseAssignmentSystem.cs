@@ -7,16 +7,11 @@ using Unity.Transforms;
 
 public class CitizenFamilyHouseAssignmentSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
     EntityQuery housesQuery;
     EntityQuery familyQuery;
-    EntityQuery citizensWithoutFamilyQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         housesQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(HouseData), typeof(CitizenElement), typeof(Translation) }
@@ -26,12 +21,6 @@ public class CitizenFamilyHouseAssignmentSystem : SystemBase
         {
             All = new ComponentType[] { typeof(FamilyData) }
         });
-
-        citizensWithoutFamilyQuery = GetEntityQuery(new EntityQueryDesc
-        {
-            All = new ComponentType[] { typeof(Citizen) },
-            None = new ComponentType[] { typeof(IsChildTag), typeof(CitizenFamily) }
-        });
     }
 
     protected override void OnUpdate()
@@ -39,7 +28,7 @@ public class CitizenFamilyHouseAssignmentSystem : SystemBase
         if (familyQuery.CalculateEntityCount() == 0 || housesQuery.CalculateEntityCount() == 0)
             return;
 
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         NativeArray<Entity> familyEntites = familyQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<FamilyData> familyDatas = familyQuery.ToComponentDataArray<FamilyData>(Allocator.TempJob);
@@ -80,7 +69,7 @@ public class CitizenFamilyHouseAssignmentSystem : SystemBase
         }).Run();
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
 
         familyEntites.Dispose();
         familyDatas.Dispose();
