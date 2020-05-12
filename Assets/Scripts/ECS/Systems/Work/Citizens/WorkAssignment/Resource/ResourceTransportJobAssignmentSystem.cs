@@ -8,21 +8,16 @@ using Unity.Collections;
 [UpdateInGroup(typeof(WorkAssignmentGroup))]
 public class ResourceTransportJobAssignmentSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
     EntityQuery transportJobsQuery;
     EntityQuery idleCitizensQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         transportJobsQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(ResourceTransportJobData) },
             None = new ComponentType[] { typeof(Citizen) }
         });
-
 
         idleCitizensQuery = GetEntityQuery(new EntityQueryDesc
         {
@@ -37,7 +32,8 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             return;
 
         NativeArray<Entity> idleCitizens = idleCitizensQuery.ToEntityArray(Allocator.TempJob);
-        EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
+
+        EntityCommandBuffer CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         int citizenIndex = 0;
         Entities.WithNone<Citizen>().ForEach((Entity entity, ref ResourceTransportJobData transportJobData) =>
@@ -91,9 +87,8 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             citizenIndex++;
         }).WithoutBurst().Run();
 
-        // Needs to be played back here to remove IdleTag immediately
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
 
         idleCitizens.Dispose();
     }

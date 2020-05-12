@@ -5,19 +5,19 @@ using Unity.Transforms;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Burst;
+using JetBrains.Annotations;
+using System;
+using System.Linq;
 
 [UpdateInGroup(typeof(WorkAssignmentGroup))]
 public class CitizenWorkAssignmentSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
     EntityQuery idleCitizensQuery;
     EntityQuery needsWorkersQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         idleCitizensQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(Citizen), typeof(IdleTag), typeof(Translation) }
@@ -35,49 +35,137 @@ public class CitizenWorkAssignmentSystem : SystemBase
         if (idleCitizensQuery.CalculateChunkCount() == 0 || needsWorkersQuery.CalculateChunkCount() == 0)
             return;
 
-        var idleCitizens = idleCitizensQuery.ToEntityArray(Allocator.TempJob);
-        var idleCitizensTranslation = idleCitizensQuery.ToComponentDataArray<Translation>(Allocator.TempJob);
+        var idleCitizens = idleCitizensQuery.ToEntityArrayAsync(Allocator.TempJob, out JobHandle citizenEntititiesHandle);
+        var idleCitizensTranslation = idleCitizensQuery.ToComponentDataArrayAsync<Translation>(Allocator.TempJob, out JobHandle citizenTranslationHandle);
 
-        EntityCommandBuffer CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var workplaceEntities = needsWorkersQuery.ToEntityArray(Allocator.TempJob);
+        var workplaceWorkerDatas = needsWorkersQuery.ToComponentDataArray<WorkplaceWorkerData>(Allocator.TempJob);
 
-        int citizenIndex = 0;
-        Entities.WithNone<RemoveWorkplaceTag>().ForEach((Entity workPlace, ref WorkplaceWorkerData workerData) =>
+        EntityCommandBuffer CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
+
+        for (int i = 0; i < workplaceEntities.Length; i++)
         {
-            if (idleCitizens.Length == 0)
-                return;
+            var workerData = workplaceWorkerDatas[i];
 
             if (workerData.CurrentWorkers < workerData.MaxWorkers && workerData.IsWorkable && math.all(workerData.WorkPosition != float3.zero))
             {
-                int currentWorkers = workerData.CurrentWorkers;
-                for (int i = citizenIndex; i < idleCitizens.Length; i++)
+                int neededWorkers = workerData.MaxWorkers - workerData.CurrentWorkers;
+
+                NativeArray<EntityDistanceInfo> nearestCitizenIndexes = new NativeArray<EntityDistanceInfo>(neededWorkers, Allocator.TempJob);
+
+                FindNearestCitizensJob nearestCitizensJob = new FindNearestCitizensJob
                 {
-                    if (currentWorkers < workerData.MaxWorkers)
-                    {
-                        CommandBuffer.AddComponent<CitizenWork>(idleCitizens[i]);
-                        CommandBuffer.AddComponent<NavAgentRequestingPath>(idleCitizens[i]);
+                    NeededCitizens = neededWorkers,
+                    CitizenTranslations = idleCitizensTranslation,
+                    StartPosition = workerData.WorkPosition,
+                    ClosestCitizenIndexes = nearestCitizenIndexes
+                };
 
-                        CommandBuffer.SetComponent(idleCitizens[i], new CitizenWork { WorkplaceEntity = workPlace, WorkPosition = workerData.WorkPosition });
-                        CommandBuffer.SetComponent(idleCitizens[i], new NavAgentRequestingPath { StartPosition = idleCitizensTranslation[i].Value, EndPosition = workerData.WorkPosition });
-                        currentWorkers++;
-                        CommandBuffer.RemoveComponent<IdleTag>(idleCitizens[i]);
-                        CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(idleCitizens[i]);
+                nearestCitizensJob.Schedule(citizenTranslationHandle).Complete();
 
-                        citizenIndex++;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                citizenEntititiesHandle.Complete();
+
+                for (int c = 0; c < nearestCitizenIndexes.Length; c++)
+                {
+                    int citizenIndex = nearestCitizenIndexes[c].EntityIndex;
+
+                    if (citizenIndex == -1)
+                        continue;
+
+                    CommandBuffer.AddComponent<CitizenWork>(idleCitizens[citizenIndex]);
+                    CommandBuffer.SetComponent(idleCitizens[citizenIndex], new CitizenWork { WorkplaceEntity = workplaceEntities[i], WorkPosition = workerData.WorkPosition });
+
+                    CommandBuffer.AddComponent<NavAgentRequestingPath>(idleCitizens[citizenIndex]);
+                    CommandBuffer.SetComponent(idleCitizens[citizenIndex], new NavAgentRequestingPath { StartPosition = idleCitizensTranslation[citizenIndex].Value, EndPosition = workerData.WorkPosition });
+
+                    CommandBuffer.RemoveComponent<IdleTag>(idleCitizens[citizenIndex]);
+                    CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(idleCitizens[citizenIndex]);
+
+                    // Save the worker count
+                    workerData.CurrentWorkers++;
+                    CommandBuffer.SetComponent(workplaceEntities[i], workerData);
+
+                    // Prevents the same entity from being uses twice
+                    idleCitizensTranslation[citizenIndex] = new Translation { };
                 }
-                workerData.CurrentWorkers = currentWorkers;
-            }
-        }).Run();
 
-        // Needs to be played back here to remove IdleTag immediately
+                nearestCitizenIndexes.Dispose();
+            }
+        }
+
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
+
+        citizenEntititiesHandle.Complete();
+        citizenTranslationHandle.Complete();
 
         idleCitizens.Dispose();
         idleCitizensTranslation.Dispose();
+
+        workplaceEntities.Dispose();
+        workplaceWorkerDatas.Dispose();
+    }
+
+
+    [BurstCompile]
+    struct FindNearestCitizensJob : IJob
+    {
+        public int NeededCitizens;
+
+        public float3 StartPosition;
+
+        public NativeArray<Translation> CitizenTranslations;
+
+        public NativeArray<EntityDistanceInfo> ClosestCitizenIndexes;
+
+        public void Execute()
+        {
+            float distanceToBeat = Mathf.Infinity;
+
+            if (CitizenTranslations.Length < NeededCitizens)
+            {
+                for (int i = 0; i < NeededCitizens - CitizenTranslations.Length; i++)
+                {
+                    ClosestCitizenIndexes[i] = new EntityDistanceInfo { EntityIndex = -1 };
+                }
+            }
+
+            for (int i = 0; i < CitizenTranslations.Length; i++)
+            {
+                if (math.all(CitizenTranslations[i].Value == float3.zero))
+                    continue;
+
+                float distance = math.distance(StartPosition, CitizenTranslations[i].Value);
+
+                if (distance < distanceToBeat)
+                {
+                    for (int j = 0; j < ClosestCitizenIndexes.Length; j++)
+                    {
+                        if (distance < ClosestCitizenIndexes[j].Distance)
+                        {
+                            ClosestCitizenIndexes[j] = new EntityDistanceInfo { EntityIndex = i, Distance = distance };
+                            break;
+                        }
+
+                        if (distanceToBeat < ClosestCitizenIndexes[j].Distance)
+                        {
+                            distanceToBeat = ClosestCitizenIndexes[j].Distance;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    [Serializable]
+    struct EntityDistanceInfo : IComparable<EntityDistanceInfo>
+    {
+        public int EntityIndex;
+        public float Distance;
+
+        public int CompareTo(EntityDistanceInfo other)
+        {
+            return Distance.CompareTo(other.Distance);
+        }
     }
 }
