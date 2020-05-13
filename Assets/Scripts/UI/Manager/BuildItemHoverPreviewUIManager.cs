@@ -49,7 +49,7 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (panelObject.activeSelf && (buildItem == null || buildItem.gameObject.activeSelf == false))
+        if (panelObject.activeSelf && (buildItem == null || !buildItem.gameObject.activeSelf|| !BuildUIManager.Instance.IsActive))
         {
             HoverEnd();
         }

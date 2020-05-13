@@ -13,6 +13,7 @@ public class UIStatUpdatingSystem : SystemBase
 
     public Action<int> CitizenCountChanged;
     public Action<int> StoneResourceCountChanged;
+    public Action<int> WoodResourceCountChanged;
 
     NativeArray<int> resourceCounts;
     NativeQueue<ResourceCountInfo> resourceCountInfoQueue;
@@ -45,6 +46,21 @@ public class UIStatUpdatingSystem : SystemBase
             {
                 StoneResourceCountChanged?.Invoke(value);
                 stoneResourceCount = value;
+            }
+        }
+    }
+
+    private int woodResourceCount;
+
+    public int WoodResourceCount
+    {
+        get { return woodResourceCount; }
+        set
+        {
+            if (value != woodResourceCount)
+            {
+                WoodResourceCountChanged?.Invoke(value);
+                woodResourceCount = value;
             }
         }
     }
@@ -97,6 +113,10 @@ public class UIStatUpdatingSystem : SystemBase
             if ((ResourceType)i == ResourceType.Stone)
             {
                 StoneResourceCount = resourceCounts[i];
+            }
+            if ((ResourceType)i == ResourceType.Wood)
+            {
+                WoodResourceCount = resourceCounts[i];
             }
         }
 
