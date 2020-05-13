@@ -120,8 +120,6 @@ MonoBehaviour:
   Values:
   - ResourceType: 2
     Amount: 20
-  - ResourceType: 1
-    Amount: 0
 --- !u!114 &2057154587401318059
 MonoBehaviour:
   m_ObjectHideFlags: 0
