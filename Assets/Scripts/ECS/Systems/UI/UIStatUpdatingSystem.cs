@@ -12,10 +12,10 @@ public class UIStatUpdatingSystem : SystemBase
     public static UIStatUpdatingSystem Instance;
 
     public Action<int> CitizenCountChanged;
-    public Action<int> StoneResourceCountChanged;
-    public Action<int> WoodResourceCountChanged;
+    public Action<ResourceType, int> ResourceCountChanged;
 
     NativeArray<int> resourceCounts;
+    NativeArray<int> newResourceCounts;
     NativeQueue<ResourceCountInfo> resourceCountInfoQueue;
 
     int numOfResourceTypes;
@@ -35,36 +35,6 @@ public class UIStatUpdatingSystem : SystemBase
         }
     }
 
-    private int stoneResourceCount;
-
-    public int StoneResourceCount
-    {
-        get { return stoneResourceCount; }
-        set
-        {
-            if (value != stoneResourceCount)
-            {
-                StoneResourceCountChanged?.Invoke(value);
-                stoneResourceCount = value;
-            }
-        }
-    }
-
-    private int woodResourceCount;
-
-    public int WoodResourceCount
-    {
-        get { return woodResourceCount; }
-        set
-        {
-            if (value != woodResourceCount)
-            {
-                WoodResourceCountChanged?.Invoke(value);
-                woodResourceCount = value;
-            }
-        }
-    }
-
     EntityQuery citizensQuery;
     EntityQuery resourcesQuery;
 
@@ -73,6 +43,7 @@ public class UIStatUpdatingSystem : SystemBase
         numOfResourceTypes = Enum.GetValues(typeof(ResourceType)).Length;
 
         resourceCounts = new NativeArray<int>(numOfResourceTypes, Allocator.Persistent);
+        newResourceCounts = new NativeArray<int>(numOfResourceTypes, Allocator.Persistent);
         resourceCountInfoQueue = new NativeQueue<ResourceCountInfo>(Allocator.Persistent);
 
         if (Instance == null)
@@ -91,9 +62,10 @@ public class UIStatUpdatingSystem : SystemBase
 
     protected override void OnUpdate()
     {
-        ResetCountsArray();
-
         CitizenCount = citizensQuery.CalculateEntityCount();
+
+
+        ResetNewCount();
 
         var countJob = new ResourceBasicCountJob
         {
@@ -105,35 +77,31 @@ public class UIStatUpdatingSystem : SystemBase
 
         while (resourceCountInfoQueue.TryDequeue(out ResourceCountInfo countInfo))
         {
-            resourceCounts[(int)countInfo.ResourceType] += countInfo.Count;
+            newResourceCounts[(int)countInfo.ResourceType] += countInfo.Count;
         }
 
         for (int i = 0; i < resourceCounts.Length; i++)
         {
-            if ((ResourceType)i == ResourceType.Stone)
+            if (resourceCounts[i] != newResourceCounts[i])
             {
-                StoneResourceCount = resourceCounts[i];
-            }
-            if ((ResourceType)i == ResourceType.Wood)
-            {
-                WoodResourceCount = resourceCounts[i];
+                resourceCounts[i] = newResourceCounts[i];
+                ResourceCountChanged?.Invoke((ResourceType)i, resourceCounts[i]);
             }
         }
-
     }
 
-    [BurstCompile]
-    void ResetCountsArray()
+    void ResetNewCount()
     {
-        for (int i = 0; i < numOfResourceTypes; i++)
+        for (int i = 0; i < newResourceCounts.Length; i++)
         {
-            resourceCounts[i] = 0;
+            newResourceCounts[i] = 0;
         }
     }
 
     protected override void OnDestroy()
     {
         resourceCounts.Dispose();
+        newResourceCounts.Dispose();
         resourceCountInfoQueue.Dispose();
     }
 
