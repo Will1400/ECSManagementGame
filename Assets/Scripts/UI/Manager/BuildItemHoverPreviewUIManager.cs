@@ -13,6 +13,12 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
     public static BuildItemHoverPreviewUIManager Instance;
 
     [SerializeField]
+    private CanvasScaler canvasScaler;
+    [SerializeField]
+    private Canvas canvas;
+    [SerializeField]
+    private RectTransform canvasRectTransform;
+    [SerializeField]
     private GameObject panelObject;
     [SerializeField]
     private GameObject contentHolder;
@@ -49,7 +55,7 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
 
     private void Update()
     {
-        if (panelObject.activeSelf && (buildItem == null || !buildItem.gameObject.activeSelf|| !BuildUIManager.Instance.IsActive))
+        if (panelObject.activeSelf && (buildItem == null || !buildItem.gameObject.activeSelf || !BuildUIManager.Instance.IsActive))
         {
             HoverEnd();
         }
@@ -63,7 +69,7 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
 
             hoverTimeRemaining -= Time.deltaTime;
 
-            if (hoverTimeRemaining <= 0)
+            if (hoverTimeRemaining <= 0 && !panelObject.activeSelf)
             {
                 SetupPanel();
             }
@@ -98,8 +104,15 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
     void SetupPanel()
     {
         var previewedEntity = EntityPrefabManager.Instance.GetEntityPrefab(buildItem.NameText.text);
+        var panelRectTransform = panelObject.gameObject.GetComponent<RectTransform>();
 
-        panelObject.transform.position = buildItem.transform.position + new Vector3(140, 260);
+        var buildRectTransform = buildItem.GetComponent<RectTransform>();
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRectTransform, buildRectTransform.anchoredPosition, canvas.worldCamera, out Vector2 point);
+
+        point.y = panelRectTransform.anchoredPosition.y;
+        point.x += panelRectTransform.rect.xMax - panelRectTransform.rect.xMin;
+        panelRectTransform.anchoredPosition = point;
 
         var displayData = EntityManager.GetComponentData<DisplayData>(previewedEntity);
         titleText.text = displayData.Name.ToString();
