@@ -2,20 +2,17 @@
 using System.Collections;
 using Unity.Entities;
 using Unity.Collections;
+using Unity.Jobs;
 
 [UpdateInGroup(typeof(WorkCreationGroup))]
 public class EmptyResourceStorageJobCreationSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
     EntityQuery resourcesInStorageQuery;
     EntityQuery StorageAreasQuery;
     EntityQuery resourceStoragesToEmptyQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         resourceStoragesToEmptyQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(ResourceStorageData), typeof(EmptyResourceStorageTag) },
@@ -52,11 +49,11 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
         if (isResourceStorageEmpty)
             return;
 
-        NativeArray<Entity> resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArray(Allocator.TempJob);
-        NativeArray<ResourceInStorageData> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArray<ResourceInStorageData>(Allocator.TempJob);
-        NativeArray<Entity> storageAreas = StorageAreasQuery.ToEntityArray(Allocator.TempJob);
+        NativeArray<Entity> resourcesInStorageEntities = resourcesInStorageQuery.ToEntityArrayAsync(Allocator.TempJob, out JobHandle resourceEntitiesHandle);
+        NativeArray<ResourceInStorageData> resourcesInStorage = resourcesInStorageQuery.ToComponentDataArrayAsync<ResourceInStorageData>(Allocator.TempJob, out JobHandle resourceInStorageHandle);
+        NativeArray<Entity> storageAreas = StorageAreasQuery.ToEntityArrayAsync(Allocator.TempJob, out JobHandle storageAreasEntitiesHandle);
 
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         Entities.WithAll<EmptyResourceStorageTag>().ForEach((Entity entity, int entityInQueryIndex, DynamicBuffer<ResourceDataElement> resourceDatas, ref ResourceStorageData resourceStorage) =>
         {
@@ -93,7 +90,14 @@ public class EmptyResourceStorageJobCreationSystem : SystemBase
                     }
                 }
             }
-        }).Schedule(Dependency).Complete();
+        }).Schedule(JobHandle.CombineDependencies(resourceEntitiesHandle, resourceInStorageHandle, storageAreasEntitiesHandle)).Complete();
+        
+        CommandBuffer.Playback(EntityManager);
+        CommandBuffer.Dispose();
+
+        resourceEntitiesHandle.Complete();
+        resourceInStorageHandle.Complete();
+        storageAreasEntitiesHandle.Complete();
 
         resourcesInStorage.Dispose();
         resourcesInStorageEntities.Dispose();

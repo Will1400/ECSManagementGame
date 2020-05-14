@@ -35,7 +35,6 @@ public class PauseMenuUIManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape) && !BuildUIManager.Instance.IsActive &&
             (GameManager.Instance.CursorState == CursorState.None || GameManager.Instance.CursorState == CursorState.Menu))
         {
-            Debug.Log(BuildUIManager.Instance.IsActive);
             ToggleWindow();
         }
     }

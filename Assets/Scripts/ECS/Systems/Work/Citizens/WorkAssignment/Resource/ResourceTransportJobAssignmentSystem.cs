@@ -43,10 +43,8 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
 
             var citizen = idleCitizens[citizenIndex];
 
-            if (math.all(transportJobData.DestinationPosition == float3.zero))
-            {
-                transportJobData.DestinationPosition = EntityManager.GetComponentData<Translation>(transportJobData.DestinationEntity).Value;
-            }
+            if (math.all( transportJobData.ResourcePosition == float3.zero))
+                return;
 
             if (EntityManager.HasComponent<ResourceStorageData>(transportJobData.DestinationEntity))
             {
@@ -59,7 +57,7 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             NavAgentRequestingPath requestingPath = new NavAgentRequestingPath
             {
                 StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value,
-                EndPosition = EntityManager.GetComponentData<Translation>(transportJobData.ResourceEntity).Value
+                EndPosition = transportJobData.ResourcePosition
             };
 
             CommandBuffer.AddComponent<MovingToPickupResource>(citizen);
