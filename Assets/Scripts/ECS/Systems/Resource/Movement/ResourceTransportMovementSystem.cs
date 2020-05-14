@@ -34,7 +34,6 @@ public class ResourceTransportMovementSystem : SystemBase
 
         }.Schedule(citizensCarryingResourcesQuery);
         moveJob.Complete();
-
     }
 
     [BurstCompile]

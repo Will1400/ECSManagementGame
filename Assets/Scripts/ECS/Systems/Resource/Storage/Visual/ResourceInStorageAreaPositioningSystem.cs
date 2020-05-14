@@ -9,13 +9,10 @@ using Unity.Burst;
 [UpdateInGroup(typeof(VisualGroup))]
 public class ResourceInStorageAreaPositioningSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery resourcesInStorageQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         resourcesInStorageQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(ResourceInStorageData), typeof(Translation) }
@@ -26,7 +23,6 @@ public class ResourceInStorageAreaPositioningSystem : SystemBase
     {
         var job = new PositionJob
         {
-            EntityType = GetArchetypeChunkEntityType(),
             TranslationType = GetArchetypeChunkComponentType<Translation>(),
             ResourceInStorageType = GetArchetypeChunkComponentType<ResourceInStorageData>(),
         }.Schedule(resourcesInStorageQuery);
@@ -36,15 +32,11 @@ public class ResourceInStorageAreaPositioningSystem : SystemBase
     [BurstCompile]
     struct PositionJob : IJobChunk
     {
-        [ReadOnly]
-        public ArchetypeChunkEntityType EntityType;
         public ArchetypeChunkComponentType<Translation> TranslationType;
         public ArchetypeChunkComponentType<ResourceInStorageData> ResourceInStorageType;
 
         public void Execute(ArchetypeChunk chunk, int chunkIndex, int firstEntityIndex)
         {
-            //NativeArray<Entity> entities = chunk.GetNativeArray(EntityType);
-
             NativeArray<Translation> translations = chunk.GetNativeArray(TranslationType);
             NativeArray<ResourceInStorageData> resourceInStorages = chunk.GetNativeArray(ResourceInStorageType);
 

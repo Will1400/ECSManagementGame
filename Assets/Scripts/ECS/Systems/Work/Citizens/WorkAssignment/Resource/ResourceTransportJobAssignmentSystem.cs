@@ -52,16 +52,8 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             {
                 var storageData = EntityManager.GetComponentData<ResourceStorageData>(transportJobData.DestinationEntity);
 
-                if (storageData.UsedCapacity >= storageData.MaxCapacity && storageData.MaxCapacity != -1)
-                {
-                    CommandBuffer.AddComponent<ResourceStorageFullTag>(transportJobData.DestinationEntity);
-                    return;
-                }
-                else
-                {
-                    storageData.UsedCapacity++;
-                    CommandBuffer.SetComponent(transportJobData.DestinationEntity, storageData);
-                }
+                storageData.UsedCapacity++;
+                CommandBuffer.SetComponent(transportJobData.DestinationEntity, storageData);
             }
 
             NavAgentRequestingPath requestingPath = new NavAgentRequestingPath
