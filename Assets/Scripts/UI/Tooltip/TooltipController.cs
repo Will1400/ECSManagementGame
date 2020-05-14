@@ -43,7 +43,6 @@ public class TooltipController : MonoBehaviour
         float2 backgroundSize = new float2(tooltipText.preferredWidth, tooltipText.preferredHeight);
         backgroundRectTransform.sizeDelta = backgroundSize;
         backgroundRectTransform.anchoredPosition = backgroundSize / 2;
-        //transform.position = Input.mousePosition;
     }
 
     public void HideTooltip()

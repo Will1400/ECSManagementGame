@@ -13,8 +13,6 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
     public static BuildItemHoverPreviewUIManager Instance;
 
     [SerializeField]
-    private CanvasScaler canvasScaler;
-    [SerializeField]
     private Canvas canvas;
     [SerializeField]
     private RectTransform canvasRectTransform;
@@ -56,9 +54,8 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
     private void Update()
     {
         if (panelObject.activeSelf && (buildItem == null || !buildItem.gameObject.activeSelf || !BuildUIManager.Instance.IsActive))
-        {
             HoverEnd();
-        }
+
 
         if (isHovering)
         {
@@ -77,9 +74,7 @@ public class BuildItemHoverPreviewUIManager : MonoBehaviour
         else
         {
             if (instantHoverTimeRemaining >= 0)
-            {
                 instantHoverTimeRemaining -= Time.deltaTime;
-            }
         }
     }
 
