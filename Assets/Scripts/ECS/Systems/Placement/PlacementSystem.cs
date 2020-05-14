@@ -112,6 +112,8 @@ public class PlacementSystem : SystemBase
         EntityManager.SetSharedComponentData(currentEntity, renderMesh);
 
         GameManager.Instance.CursorState = CursorState.Building;
+
+        PlacementPreviewUIManager.Instance.ShowPreview(prefabName);
     }
 
     public void Spawn(string name, bool openBuildingMenuWhenDone)
@@ -125,6 +127,7 @@ public class PlacementSystem : SystemBase
         GameManager.Instance.CursorState = CursorState.None;
         if (currentEntity == Entity.Null)
             return;
+        PlacementPreviewUIManager.Instance.HidePreview();
 
         prefabName = string.Empty;
         EntityManager.DestroyEntity(currentEntity);
