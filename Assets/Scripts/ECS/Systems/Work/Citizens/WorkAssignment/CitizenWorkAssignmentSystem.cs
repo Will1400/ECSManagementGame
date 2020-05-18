@@ -35,8 +35,8 @@ public class CitizenWorkAssignmentSystem : SystemBase
         if (idleCitizensQuery.CalculateChunkCount() == 0 || needsWorkersQuery.CalculateChunkCount() == 0)
             return;
 
-        var idleCitizens = idleCitizensQuery.ToEntityArrayAsync(Allocator.TempJob, out JobHandle citizenEntititiesHandle);
-        var idleCitizensTranslation = idleCitizensQuery.ToComponentDataArrayAsync<Translation>(Allocator.TempJob, out JobHandle citizenTranslationHandle);
+        var idleCitizenEntitities = idleCitizensQuery.ToEntityArrayAsync(Allocator.TempJob, out JobHandle citizenEntititiesHandle);
+        var idleCitizensTranslations = idleCitizensQuery.ToComponentDataArrayAsync<Translation>(Allocator.TempJob, out JobHandle citizenTranslationHandle);
 
         var workplaceEntities = needsWorkersQuery.ToEntityArray(Allocator.TempJob);
         var workplaceWorkerDatas = needsWorkersQuery.ToComponentDataArray<WorkplaceWorkerData>(Allocator.TempJob);
@@ -56,7 +56,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
                 FindNearestCitizensJob nearestCitizensJob = new FindNearestCitizensJob
                 {
                     NeededCitizens = neededWorkers,
-                    CitizenTranslations = idleCitizensTranslation,
+                    CitizenTranslations = idleCitizensTranslations,
                     StartPosition = workerData.WorkPosition,
                     ClosestCitizenIndexes = nearestCitizenIndexes
                 };
@@ -73,21 +73,21 @@ public class CitizenWorkAssignmentSystem : SystemBase
                     if (citizenIndex == -1)
                         continue;
 
-                    CommandBuffer.AddComponent<CitizenWork>(idleCitizens[citizenIndex]);
-                    CommandBuffer.SetComponent(idleCitizens[citizenIndex], new CitizenWork { WorkplaceEntity = workplaceEntities[i], WorkPosition = workerData.WorkPosition });
+                    CommandBuffer.AddComponent<CitizenWork>(idleCitizenEntitities[citizenIndex]);
+                    CommandBuffer.SetComponent(idleCitizenEntitities[citizenIndex], new CitizenWork { WorkplaceEntity = workplaceEntities[i], WorkPosition = workerData.WorkPosition });
 
-                    CommandBuffer.AddComponent<NavAgentRequestingPath>(idleCitizens[citizenIndex]);
-                    CommandBuffer.SetComponent(idleCitizens[citizenIndex], new NavAgentRequestingPath { StartPosition = idleCitizensTranslation[citizenIndex].Value, EndPosition = workerData.WorkPosition });
+                    CommandBuffer.AddComponent<NavAgentRequestingPath>(idleCitizenEntitities[citizenIndex]);
+                    CommandBuffer.SetComponent(idleCitizenEntitities[citizenIndex], new NavAgentRequestingPath { StartPosition = idleCitizensTranslations[citizenIndex].Value, EndPosition = workerData.WorkPosition });
 
-                    CommandBuffer.RemoveComponent<IdleTag>(idleCitizens[citizenIndex]);
-                    CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(idleCitizens[citizenIndex]);
+                    CommandBuffer.RemoveComponent<IdleTag>(idleCitizenEntitities[citizenIndex]);
+                    CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(idleCitizenEntitities[citizenIndex]);
 
                     // Save the worker count
                     workerData.CurrentWorkers++;
                     CommandBuffer.SetComponent(workplaceEntities[i], workerData);
 
                     // Prevents the same entity from being uses twice
-                    idleCitizensTranslation[citizenIndex] = new Translation { };
+                    idleCitizensTranslations[citizenIndex] = new Translation { };
                 }
 
                 nearestCitizenIndexes.Dispose();
@@ -100,8 +100,8 @@ public class CitizenWorkAssignmentSystem : SystemBase
         citizenEntititiesHandle.Complete();
         citizenTranslationHandle.Complete();
 
-        idleCitizens.Dispose();
-        idleCitizensTranslation.Dispose();
+        idleCitizenEntitities.Dispose();
+        idleCitizensTranslations.Dispose();
 
         workplaceEntities.Dispose();
         workplaceWorkerDatas.Dispose();
