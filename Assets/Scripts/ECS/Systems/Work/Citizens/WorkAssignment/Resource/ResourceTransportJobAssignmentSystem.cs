@@ -4,6 +4,9 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Collections;
+using Unity.Jobs;
+using Unity.Burst;
+using UnityEngine.Rendering;
 
 [UpdateInGroup(typeof(WorkAssignmentGroup))]
 public class ResourceTransportJobAssignmentSystem : SystemBase
@@ -21,7 +24,7 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
 
         idleCitizensQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(Citizen), typeof(IdleTag) },
+            All = new ComponentType[] { typeof(Citizen), typeof(IdleTag), typeof(Translation) },
             None = new ComponentType[] { typeof(MovingToPickupResource) }
         });
     }
@@ -32,54 +35,98 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             return;
 
         NativeArray<Entity> idleCitizens = idleCitizensQuery.ToEntityArray(Allocator.TempJob);
+        var idleCitizenTranslations = idleCitizensQuery.ToComponentDataArray<Translation>(Allocator.TempJob);
+
+        var transportJobEntities = transportJobsQuery.ToEntityArray(Allocator.TempJob);
+        var transportJobDatas = transportJobsQuery.ToComponentDataArray<ResourceTransportJobData>(Allocator.TempJob);
 
         EntityCommandBuffer CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
-        int citizenIndex = 0;
-        Entities.WithNone<Citizen>().ForEach((Entity entity, ref ResourceTransportJobData transportJobData) =>
+
+        NativeArray<int> closestPositionArray = new NativeArray<int>(1, Allocator.TempJob);
+
+        for (int i = 0; i < transportJobDatas.Length; i++)
         {
-            if (citizenIndex >= idleCitizens.Length)
-                return;
-
-            var citizen = idleCitizens[citizenIndex];
-
-            if (math.all( transportJobData.ResourcePosition == float3.zero))
-                return;
-
-            if (EntityManager.HasComponent<ResourceStorageData>(transportJobData.DestinationEntity))
+            var job = new FindClosestPositionJob
             {
-                var storageData = EntityManager.GetComponentData<ResourceStorageData>(transportJobData.DestinationEntity);
+                CitizenTranslations = idleCitizenTranslations,
+                StartPosition = transportJobDatas[i].ResourcePosition,
+                ClosestIndexArray = closestPositionArray
+            };
+
+            job.Run();
+
+            if (closestPositionArray[0] == -1)
+                continue;
+
+            var citizen = idleCitizens[closestPositionArray[0]];
+            if (EntityManager.HasComponent<ResourceStorageData>(transportJobDatas[i].DestinationEntity))
+            {
+                var storageData = EntityManager.GetComponentData<ResourceStorageData>(transportJobDatas[i].DestinationEntity);
 
                 storageData.UsedCapacity++;
-                CommandBuffer.SetComponent(transportJobData.DestinationEntity, storageData);
+                CommandBuffer.SetComponent(transportJobDatas[i].DestinationEntity, storageData);
             }
 
             NavAgentRequestingPath requestingPath = new NavAgentRequestingPath
             {
                 StartPosition = EntityManager.GetComponentData<Translation>(citizen).Value,
-                EndPosition = transportJobData.ResourcePosition
+                EndPosition = transportJobDatas[i].ResourcePosition
             };
 
             CommandBuffer.AddComponent<MovingToPickupResource>(citizen);
-            CommandBuffer.SetComponent(citizen, new MovingToPickupResource { ResourceEntity = transportJobData.ResourceEntity });
+            CommandBuffer.SetComponent(citizen, new MovingToPickupResource { ResourceEntity = transportJobDatas[i].ResourceEntity });
 
             CommandBuffer.AddComponent<NavAgentRequestingPath>(citizen);
             CommandBuffer.SetComponent(citizen, requestingPath);
 
             CommandBuffer.AddComponent<ResourceTransportJobData>(citizen);
-            CommandBuffer.SetComponent(citizen, transportJobData);
+            CommandBuffer.SetComponent(citizen, transportJobDatas[i]);
 
             CommandBuffer.RemoveComponent<HasArrivedAtDestinationTag>(citizen);
             CommandBuffer.RemoveComponent<IdleTag>(citizen);
 
-            CommandBuffer.DestroyEntity(entity);
+            CommandBuffer.DestroyEntity(transportJobEntities[i]);
+        }
 
-            citizenIndex++;
-        }).WithoutBurst().Run();
+        closestPositionArray.Dispose();
 
         CommandBuffer.Playback(EntityManager);
         CommandBuffer.Dispose();
 
         idleCitizens.Dispose();
+        idleCitizenTranslations.Dispose();
+
+        transportJobEntities.Dispose();
+        transportJobDatas.Dispose();
+    }
+
+    [BurstCompile]
+    struct FindClosestPositionJob : IJob
+    {
+        public float3 StartPosition;
+
+        public NativeArray<Translation> CitizenTranslations;
+
+        public NativeArray<int> ClosestIndexArray;
+
+        public void Execute()
+        {
+            float distanceToBeat = Mathf.Infinity;
+
+            for (int i = 0; i < CitizenTranslations.Length; i++)
+            {
+                if (math.all(CitizenTranslations[i].Value == float3.zero))
+                    continue;
+
+                float distance = math.distance(StartPosition, CitizenTranslations[i].Value);
+
+                if (distance < distanceToBeat)
+                {
+                    ClosestIndexArray[0] = i; ;
+                    distanceToBeat = distance;
+                }
+            }
+        }
     }
 }

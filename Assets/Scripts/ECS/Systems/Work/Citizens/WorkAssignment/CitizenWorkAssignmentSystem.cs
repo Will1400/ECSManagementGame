@@ -51,22 +51,22 @@ public class CitizenWorkAssignmentSystem : SystemBase
             {
                 int neededWorkers = workerData.MaxWorkers - workerData.CurrentWorkers;
 
-                NativeArray<EntityDistanceInfo> nearestCitizenIndexes = new NativeArray<EntityDistanceInfo>(neededWorkers, Allocator.TempJob);
+                NativeArray<EntityDistanceInfo> closestCitizenIndexes = new NativeArray<EntityDistanceInfo>(neededWorkers, Allocator.TempJob);
 
-                FindNearestCitizensJob nearestCitizensJob = new FindNearestCitizensJob
+                FindClosestCitizensJob job = new FindClosestCitizensJob
                 {
                     NeededCitizens = neededWorkers,
                     CitizenTranslations = idleCitizensTranslations,
                     StartPosition = workerData.WorkPosition,
-                    ClosestCitizenIndexes = nearestCitizenIndexes
+                    ClosestCitizenIndexes = closestCitizenIndexes
                 };
 
-                nearestCitizensJob.Schedule(citizenTranslationHandle).Complete();
+                job.Schedule(citizenTranslationHandle).Complete();
 
                 citizenEntititiesHandle.Complete();
 
                 // Assign citizens to job
-                foreach (var item in nearestCitizenIndexes.Distinct())
+                foreach (var item in closestCitizenIndexes.Distinct())
                 {
                     int citizenIndex = item.EntityIndex;
 
@@ -90,7 +90,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
                     idleCitizensTranslations[citizenIndex] = new Translation { };
                 }
 
-                nearestCitizenIndexes.Dispose();
+                closestCitizenIndexes.Dispose();
             }
         }
 
@@ -109,12 +109,13 @@ public class CitizenWorkAssignmentSystem : SystemBase
 
 
     [BurstCompile]
-    struct FindNearestCitizensJob : IJob
+    struct FindClosestCitizensJob : IJob
     {
         public int NeededCitizens;
 
         public float3 StartPosition;
 
+        [ReadOnly]
         public NativeArray<Translation> CitizenTranslations;
 
         public NativeArray<EntityDistanceInfo> ClosestCitizenIndexes;
@@ -122,6 +123,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
         public void Execute()
         {
             float distanceToBeat = Mathf.Infinity;
+            int highestDistanceIndex = 0;
 
             for (int i = 0; i < ClosestCitizenIndexes.Length; i++)
             {
@@ -137,14 +139,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
 
                 if (distance < distanceToBeat)
                 {
-                    for (int j = 0; j < ClosestCitizenIndexes.Length; j++)
-                    {
-                        if (distance < ClosestCitizenIndexes[j].Distance)
-                        {
-                            ClosestCitizenIndexes[j] = new EntityDistanceInfo { EntityIndex = i, Distance = distance };
-                            break;
-                        }
-                    }
+                    ClosestCitizenIndexes[highestDistanceIndex] = new EntityDistanceInfo { EntityIndex = i, Distance = distance };
 
                     // Set distanceToBeat to the highest distance
                     distanceToBeat = ClosestCitizenIndexes[0].Distance;
@@ -153,6 +148,7 @@ public class CitizenWorkAssignmentSystem : SystemBase
                         if (distanceToBeat < ClosestCitizenIndexes[d].Distance)
                         {
                             distanceToBeat = ClosestCitizenIndexes[d].Distance;
+                            highestDistanceIndex = d;
                         }
                     }
                 }
