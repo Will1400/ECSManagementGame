@@ -47,6 +47,10 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
 
         for (int i = 0; i < transportJobDatas.Length; i++)
         {
+            if (math.all(transportJobDatas[i].ResourcePosition == float3.zero))
+                continue;
+            
+            closestPositionArray[0] = -1;
             var job = new FindClosestPositionJob
             {
                 CitizenTranslations = idleCitizenTranslations,
@@ -87,6 +91,9 @@ public class ResourceTransportJobAssignmentSystem : SystemBase
             CommandBuffer.RemoveComponent<IdleTag>(citizen);
 
             CommandBuffer.DestroyEntity(transportJobEntities[i]);
+
+            // Prevents the same entity from being uses twice
+            idleCitizenTranslations[closestPositionArray[0]] = new Translation { };
         }
 
         closestPositionArray.Dispose();
