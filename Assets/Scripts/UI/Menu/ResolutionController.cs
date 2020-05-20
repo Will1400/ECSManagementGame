@@ -13,9 +13,20 @@ public class ResolutionController : MonoBehaviour
     private void Start()
     {
         resolutions = Screen.resolutions;
+        var currentResolution = Screen.currentResolution;
 
         dropdown.ClearOptions();
         dropdown.AddOptions(resolutions.Select(x => x.ToString()).ToList());
+
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            if (resolutions[i].height == currentResolution.height && resolutions[i].width == currentResolution.width)
+            {
+                dropdown.SetValueWithoutNotify(i);
+                dropdown.RefreshShownValue();
+                break;
+            }
+        }
     }
 
     public void SetResolution(int valueIndex)
@@ -23,7 +34,5 @@ public class ResolutionController : MonoBehaviour
         var resolution = resolutions[valueIndex];
 
         Screen.SetResolution(resolution.width, resolution.height, FullScreenMode.FullScreenWindow);
-        Debug.Log(Screen.currentResolution);
-        
     }
 }

@@ -25,6 +25,11 @@ public class ValueSelector : MonoBehaviour
         valueText.text = Values[CurrentIndex];
     }
 
+    public void UpdateDisplayedText()
+    {
+        valueText.text = Values[CurrentIndex % Values.Length];
+    }
+
     public void SelectNext()
     {
         CurrentIndex++;

@@ -28,4 +28,11 @@ public class TextureQualitySettingController : GraphicsControllerBase
     {
     }
 
+    public override void ConfigLoaded()
+    {
+    }
+
+    public override void ConfigChanged()
+    {
+    }
 }
