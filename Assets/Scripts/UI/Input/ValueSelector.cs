@@ -9,31 +9,36 @@ public class ValueSelector : MonoBehaviour
     public UnityEvent<int> OnValueChanged;
 
     public string[] Values;
+    public int CurrentIndex;
 
     [SerializeField]
     private TextMeshProUGUI valueText;
 
-    int currentIndex;
 
-    private void Start()
+    private void Awake()
     {
         OnValueChanged = new UnityEvent<int>();
     }
 
+    private void Start()
+    {
+        valueText.text = Values[CurrentIndex];
+    }
+
     public void SelectNext()
     {
-        currentIndex++;
+        CurrentIndex++;
 
-        valueText.text = Values[currentIndex % Values.Length];
+        valueText.text = Values[CurrentIndex % Values.Length];
     }
 
     public void SelectPrevious()
     {
-        currentIndex--;
+        CurrentIndex--;
 
-        if (currentIndex < 0)
-            currentIndex = Values.Length - 1;
+        if (CurrentIndex < 0)
+            CurrentIndex = Values.Length - 1;
 
-        valueText.text = Values[currentIndex % Values.Length];
+        valueText.text = Values[CurrentIndex % Values.Length];
     }
 }

@@ -13,7 +13,7 @@ public class PauseMenuUIManager : MonoBehaviour
     [SerializeField]
     GameObject menuPanel;
     [SerializeField]
-    Image backgroundOverlay;
+    GameObject graphicSettingsPanel;
 
     SelectionWindowUISystem windowSystem;
 
@@ -35,30 +35,52 @@ public class PauseMenuUIManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape) && !BuildUIManager.Instance.IsActive &&
             (GameManager.Instance.CursorState == CursorState.None || GameManager.Instance.CursorState == CursorState.Menu))
         {
-            ToggleWindow();
+            MenuAwareBack();
         }
     }
 
-
-    public void CloseWindow()
+    public void ClosePanel(GameObject panel)
     {
-        GameManager.Instance.CursorState = CursorState.None;
-        menuPanel.transform.DOScale(.1f, .1f);
-        pauseMenuPanel.SetActive(false);
+        panel.transform.localScale = Vector3.zero;
+        panel.SetActive(false);
     }
 
-    public void OpenWindow()
+    public void OpenPanel(GameObject panel)
     {
+        if (!pauseMenuPanel.activeSelf)
+            pauseMenuPanel.SetActive(true);
+
         GameManager.Instance.CursorState = CursorState.Menu;
-        pauseMenuPanel.SetActive(true);
-        menuPanel.transform.DOScale(1, .2f);
+        panel.SetActive(true);
+        panel.transform.DOScale(1, .2f);
+    }
+
+
+    void MenuAwareBack()
+    {
+        if (graphicSettingsPanel.activeSelf)
+        {
+            ClosePanel(graphicSettingsPanel);
+            //ClosePanel(graphicSettingsPanel);
+            OpenPanel(menuPanel);
+        }
+        else
+        {
+            ToggleWindow();
+        }
     }
 
     public void ToggleWindow()
     {
         if (pauseMenuPanel.activeSelf)
-            CloseWindow();
+        {
+            GameManager.Instance.CursorState = CursorState.None;
+            menuPanel.transform.DOScale(.1f, .1f);
+            pauseMenuPanel.SetActive(false);
+        }
         else
-            OpenWindow();
+        {
+            OpenPanel(menuPanel);
+        }
     }
 }

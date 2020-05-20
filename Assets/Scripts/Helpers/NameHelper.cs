@@ -11,6 +11,7 @@ public class NameHelper : MonoBehaviour
 
     public static string GetName(Gender gender)
     {
+        Resources.Load<TextAsset>("Text/Names/MaleNames");
         string path = "";
         if (gender == Gender.Male)
         {

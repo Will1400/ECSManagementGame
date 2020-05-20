@@ -11,10 +11,11 @@ public class QualityPresetController : MonoBehaviour
     [SerializeField]
     ValueSelector valueSelector;
 
-    private void Start()
+    private void Awake()
     {
         OnPresetChanged = new UnityEvent<int>();
         valueSelector.Values = QualitySettings.names;
+        valueSelector.CurrentIndex = QualitySettings.GetQualityLevel();
     }
 
     public void SetQuality(int level)
