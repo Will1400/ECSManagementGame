@@ -7,12 +7,10 @@ using Unity.Collections;
 [UpdateAfter(typeof(EntityArrivedAtFoodSystem))]
 public class FoodConsumptionSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
     EntityQuery consumptionDataQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
 
         consumptionDataQuery = GetEntityQuery(new EntityQueryDesc
         {
@@ -25,7 +23,7 @@ public class FoodConsumptionSystem : SystemBase
         if (consumptionDataQuery.CalculateChunkCount() == 0)
             return;
 
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         var consumptionData = consumptionDataQuery.ToComponentDataArray<ConsumeFoodData>(Allocator.TempJob);
 
@@ -45,7 +43,7 @@ public class FoodConsumptionSystem : SystemBase
         }).Run();
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
 
         consumptionData.Dispose();
     }

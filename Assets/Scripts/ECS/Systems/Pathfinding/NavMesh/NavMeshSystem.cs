@@ -33,12 +33,8 @@ public class NavMeshSystem : SystemBase
     EntityQuery obstacleQuery;
     EntityQuery surfaceQuery;
 
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         navMeshData = new NavMeshData();
         navMeshDataInstance = NavMesh.AddNavMeshData(navMeshData);
         bounds = new Bounds(Vector3.zero, new Vector3(5000, 256, 5000));
@@ -63,7 +59,7 @@ public class NavMeshSystem : SystemBase
     {
         remainingTimeUntilUpdateAvailable -= Time.DeltaTime;
 
-        var commandBuffer = bufferSystem.CreateCommandBuffer();
+        var commandBuffer = new EntityCommandBuffer(Allocator.TempJob); ;
         Entities.WithNone<NavMeshSourceHasSizeTag>().ForEach((Entity entity, ref LocalToWorld localToWorld, ref NavMeshObstacle obstacleData) =>
         {
             if (obstacleData.Size.Equals(float3.zero))
@@ -90,6 +86,9 @@ public class NavMeshSystem : SystemBase
             commandBuffer.AddComponent<NavMeshSourceHasSizeTag>(entity);
 
         }).WithoutBurst().Run();
+
+        commandBuffer.Playback(EntityManager);
+        commandBuffer.Dispose();
 
         if (sourceQueue.Count > 0)
             sourceQueue.Clear();

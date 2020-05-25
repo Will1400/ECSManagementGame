@@ -6,13 +6,6 @@ using Unity.Collections;
 [UpdateAfter(typeof(FoodConsumptionSystem))]
 public class FoodConsumptionCleanupSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
-    protected override void OnCreate()
-    {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-    }
-
     protected override void OnUpdate()
     {
         var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob) ;

@@ -6,14 +6,10 @@ using Unity.Burst;
 
 public class CitizenFamilyCreationSystem : SystemBase
 {
-    EndSimulationEntityCommandBufferSystem bufferSystem;
-
     EntityQuery citizensWithoutFamilyQuery;
 
     protected override void OnCreate()
     {
-        bufferSystem = World.DefaultGameObjectInjectionWorld.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-
         citizensWithoutFamilyQuery = GetEntityQuery(new EntityQueryDesc
         {
             All = new ComponentType[] { typeof(Citizen) },
@@ -26,7 +22,7 @@ public class CitizenFamilyCreationSystem : SystemBase
         if (citizensWithoutFamilyQuery.CalculateEntityCount() == 0)
             return;
 
-        var CommandBuffer = bufferSystem.CreateCommandBuffer();
+        var CommandBuffer = new EntityCommandBuffer(Allocator.TempJob);
 
         var citizenEntites = citizensWithoutFamilyQuery.ToEntityArray(Allocator.TempJob);
         var citizenDatas = citizensWithoutFamilyQuery.ToComponentDataArray<Citizen>(Allocator.TempJob);
@@ -75,7 +71,7 @@ public class CitizenFamilyCreationSystem : SystemBase
         }
 
         CommandBuffer.Playback(EntityManager);
-        CommandBuffer.ShouldPlayback = false;
+        CommandBuffer.Dispose();
 
         citizenEntites.Dispose();
         citizenDatas.Dispose();
