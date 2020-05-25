@@ -24,6 +24,9 @@ public class CitySpawner : MonoBehaviour
         EntityManager.AddComponentData(entityPrefab, new ConstructionData { TotalConstructionTime = 4, RemainingConstructionTime = 4, FinishedPrefabName = PrefabName });
 
         NativeArray<Entity> constructionSites = EntityManager.Instantiate(entityPrefab, count, Allocator.Temp);
+
+        EntityManager.DestroyEntity(entityPrefab);
+
         int columnCount = (int)math.round(math.sqrt(count));
 
         for (int i = 0; i < constructionSites.Length; i++)
