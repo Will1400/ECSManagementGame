@@ -11,7 +11,10 @@ public abstract class GraphicsControllerBase : MonoBehaviour
         GraphicConfigManager.Instance.OnConfigChanged += ConfigChanged;
     }
 
-    public abstract void PresetChanged(int level);
+    public virtual void PresetChanged(int level)
+    {
+
+    }
 
     public virtual void ConfigLoaded()
     {

@@ -10,6 +10,12 @@ public class AntiAliasingSettingController : GraphicsControllerBase
     [SerializeField]
     ValueSelector valueSelector;
 
+    protected override void Start()
+    {
+        base.Start();
+        ApplyChanges();
+    }
+
     public override void ConfigLoaded()
     {
         ApplyChanges();

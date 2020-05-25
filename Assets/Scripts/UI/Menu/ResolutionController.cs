@@ -33,6 +33,6 @@ public class ResolutionController : MonoBehaviour
     {
         var resolution = resolutions[valueIndex];
 
-        Screen.SetResolution(resolution.width, resolution.height, FullScreenMode.FullScreenWindow);
+        Screen.SetResolution(resolution.width, resolution.height, (FullScreenMode)GraphicConfigManager.Instance.GraphicConfiguration["Display"]["FullScreenMode"].IntValue);
     }
 }

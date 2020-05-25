@@ -17,7 +17,7 @@ public class GraphicConfigManager : MonoBehaviour
 
     string configFile = "/Graphics.config";
 
-    float configVersion = 0.1f;
+    float configVersion = 0.2f;
 
     private void Awake()
     {
@@ -25,11 +25,7 @@ public class GraphicConfigManager : MonoBehaviour
             Instance = this;
         else
             Destroy(this);
-    }
 
-
-    private void Start()
-    {
         if (File.Exists(Application.persistentDataPath + configFile))
         {
             LoadConfig();
@@ -43,11 +39,11 @@ public class GraphicConfigManager : MonoBehaviour
     public void CreateNewConfig()
     {
         var config = new Configuration();
-        config["Version"]["ConfigVersion"].FloatValue = 0.1f;
+        config["Version"]["ConfigVersion"].FloatValue = configVersion;
 
         config["Display"]["ResolutionWidth"].IntValue = 1920;
         config["Display"]["ResolutionHeight"].IntValue = 1080;
-        config["Display"]["FullScreenMode"].IntValue = 0;
+        config["Display"]["FullScreenMode"].IntValue = 3;
 
         config.Add(Section.FromObject("AntiAliasing", new AntiAliasingInfo { AntiAliasingQuality = AntiAliasingQuality.Medium, AntialiasingMode = 1 }));
         SaveConfig();
