@@ -4,26 +4,35 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class NameHelper : MonoBehaviour
 {
+    static string[] maleNames;
+    static string[] femaleNames;
+
 
     public static string GetName(Gender gender)
     {
-        Resources.Load<TextAsset>("Text/Names/MaleNames");
-        string path = "";
+        if (maleNames == null)
+        {
+            var textAsset = Resources.Load<TextAsset>("Text/Names/MaleNames");
+            maleNames = textAsset.text.Split(',').Select(x => x.Trim()).ToArray();
+        }
+        if (femaleNames == null)
+        {
+            var textAsset = Resources.Load<TextAsset>("Text/Names/FemaleNames");
+            femaleNames = textAsset.text.Split(',').Select(x => x.Trim()).ToArray();
+        }
+
         if (gender == Gender.Male)
         {
-            path = @"Assets\Resources\Text\Names\MaleNames.csv";
+            return maleNames[Random.Range(0, maleNames.Length)];
         }
         else if (gender == Gender.Female)
         {
-            path = @"Assets\Resources\Text\Names\FemaleNames.csv";
-
+            return femaleNames[Random.Range(0, maleNames.Length)];
         }
 
-        var name = File.ReadLines(path).Skip(Random.Range(0, 1000)).First().Split(',').First();
-        return name;
+        return string.Empty;
     }
 }
