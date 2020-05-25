@@ -17,7 +17,8 @@ public class ValueSelector : MonoBehaviour
 
     private void Awake()
     {
-        OnValueChanged = new UnityEvent<int>();
+        if (OnValueChanged == null)
+            OnValueChanged = new UnityEvent<int>();
     }
 
     private void Start()
@@ -33,8 +34,10 @@ public class ValueSelector : MonoBehaviour
     public void SelectNext()
     {
         CurrentIndex++;
+        CurrentIndex %= Values.Length;
 
-        valueText.text = Values[CurrentIndex % Values.Length];
+        valueText.text = Values[CurrentIndex];
+        OnValueChanged.Invoke(CurrentIndex);
     }
 
     public void SelectPrevious()
@@ -45,5 +48,6 @@ public class ValueSelector : MonoBehaviour
             CurrentIndex = Values.Length - 1;
 
         valueText.text = Values[CurrentIndex % Values.Length];
+        OnValueChanged.Invoke(CurrentIndex);
     }
 }

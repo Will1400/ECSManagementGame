@@ -26,19 +26,16 @@ public class AntiAliasingSettingController : GraphicsControllerBase
 
     public void ChangeLevel(int level)
     {
-        GraphicConfigManager.Instance.UpdateConfigSetting("AntiAliasing", "AntialiasingMode", (HDAdditionalCameraData.AntialiasingMode)level);
-        Debug.Log("Updating AA to: " + (HDAdditionalCameraData.AntialiasingMode)level);
+        GraphicConfigManager.Instance.UpdateConfigSetting("AntiAliasing", "AntialiasingMode", level);
     }
-
-
 
     public void ApplyChanges()
     {
         var cameraData = Camera.main.GetComponent<HDAdditionalCameraData>();
-        var antiAliasingInfo = GraphicConfigManager.Instance.GraphicConfiguration["AntiAliasing"].ToObject<AntiAliasingInfo>();
-        cameraData.antialiasing = antiAliasingInfo.AntialiasingMode;
+        int mode = GraphicConfigManager.Instance.GraphicConfiguration["AntiAliasing"]["AntiAliasingMode"].IntValue;
+        cameraData.antialiasing = (HDAdditionalCameraData.AntialiasingMode)mode;
 
-        valueSelector.CurrentIndex = (int)antiAliasingInfo.AntialiasingMode;
+        valueSelector.CurrentIndex = mode;
         valueSelector.UpdateDisplayedText();
     }
 

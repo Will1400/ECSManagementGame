@@ -6,7 +6,7 @@ namespace WHK.Config
 {
     public struct AntiAliasingInfo
     {
-        public HDAdditionalCameraData.AntialiasingMode AntialiasingMode;
+        public int AntialiasingMode;
         public AntiAliasingQuality AntiAliasingQuality;
     }
 }

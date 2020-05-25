@@ -15,8 +15,11 @@ public class TextureQualitySettingController : GraphicsControllerBase
         2048
     };
 
-    private void Start()
+    
+    protected override void Start()
     {
+        base.Start();
+
         valueSelector.Values = textureSizes.Select(x => x.ToString()).ToArray();
     }
 

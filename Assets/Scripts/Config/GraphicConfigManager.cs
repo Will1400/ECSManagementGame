@@ -25,7 +25,11 @@ public class GraphicConfigManager : MonoBehaviour
             Instance = this;
         else
             Destroy(this);
+    }
 
+
+    private void Start()
+    {
         if (File.Exists(Application.persistentDataPath + configFile))
         {
             LoadConfig();
@@ -45,14 +49,13 @@ public class GraphicConfigManager : MonoBehaviour
         config["Display"]["ResolutionHeight"].IntValue = 1080;
         config["Display"]["FullScreenMode"].IntValue = 0;
 
-        config.Add(Section.FromObject("AntiAliasing", new AntiAliasingInfo { AntiAliasingQuality = AntiAliasingQuality.Medium }));
+        config.Add(Section.FromObject("AntiAliasing", new AntiAliasingInfo { AntiAliasingQuality = AntiAliasingQuality.Medium, AntialiasingMode = 1 }));
         SaveConfig();
     }
 
     public void UpdateConfigSetting(string section, string name, object value)
     {
         GraphicConfiguration[section][name].SetValue(value);
-        Debug.Log("Updated Config");
         ApplyChanges();
     }
 
@@ -71,7 +74,6 @@ public class GraphicConfigManager : MonoBehaviour
     public void SaveConfig()
     {
         GraphicConfiguration.SaveToFile(Application.persistentDataPath + configFile);
-        Debug.Log("Saved Config");
         OnConfigSaved?.Invoke();
     }
 }
